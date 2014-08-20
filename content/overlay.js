@@ -43,8 +43,22 @@ function kcexCallback(request, content) {
 			log("ndock: " + kcex.repair[i].api_id + ": " + kcex.repair[i].api_complete_time);
 		}
 	} else if (url.indexOf("/destroyship") != -1) {
-			kcex.ship_num--;
-	} else {
+		kcex.ship_num--;
+		log("destroyship: " + String(kcex.ship_num) + " ships");
+	} else if (url.indexOf("/api_start2") != -1) {
+		var mst_ship = json.api_data.api_mst_ship;
+		var master = {};
+		for (var i = 0, ship; ship = mst_ship[i]; i++) {
+			master[ship.api_id] = {
+				ship_id: ship.api_id,
+				name: ship.api_name
+			};
+		}
+		kcex.ship_master = master;
+		kcex.putStorage("ship_master", JSON.stringify(master));
+		log("ship_master parsed");
+		return;
+	} else { // ship2 or port
 		var port = url.indexOf("/port") != -1;
 		log("etc: port=" + port);
 		var data_list = port ? json.api_data.api_ship : json.api_data;
@@ -73,8 +87,8 @@ function kcexCallback(request, content) {
 				nowhp: data.api_nowhp,
 				maxhp: data.api_maxhp
 			};
-			if (data.api_ship_name) {
-				ship_list[api_id].name = data.api_ship_name;
+			if (kcex.ship_master[data.api_ship_id]) {
+				ship_list[api_id].name = kcex.ship_master[data.api_ship_id].name;
 			}
 		}
 		kcex.ship_num = i;
@@ -174,7 +188,7 @@ function kcexCallback(request, content) {
 				} else if (ship.c_cond >= 50) {
 					scd = "<font color='#0d0'>" + scd + "</font>";
 				}
-				var sid = " " + (ship.name ? ship.name : "") + "(" + ship.ship_id + ")";
+				var sid = " <b>" + (ship.name ? ship.name : "") + "</b>(" + ship.ship_id + ")";
 				r.push(s + shp + scd + sid);
 			}
 		}
@@ -242,8 +256,8 @@ var kcexHttpObserver = {
 
 		var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
 		var path = httpChannel.URI.path;
-		if (path.indexOf("/kcsapi/api_get_member/") != -1 || path.indexOf("/kcsapi/api_port/") != -1 || path.indexOf("/kcsapi/api_req_kousyou/") != -1) {
-			if (path.indexOf("/ship2") != -1 || path.indexOf("/port") != -1 || path.indexOf("/deck_port") != -1 || path.indexOf("/deck") != -1 || path.indexOf("/kdock") != -1 || path.indexOf("/getship") != -1 || path.indexOf("/ndock") != -1 || path.indexOf("/destroyship") != -1) {
+		if (path.indexOf("/kcsapi/api_get_member/") != -1 || path.indexOf("/kcsapi/api_port/") != -1 || path.indexOf("/kcsapi/api_req_kousyou/") != -1 || path.indexOf("/kcsapi/api_start2") != -1) {
+			if (path.indexOf("/api_start2") != -1 || path.indexOf("/ship2") != -1 || path.indexOf("/port") != -1 || path.indexOf("/deck_port") != -1 || path.indexOf("/deck") != -1 || path.indexOf("/kdock") != -1 || path.indexOf("/getship") != -1 || path.indexOf("/ndock") != -1 || path.indexOf("/destroyship") != -1) {
 				log("create TracingListener");
 				var newListener = new TracingListener();
 				aSubject.QueryInterface(Ci.nsITraceableChannel);
@@ -258,6 +272,7 @@ var kcexHttpObserver = {
 var kcex = {
 	div: null,
 	storage: null,
+	ship_master: {},
 	ship_list: {},
 	mission: [],
 	repair: [],
@@ -275,7 +290,11 @@ var kcex = {
 		var uri = ios.newURI(url, "", null);
 		var principal = ssm.getCodebasePrincipal(uri);
 		kcex.storage = dsm.getLocalStorageForPrincipal(principal, "");
-		
+
+		var s = kcex.getStorage("ship_master");
+		if (s) {
+			kcex.ship_master = JSON.parse(s);
+		}
 		var s = kcex.getStorage("ship_list");
 		if (s) {
 			kcex.ship_list = JSON.parse(s);

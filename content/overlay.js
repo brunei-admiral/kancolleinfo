@@ -317,7 +317,7 @@ var kcex = {
 		else if (url.match(/\/app_id=854854\//)) {
 			var game_frame = event.originalTarget.getElementById('game_frame');
 			if (game_frame) {
-				game_frame.style.width = '950px';
+				game_frame.style.width = '970px';
 			}
 		}
 	},

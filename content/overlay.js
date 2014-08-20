@@ -33,18 +33,22 @@ function kcexCallback(request, content) {
 			kcex.build[i] = dock;
 			log("kdock: " + kcex.build[i].api_id + ": " + kcex.build[i].api_complete_time);
 		}
+		if (url.indexOf("/getship") != -1) {
+			kcex.ship_num++;
+		}
 	} else if (url.indexOf("/ndock") != -1) {
 		var dock_list = json.api_data;
 		for (var i = 0, dock; dock = dock_list[i]; i++) {
 			kcex.repair[i] = dock;
 			log("ndock: " + kcex.repair[i].api_id + ": " + kcex.repair[i].api_complete_time);
 		}
+	} else if (url.indexOf("/destroyship") != -1) {
+			kcex.ship_num--;
 	} else {
 		var port = url.indexOf("/port") != -1;
-		var ship3 = url.indexOf("/ship3") != -1
-		log("etc: port=" + port + ", ship3 = " + ship3);
-		var data_list = port ? json.api_data.api_ship : ship3 ? json.api_data.api_ship_data : json.api_data;
-		var deck_list = port ? json.api_data.api_deck_port : ship3 ? json.api_data.api_deck_data: json.api_data_deck;
+		log("etc: port=" + port);
+		var data_list = port ? json.api_data.api_ship : json.api_data;
+		var deck_list = port ? json.api_data.api_deck_port : json.api_data_deck;
 		if (port) {
 			for (var i = 0, deck; deck = deck_list[i]; i++) {
 				kcex.mission[i] = deck.api_mission[2];
@@ -73,9 +77,7 @@ function kcexCallback(request, content) {
 				ship_list[api_id].name = data.api_ship_name;
 			}
 		}
-		if (!ship3) {
-			kcex.ship_num = i;
-		}
+		kcex.ship_num = i;
 
 		kcex.ship_list = ship_list;
 		kcex.putStorage("ship_list", JSON.stringify(ship_list));
@@ -241,7 +243,7 @@ var kcexHttpObserver = {
 		var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
 		var path = httpChannel.URI.path;
 		if (path.indexOf("/kcsapi/api_get_member/") != -1 || path.indexOf("/kcsapi/api_port/") != -1 || path.indexOf("/kcsapi/api_req_kousyou/") != -1) {
-			if (path.indexOf("/ship2") != -1 || path.indexOf("/ship3") != -1 || path.indexOf("/port") != -1 || path.indexOf("/deck_port") != -1 || path.indexOf("/deck") != -1 || path.indexOf("/kdock") != -1 || path.indexOf("/getship") != -1 || path.indexOf("/ndock") != -1) {
+			if (path.indexOf("/ship2") != -1 || path.indexOf("/port") != -1 || path.indexOf("/deck_port") != -1 || path.indexOf("/deck") != -1 || path.indexOf("/kdock") != -1 || path.indexOf("/getship") != -1 || path.indexOf("/ndock") != -1 || path.indexOf("/destroyship") != -1) {
 				log("create TracingListener");
 				var newListener = new TracingListener();
 				aSubject.QueryInterface(Ci.nsITraceableChannel);

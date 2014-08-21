@@ -126,7 +126,9 @@ function kcexCallback(request, content, query) {
 			} else if (dt.getTime() - 60000 <= now) {
 				s = "<font color='#c60'>" + s + "</font>";
 			}
-			r.push(s);
+			var ship = kcex.ship_list[kcex.build[i].api_ship_id];
+			var sid = " <b>" + ((ship && ship.name) ? ship.name : "") + "</b>(" + ((ship && ship.ship_id) ? ship.ship_id : "") + ")";
+			r.push(s + sid);
 		}
 	}
 	p.push(r);
@@ -143,7 +145,9 @@ function kcexCallback(request, content, query) {
 			} else if (dt.getTime() - 60000 <= now) {
 				s = "<font color='#c60'>" + s + "</font>";
 			}
-			r.push(s);
+			var ship = kcex.ship_list[kcex.repair[i].api_ship_id];
+			var sid = " <b>" + ((ship && ship.name) ? ship.name : "") + "</b>(" + ((ship && ship.ship_id) ? ship.ship_id : "") + ")";
+			r.push(s + sid);
 		}
 	}
 	p.push(r);

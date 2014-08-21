@@ -1,3 +1,5 @@
+// derived from http://vcraft.jp/soft/kancolle.html 0.2 by c.mos
+//
 // original code: https://github.com/kageroh/cond_checker
 // references:
 //	http://d.hatena.ne.jp/teramako/20120215/p1
@@ -17,7 +19,7 @@ function time2str(dt) {
 	return s;
 }
 
-function kcexCallback(request, content) {
+function kcexCallback(request, content, query) {
 	var url = request.name;
 	var n = content.indexOf("=");
 	var json = JSON.parse(content.substring(n + 1));
@@ -197,6 +199,45 @@ function kcexCallback(request, content) {
 	kcex.render(p);
 }
 
+function parseQuery(query) {
+	var vars = query.split("&");
+	var result = {};
+	for (var i = 0; i < vars.length; i++) {
+		var pair = vars[i].split("=");
+		log("query: " + pair[0] + " = " + pair[1]);
+		result[pair[0]] = pair[1];
+	}
+	return result;
+}
+
+// Helper function to read post text (from Firebug)
+function readPostTextFromRequest(request, context) {
+  try {
+    var stream = request.uploadStream;
+
+    var offset = stream.tell();
+    stream.seek(0, 0);
+
+    var sis = Cc["@mozilla.org/scriptableinputstream;1"].createInstance(Ci.nsIScriptableInputStream);
+    sis.init(stream);
+
+    var segments = [];
+    for (var count = stream.available(); count; count = stream.available()) {
+        segments.push(sis.readBytes(count));
+    }
+
+    var text = segments.join("");
+
+    stream.seek(0, offset);
+
+    return text;
+  }
+  catch (exc) {
+    log("readPostTextFromRequest failed: " + exc.toString());
+  }
+  return null;
+}
+
 // Helper function for XPCOM instanciation (from Firebug)
 function CCIN(cName, ifaceName) {
 	return Cc[cName].createInstance(Ci[ifaceName]);
@@ -232,11 +273,18 @@ TracingListener.prototype = {
 	},
 
 	onStopRequest: function(request, context, statusCode) {
+		var query = null;
+		if (request.requestMethod.toLowerCase() == "post") {
+			var postText = readPostTextFromRequest(request, context);
+			if (postText) {
+				query = parseQuery(String(postText));
+			}
+		}
 		this.originalListener.onStopRequest(request, context, statusCode);
 		// Get entire response
 		var responseSource = this.receivedData.join("");
 
-		kcexCallback(request, responseSource);
+		kcexCallback(request, responseSource, query);
 	},
 
 	QueryInterface: function(aIID) {

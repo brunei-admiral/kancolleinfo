@@ -47,6 +47,9 @@ function kcexCallback(request, content, query) {
 	} else if (url.indexOf("/destroyship") != -1) {
 		kcex.ship_num--;
 		log("destroyship: " + String(kcex.ship_num) + " ships");
+	} else if (url.indexOf("/powerup") != -1) {
+		kcex.ship_num -= query["api_id_items"].split(",").length;
+		log("powerup: " + String(kcex.ship_num) + " ships");
 	} else if (url.indexOf("/api_start2") != -1) {
 		var mst_ship = json.api_data.api_mst_ship;
 		var master = {};
@@ -203,20 +206,24 @@ function parseQuery(query) {
 	var vars = query.split("&");
 	var result = {};
 	for (var i = 0; i < vars.length; i++) {
-		var pair = vars[i].split("=");
-		log("query: " + pair[0] + " = " + pair[1]);
-		result[pair[0]] = pair[1];
+		var pair = vars[i].split("=", 2);
+		var key = pair[0].replace(/%([0-9A-F][0-9A-F])/gi, function(a, s){return String.fromCharCode(parseInt(s, 16));});
+		var val = pair[1].replace(/%([0-9A-F][0-9A-F])/gi, function(a, s){return String.fromCharCode(parseInt(s, 16));});
+		result[key] = val;
+		//log("query: " + key + " = " + val);
 	}
 	return result;
 }
 
-// Helper function to read post text (from Firebug)
+// Helper function to read post text (derived from Firebug)
 function readPostTextFromRequest(request, context) {
   try {
-    var stream = request.uploadStream;
+    var channel = request.QueryInterface(Ci.nsIUploadChannel);
+    var stream = channel.uploadStream;
+    var ss = stream.QueryInterface(Ci.nsISeekableStream);
 
     var offset = stream.tell();
-    stream.seek(0, 0);
+    ss.seek(Ci.nsISeekableStream.NS_SEEK_SET, 0);
 
     var sis = Cc["@mozilla.org/scriptableinputstream;1"].createInstance(Ci.nsIScriptableInputStream);
     sis.init(stream);
@@ -228,7 +235,12 @@ function readPostTextFromRequest(request, context) {
 
     var text = segments.join("");
 
-    stream.seek(0, offset);
+    ss.seek(Ci.nsISeekableStream.NS_SEEK_SET, offset);
+
+    var index = text.indexOf("\r\n\r\n");
+    if (index != -1) {
+      text = text.substring(index + 4);
+    }
 
     return text;
   }
@@ -277,6 +289,7 @@ TracingListener.prototype = {
 		if (request.requestMethod.toLowerCase() == "post") {
 			var postText = readPostTextFromRequest(request, context);
 			if (postText) {
+				log("URL: " + request.name);
 				query = parseQuery(String(postText));
 			}
 		}
@@ -304,8 +317,8 @@ var kcexHttpObserver = {
 
 		var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
 		var path = httpChannel.URI.path;
-		if (path.indexOf("/kcsapi/api_get_member/") != -1 || path.indexOf("/kcsapi/api_port/") != -1 || path.indexOf("/kcsapi/api_req_kousyou/") != -1 || path.indexOf("/kcsapi/api_start2") != -1) {
-			if (path.indexOf("/api_start2") != -1 || path.indexOf("/ship2") != -1 || path.indexOf("/port") != -1 || path.indexOf("/deck_port") != -1 || path.indexOf("/deck") != -1 || path.indexOf("/kdock") != -1 || path.indexOf("/getship") != -1 || path.indexOf("/ndock") != -1 || path.indexOf("/destroyship") != -1) {
+		if (path.indexOf("/kcsapi/api_get_member/") != -1 || path.indexOf("/kcsapi/api_port/") != -1 || path.indexOf("/kcsapi/api_req_kousyou/") != -1 || path.indexOf("/kcsapi/api_req_kaisou/") != -1 || path.indexOf("/kcsapi/api_start2") != -1) {
+			if (path.indexOf("/api_start2") != -1 || path.indexOf("/ship2") != -1 || path.indexOf("/port") != -1 || path.indexOf("/deck_port") != -1 || path.indexOf("/deck") != -1 || path.indexOf("/kdock") != -1 || path.indexOf("/getship") != -1 || path.indexOf("/ndock") != -1 || path.indexOf("/destroyship") != -1 || path.indexOf("/powerup") != -1) {
 				log("create TracingListener");
 				var newListener = new TracingListener();
 				aSubject.QueryInterface(Ci.nsITraceableChannel);

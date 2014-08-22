@@ -19,6 +19,10 @@ function time2str(dt) {
 	return s;
 }
 
+function ship2str(ship) {
+	return "<b>" + ((ship && ship.name) ? ship.name : "") + "</b><font color=\"#888\">(" + ((ship && ship.ship_id) ? ship.ship_id : "") + ")</font>";
+}
+
 function kcexCallback(request, content, query) {
 	var url = request.name;
 	var n = content.indexOf("=");
@@ -126,9 +130,7 @@ function kcexCallback(request, content, query) {
 			} else if (dt.getTime() - 60000 <= now) {
 				s = "<font color='#c60'>" + s + "</font>";
 			}
-			var ship = kcex.ship_list[kcex.build[i].api_ship_id];
-			var sid = " <b>" + ((ship && ship.name) ? ship.name : "") + "</b>(" + ((ship && ship.ship_id) ? ship.ship_id : "") + ")";
-			r.push(s + sid);
+			r.push(s + " " + ship2str(kcex.build[i].api_created_ship_id));
 		}
 	}
 	p.push(r);
@@ -145,9 +147,7 @@ function kcexCallback(request, content, query) {
 			} else if (dt.getTime() - 60000 <= now) {
 				s = "<font color='#c60'>" + s + "</font>";
 			}
-			var ship = kcex.ship_list[kcex.repair[i].api_ship_id];
-			var sid = " <b>" + ((ship && ship.name) ? ship.name : "") + "</b>(" + ((ship && ship.ship_id) ? ship.ship_id : "") + ")";
-			r.push(s + sid);
+			r.push(s + " " + ship2str(kcex.ship_list[kcex.repair[i].api_ship_id]));
 		}
 	}
 	p.push(r);
@@ -197,8 +197,7 @@ function kcexCallback(request, content, query) {
 				} else if (ship.c_cond >= 50) {
 					scd = "<font color='#0d0'>" + scd + "</font>";
 				}
-				var sid = " <b>" + (ship.name ? ship.name : "") + "</b>(" + ship.ship_id + ")";
-				r.push(s + shp + scd + sid);
+				r.push(s + shp + scd + " " + ship2str(ship));
 			}
 		}
 		p.push(r);

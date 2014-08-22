@@ -20,7 +20,10 @@ function time2str(dt) {
 }
 
 function ship2str(ship) {
-  return "<b>" + ((ship && ship.name) ? ship.name : "") + "</b><font color=\"#888\">(" + ((ship && ship.ship_id) ? ship.ship_id : "") + ")</font>";
+  if (!ship || !ship.ship_id) {
+    return "";
+  }
+  return "<b>" + (ship.name ? ship.name : "(" + ship.ship_id + ")") + "</b>(" + (ship.level ? ship.level : 1) + ")";
 }
 
 function kouku_damage(deck, kouku)
@@ -29,9 +32,11 @@ function kouku_damage(deck, kouku)
     var damage_list = kouku.api_stage3.api_fdam;
     var id_list = deck.api_ship;
     for (var i = 0, id; id = id_list[i]; i++) {
-      if (damage_list[i - 1] > 0) {
+      if (damage_list[i + 1] > 0) {
+        var damage = Math.floor(damage_list[i + 1]);
+        log("ship " + (i + 1) + " damaged " + damage);
         var ship = kcex.ship_list[id.toString()];
-        ship.nowhp -= damage_list[i - 1];
+        ship.nowhp -= damage;
       }
     }
   }
@@ -42,9 +47,11 @@ function raigeki_damage(deck, raigeki)
   var damage_list = raigeki.api_fdam;
   var id_list = deck.api_ship;
   for (var i = 0, id; id = id_list[i]; i++) {
-    if (damage_list[i - 1] > 0) {
+    if (damage_list[i + 1] > 0) {
+      var damage = Math.floor(damage_list[i + 1]);
+      log("ship " + (i + 1) + " damaged " + damage);
       var ship = kcex.ship_list[id.toString()];
-      ship.nowhp -= damage_list[i - 1];
+      ship.nowhp -= damage;
     }
   }
 }
@@ -54,9 +61,11 @@ function hougeki_damage(deck, hougeki)
   for (var i = 1, t_list; t_list = hougeki.api_df_list[i]; i++) {
     for (var j = 0, target; target = t_list[j]; j++) {
       if (target >= 1 && target <= 6) {
+        var damage = Math.floor(hougeki.api_damage[i][j]);
+        log("ship " + target + " damaged " + damage);
         var id = deck.api_ship[target - 1];
         var ship = kcex.ship_list[id.toString()];
-        ship.nowhp -= hougeki.api_damage[i][j];
+        ship.nowhp -= damage;
       }
     }
   }
@@ -67,24 +76,31 @@ function damage(json) {
     for (var i = 0, deck; deck = kcex.deck_list[i]; i++) {
       if (deck.api_id == json.api_data.api_dock_id) {
         if (json.api_data.api_kouku) {
+          log("damage kouku");
           kouku_damage(deck, json.api_data.api_kouku);
         }
         if (json.api_data.api_opening_atack) {
+          log("damage opening");
           raigeki_damage(deck, json.api_data.api_opening_atack);
         }
         if (json.api_data.api_hougeki) { // midnight
-          hogeki_damage(deck, json.api_data.api_hougeki);
+          log("damage hougeki (midnight)");
+          hougeki_damage(deck, json.api_data.api_hougeki);
         }
         if (json.api_data.api_hougeki1) {
-          hogeki_damage(deck, json.api_data.api_hougeki1);
+          log("damage hougeki1");
+          hougeki_damage(deck, json.api_data.api_hougeki1);
         }
         if (json.api_data.api_hougeki2) {
-          hogeki_damage(deck, json.api_data.api_hougeki2);
+          log("damage hougeki2");
+          hougeki_damage(deck, json.api_data.api_hougeki2);
         }
         if (json.api_data.api_hougeki3) { // maybe always null
-          hogeki_damage(deck, json.api_data.api_hougeki3);
+          log("damage hougeki3");
+          hougeki_damage(deck, json.api_data.api_hougeki3);
         }
         if (json.api_data.api_raigeki) {
+          log("damage raigeki");
           raigeki_damage(deck, json.api_data.api_raigeki);
         }
         break;
@@ -104,7 +120,7 @@ function kcexCallback(request, content, query) {
     var deck_list = json.api_data;
     for (var i = 0, deck; deck = deck_list[i]; i++) {
       kcex.mission[i] = deck.api_mission[2];
-      log("deck_port: " + i + ": " + kcex.mission[i]);
+      log("deck mission: " + i + ": " + kcex.mission[i]);
     }
   } else if (url.indexOf("/kdock") != -1 || url.indexOf("/getship") != -1) {
     var dock_list = url.indexOf("/kdock") != -1 ? json.api_data : json.api_data.api_kdock;
@@ -114,6 +130,7 @@ function kcexCallback(request, content, query) {
     }
     if (url.indexOf("/getship") != -1) {
       kcex.ship_num++;
+      log("getship: " + String(kcex.ship_num) + " ships");
     }
   } else if (url.indexOf("/ndock") != -1) {
     var dock_list = json.api_data;
@@ -142,10 +159,8 @@ function kcexCallback(request, content, query) {
     return;
   } else if (url.indexOf("/battle") != -1) {
     damage(json);
-    log("battle damage");
   } else { // ship2 or port
     var port = url.indexOf("/port") != -1;
-    log("etc: port=" + port);
     var data_list = port ? json.api_data.api_ship : json.api_data;
     var deck_list = port ? json.api_data.api_deck_port : json.api_data_deck;
     if (port) {
@@ -167,6 +182,7 @@ function kcexCallback(request, content, query) {
       var ship = kcex.ship_list[api_id];
       ship_list[api_id] = {
         ship_id: data.api_ship_id,
+        level: data.api_lv,
         p_cond: ship ? ship.c_cond : 49,
         c_cond: data.api_cond,
         nowhp: data.api_nowhp,
@@ -180,7 +196,7 @@ function kcexCallback(request, content, query) {
 
     kcex.ship_list = ship_list;
     kcex.putStorage("ship_list", JSON.stringify(ship_list));
-    log(String(kcex.ship_num) + " ships");
+    log("etc: " + String(kcex.ship_num) + " ships (port=" + port + ")");
   }
 
   var p = [];
@@ -197,16 +213,23 @@ function kcexCallback(request, content, query) {
   r = []
   r.push("<b>建造</b>");
   for (var i = 0; kcex.build[i]; i++) {
-    if (kcex.build[i].api_complete_time > 0) {
-      var dt = new Date(kcex.build[i].api_complete_time);
+    if (kcex.build[i].api_complete_time > 0 || kcex.build[i].api_state == 3) {
       var now = new Date().getTime();
-      var s = kcex.build[i].api_id + ".&nbsp;" + time2str(dt);
-      if (dt.getTime() <= now) {
+      var dt;
+      var s;
+      if (kcex.build[i].api_complete_time > 0) {
+        dt = new Date(kcex.build[i].api_complete_time);
+        s = kcex.build[i].api_id + ".&nbsp;" + time2str(dt);
+      }
+      else {
+        s = "--:--";
+      }
+      if (kcex.build[i].api_complete_time <= now) {
         s = "<font color='#d00'>" + s + "</font>";
       } else if (dt.getTime() - 60000 <= now) {
         s = "<font color='#c60'>" + s + "</font>";
       }
-      r.push(s + " " + ship2str(kcex.build[i].api_created_ship_id));
+      r.push(s + " " + ship2str(kcex.ship_master[kcex.build[i].api_created_ship_id]));
     }
   }
   p.push(r);
@@ -396,8 +419,8 @@ var kcexHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.indexOf("/kcsapi/api_get_member/") != -1 || path.indexOf("/kcsapi/api_port/") != -1 || path.indexOf("/kcsapi/api_req_kousyou/") != -1 || path.indexOf("/kcsapi/api_req_kaisou/") != -1 || path.indexOf("/kcsapi/api_start2") != -1 || path.indexOf("/kcsapi/api_req_sortie") != -1 || path.indexOf("/kcsapi/api_req_battle_midnight") != -1) {
-      if (path.indexOf("/api_start2") != -1 || path.indexOf("/ship2") != -1 || path.indexOf("/port") != -1 || path.indexOf("/deck_port") != -1 || path.indexOf("/deck") != -1 || path.indexOf("/kdock") != -1 || path.indexOf("/getship") != -1 || path.indexOf("/ndock") != -1 || path.indexOf("/destroyship") != -1 || path.indexOf("/powerup") != -1 || (path.indexOf("/battle") != -1 || path.indexOf("result") == -1)) {
+    if (path.indexOf("/kcsapi/api_start2") != -1 || path.indexOf("/kcsapi/api_get_member/") != -1 || path.indexOf("/kcsapi/api_port/") != -1 || path.indexOf("/kcsapi/api_req_kousyou/") != -1 || path.indexOf("/kcsapi/api_req_kaisou/") != -1 || path.indexOf("/kcsapi/api_req_sortie/") != -1 || path.indexOf("/kcsapi/api_req_battle_midnight/") != -1) {
+      if (path.indexOf("/api_start2") != -1 || path.indexOf("/ship2") != -1 || path.indexOf("/port") != -1 || path.indexOf("/deck_port") != -1 || path.indexOf("/deck") != -1 || path.indexOf("/kdock") != -1 || path.indexOf("/getship") != -1 || path.indexOf("/ndock") != -1 || path.indexOf("/destroyship") != -1 || path.indexOf("/powerup") != -1 || (path.indexOf("/battle") != -1 && path.indexOf("result") == -1)) {
         log("create TracingListener");
         var newListener = new TracingListener();
         aSubject.QueryInterface(Ci.nsITraceableChannel);

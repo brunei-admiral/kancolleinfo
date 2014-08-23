@@ -19,11 +19,26 @@ function time2str(dt) {
   return s;
 }
 
+function hash2str(obj) {
+  var s = "";
+  for (var prop in obj) {
+    if (s.length > 0) {
+      s += "&";
+    }
+    s += prop + "=" + obj[prop];
+  }
+  return s;
+}
+
 function ship2str(ship) {
   if (!ship || !ship.ship_id) {
     return "";
   }
   return "<b>" + (ship.name ? ship.name : "(" + ship.ship_id + ")") + "</b>(" + (ship.level ? ship.level : 1) + ")";
+}
+
+function map2str(map) {
+  return map.api_maparea_id + "-" + map.api_mapinfo_no + "-" + map.api_no;
 }
 
 function kouku_damage(deck, kouku)
@@ -161,7 +176,7 @@ function kcexCallback(request, content, query) {
   if (url.indexOf("/deck_port") != -1 || url.indexOf("/deck") != -1) {
     var deck_list = json.api_data;
     for (var i = 0, deck; deck = deck_list[i]; i++) {
-      if (dec.api_mission[2] > 0) {
+      if (deck.api_mission[2] > 0) {
         kcex.mission[i] = deck.api_mission[2];
       }
       else if (!isNaN(Number(kcex.mission[i]))) {
@@ -234,6 +249,18 @@ function kcexCallback(request, content, query) {
   } else if (url.indexOf("battle") != -1) {
     log("damage: " + url);
     damage(url, json);
+  } else if (url.indexOf("_map/start") != -1) {
+    var deck = Number(query["api_deck_id"]);
+    if (deck > 0) {
+      kcex.mission[deck - 1] = "* " + map2str(json.api_data);
+    }
+  } else if (url.indexOf("_map/next") != -1) {
+    for (var i = 0, deck; deck = kcex.mission[i]; i++) {
+      if (deck && isNaN(Number(deck))) {
+        kcex.mission[i] = "* " + map2str(json.api_data);
+        break;
+      }
+    }
   } else if (url.indexOf("/ship") != -1 || url.indexOf("/port") != -1) {
     var port = url.indexOf("/port") != -1;
     var ship2 = url.indexOf("/ship2") != -1;
@@ -279,7 +306,7 @@ function kcexCallback(request, content, query) {
     log("etc: " + String(kcex.ship_num) + " ships (" + (port ? "port" : ship2 ? "ship2" : "ship3") + ")");
   }
   else {
-    log("timer(?): " + url + " , query: " + query);
+    log("timer(?): " + url + " , query: " + hash2str(query));
   }
 
   var p = [];
@@ -370,7 +397,7 @@ function kcexCallback(request, content, query) {
       r.push(s);
     }
     else if (t) {
-      r.push(t);
+      r.push("<b>" + t + "</b>");
     }
     var id_list = deck.api_ship;
     for (var j = 0, id; id = id_list[j]; j++) {

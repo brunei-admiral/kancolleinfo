@@ -85,14 +85,16 @@ function damage(url, json) {
           kouku_damage(deck, json.api_data.api_kouku.api_stage3);
           if (url.indexOf("combined") != -1 && json.api_data.api_kouku.api_stage3_combined) {
             // must be 2nd fleet
+            log("  kouku (2nd)");
             kouku_damage(kcex.deck_list[1], json.api_data.api_kouku.api_stage3_combined);
           }
         }
         if (json.api_data.api_kouku2) { // combined air battle
-          log("  kouku");
+          log("  kouku2");
           kouku_damage(deck, json.api_data.api_kouku2.api_stage3);
           if (url.indexOf("combined") != -1 && json.api_data.api_kouku2.api_stage3_combined) {
             // must be 2nd fleet
+            log("  kouku2 (2nd)");
             kouku_damage(kcex.deck_list[1], json.api_data.api_kouku2.api_stage3_combined);
           }
         }
@@ -148,9 +150,14 @@ function damage(url, json) {
 }
 
 function kcexCallback(request, content, query) {
-  var url = request.name;
-  var n = content.indexOf("=");
-  var json = JSON.parse(content.substring(n + 1));
+  if (kcex.timer) {
+    window.clearTimeout(kcex.timer);
+    kcex.timer = null;
+  }
+
+  var url = request ? request.name : "";
+  var n = content ? content.indexOf("=") : -1;
+  var json = n >= 0 ? JSON.parse(content.substring(n + 1)) : null;
   if (url.indexOf("/deck_port") != -1 || url.indexOf("/deck") != -1) {
     var deck_list = json.api_data;
     for (var i = 0, deck; deck = deck_list[i]; i++) {
@@ -222,7 +229,7 @@ function kcexCallback(request, content, query) {
   } else if (url.indexOf("battle") != -1) {
     log("damage: " + url);
     damage(url, json);
-  } else { // ship2 or port
+  } else if (url.indexOf("ship2") != -1 || url.indexOf("port") != -1) {
     var port = url.indexOf("/port") != -1;
     var data_list = port ? json.api_data.api_ship : json.api_data;
     var deck_list = port ? json.api_data.api_deck_port : json.api_data_deck;
@@ -264,6 +271,9 @@ function kcexCallback(request, content, query) {
     kcex.ship_list = ship_list;
     kcex.putStorage("ship_list", JSON.stringify(ship_list));
     log("etc: " + String(kcex.ship_num) + " ships (port=" + port + ")");
+  }
+  else {
+    log("timer(?)");
   }
 
   var p = [];
@@ -389,6 +399,12 @@ function kcexCallback(request, content, query) {
     p.push(r);
   }
   kcex.render(p);
+
+  if (kcex.timer) {
+    window.clearTimeout(kcex.timer);
+    kcex.timer = null;
+  }
+  kcex.timer = window.setTimeout(kcexCallback, 60 * 1000);
 }
 
 function parseQuery(query) {
@@ -529,6 +545,7 @@ var kcex = {
   ship_max: 0,
   item_num: 0,
   item_max: 0,
+  timer: null,
 
   init: function(event) {
     log("init");

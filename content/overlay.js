@@ -34,8 +34,8 @@ function kouku_damage(deck, kouku)
     for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
       if (damage_list[i + 1] >= 0 && (kouku.api_stage3.api_frai_flag[i + 1] > 0 || kouku.api_stage3.api_fbak_flag[i + 1] > 0)) {
         var damage = Math.floor(damage_list[i + 1]);
-        log("    ship " + (i + 1) + "(" + id.toString() + ") damaged " + damage);
-        var ship = kcex.ship_list[id.toString()];
+        log("    ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
+        var ship = kcex.ship_list[String(id)];
         ship.nowhp -= damage;
       }
     }
@@ -49,8 +49,8 @@ function raigeki_damage(deck, raigeki)
   for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
     if (damage_list[i + 1] >= 0 && raigeki.api_erai.indexOf(i + 1) != -1) {
       var damage = Math.floor(damage_list[i + 1]);
-      log("    ship " + (i + 1) + "(" + id.toString() + ") damaged " + damage);
-      var ship = kcex.ship_list[id.toString()];
+      log("    ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
+      var ship = kcex.ship_list[String(id)];
       ship.nowhp -= damage;
     }
   }
@@ -63,8 +63,8 @@ function hougeki_damage(deck, hougeki)
       if (target >= 1 && target <= 6) {
         var damage = Math.floor(hougeki.api_damage[i][j]);
         var id = deck.api_ship[target - 1];
-        log("    ship " + target + "(" + id.toString() + ") damaged " + damage);
-        var ship = kcex.ship_list[id.toString()];
+        log("    ship " + target + "(" + String(id) + ") damaged " + damage);
+        var ship = kcex.ship_list[String(id)];
         ship.nowhp -= damage;
       }
     }
@@ -137,7 +137,7 @@ function damage(url, json) {
     }
   }
   catch (exc) {
-    log("  failed: " + exc.toString());
+    log("  failed: " + String(exc));
   }
 }
 
@@ -159,7 +159,8 @@ function kcexCallback(request, content, query) {
     }
     if (url.indexOf("/getship") != -1) {
       kcex.ship_num++;
-      log("getship: " + String(kcex.ship_num) + " ships");
+      kcex.item_num += json.api_data.api_slotitem.length;
+      log("getship: " + String(kcex.ship_num) + " ships, " + String(kcex.item_num) + " items");
     }
   } else if (url.indexOf("/ndock") != -1) {
     var dock_list = json.api_data;
@@ -169,10 +170,23 @@ function kcexCallback(request, content, query) {
     }
   } else if (url.indexOf("/destroyship") != -1) {
     kcex.ship_num--;
-    log("destroyship: " + String(kcex.ship_num) + " ships");
+    kcex.item_num -= kcex.ship_list[String(query.api_ship_id)].slot.filter(function(e){return e >= 0;}).length;
+    log("destroyship: " + String(kcex.ship_num) + " ships, " + String(kcex.item_num) + " items");
+  } else if (url.indexOf("/createitem") != -1) {
+    if (json.api_data.api_create_flag > 0) {
+      kcex.item_num++;
+    }
+    log("createitem: " + String(kcex.item_num) + " items");
+  } else if (url.indexOf("/destroyitem2") != -1) {
+    kcex.item_num -= query.api_slotitem_ids.split(",").length;
+    log("destroyitem2: " + String(kcex.item_num) + " items");
   } else if (url.indexOf("/powerup") != -1) {
-    kcex.ship_num -= query["api_id_items"].split(",").length;
-    log("powerup: " + String(kcex.ship_num) + " ships");
+    var id_list = query["api_id_items"].split(",");
+    kcex.ship_num -= id_list.length;
+    for (var i = 0, id; (id = id_list[i]) && i < id_list.length; i++) {
+      kcex.item_num -= kcex.ship_list[String(id)].slot.filter(function(e){return e >= 0;}).length;
+    }
+    log("powerup: " + String(kcex.ship_num) + " ships, " + String(kcex.item_num) + " items");
   } else if (url.indexOf("/api_start2") != -1) {
     var mst_ship = json.api_data.api_mst_ship;
     var master = {};
@@ -186,6 +200,19 @@ function kcexCallback(request, content, query) {
     kcex.putStorage("ship_master", JSON.stringify(master));
     log("ship_master parsed");
     return;
+  } else if (url.indexOf("/basic") != -1) {
+    kcex.ship_max = Number(json.api_data.api_max_chara);
+    kcex.item_max = Number(json.api_data.api_max_slotitem) + 3;
+    log("basic: ship_max=" + String(kcex.ship_max) + ", item_max=" + String(kcex.item_max));
+  } else if (url.indexOf("/record") != -1) {
+    kcex.ship_num = Number(json.api_data.api_ship[0]);
+    kcex.ship_max = Number(json.api_data.api_ship[1]);
+    kcex.item_num = Number(json.api_data.api_slotitem[0]);
+    kcex.item_max = Number(json.api_data.api_slotitem[1]) + 3;
+    log("record: ship=" + String(kcex.ship_num) + "/" + String(kcex.ship_max) + ", item=" + String(kcex.item_num) + "/" + String(kcex.item_max));
+  } else if (url.indexOf("/slot_item") != -1) {
+    kcex.item_num = json.api_data.length;
+    log("slot_item: " + String(kcex.item_num) + " items");
   } else if (url.indexOf("battle") != -1) {
     log("damage: " + url);
     damage(url, json);
@@ -202,13 +229,16 @@ function kcexCallback(request, content, query) {
       for (var i = 0, dock; dock = dock_list[i]; i++) {
         kcex.repair[i] = dock;
       }
+
+      kcex.ship_max = Number(json.api_data.api_basic.api_max_chara);
+      kcex.item_max = Number(json.api_data.api_basic.api_max_slotitem) + 3;
     }
     kcex.deck_list = deck_list;
 
     var ship_list = {};
     var i = 0;
     for (var data; data = data_list[i]; i++) {
-      var api_id = data.api_id.toString();
+      var api_id = String(data.api_id);
       var ship = kcex.ship_list[api_id];
       ship_list[api_id] = {
         ship_id: data.api_ship_id,
@@ -216,7 +246,8 @@ function kcexCallback(request, content, query) {
         p_cond: ship ? ship.c_cond : 49,
         c_cond: data.api_cond,
         nowhp: data.api_nowhp,
-        maxhp: data.api_maxhp
+        maxhp: data.api_maxhp,
+        slot: data.api_slot
       };
       if (kcex.ship_master[data.api_ship_id]) {
         ship_list[api_id].name = kcex.ship_master[data.api_ship_id].name;
@@ -233,7 +264,27 @@ function kcexCallback(request, content, query) {
   var r = [];
   r.push("<b>" + kcex.timeStamp() + "</b>");
   if (kcex.ship_num) {
-    r.push(String(kcex.ship_num) + " ships");
+    var sh = String(kcex.ship_num) + "/" + String(kcex.ship_max);
+    if (kcex.ship_num >= kcex.ship_max) {
+      sh = "<font color='#d00'><b>" + sh + "</b></font>";
+    }
+    else if (kcex.ship_num >= kcex.ship_max - 4) {
+      sh = "<font color='#c60'>" + sh + "</font>";
+    }
+    else if (kcex.ship_num >= kcex.ship_max - 8) {
+      sh = "<font color='#a90'>" + sh + "</font>";
+    }
+    var it = String(kcex.item_num) + "/" + String(kcex.item_max);
+    if (kcex.item_num >= kcex.item_max - 3) {
+      it = "<font color='#d00'><b>" + it + "</b></font>";
+    }
+    else if (kcex.item_num >= kcex.item_max - 4 * 4 - 3) {
+      it = "<font color='#c60'>" + it + "</font>";
+    }
+    else if (kcex.item_num >= kcex.item_max - 8 * 4 - 3) {
+      it = "<font color='#a90'>" + it + "</font>";
+    }
+    r.push(sh + " ships, " + it + " items");
   }
   else {
     r.push("loading...");
@@ -283,7 +334,7 @@ function kcexCallback(request, content, query) {
 
   for (var i = 0, deck; deck = kcex.deck_list[i]; i++) {
     var r = [];
-    r.push("<b>" + String(i+1) + ":" + deck.api_name + "</b>");
+    r.push("<b>" + String(i + 1) + ":" + deck.api_name + "</b>");
     var t = kcex.mission[i];
     if (t) {
       var dt = new Date(t);
@@ -299,9 +350,9 @@ function kcexCallback(request, content, query) {
     var id_list = deck.api_ship;
     for (var j = 0, id; id = id_list[j]; j++) {
       if (id === -1) break;
-      var ship = kcex.ship_list[id.toString()];
+      var ship = kcex.ship_list[String(id)];
       if (ship != null) {
-        var s = (j + 1).toString() + '.&nbsp;';
+        var s = String(j + 1) + '.&nbsp;';
         var shp = ship.nowhp + '/' + ship.maxhp +'&nbsp;';
         if (ship.nowhp <= ship.maxhp / 4) {
           shp = "<font color='#d00'><b>" + shp + "</b></font>";
@@ -377,7 +428,7 @@ function readPostTextFromRequest(request, context) {
     return text;
   }
   catch (exc) {
-    log("readPostTextFromRequest failed: " + exc.toString());
+    log("readPostTextFromRequest failed: " + String(exc));
   }
   return null;
 }
@@ -448,7 +499,7 @@ var kcexHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship2|deck|kdock|ndock)|api_port\/port|api_req_kousyou\/(getship|destroyship)|api_req_kaisou\/powerup|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air)?battle|sp_midnight))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship2|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(getship|destroyship|createitem|destroyitem2)|api_req_kaisou\/powerup|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air)?battle|sp_midnight))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);
@@ -468,8 +519,11 @@ var kcex = {
   repair: [],
   build: [],
   deck_list: [],
-  ship_num: null,
-  
+  ship_num: 0,
+  ship_max: 0,
+  item_num: 0,
+  item_max: 0,
+
   init: function(event) {
     log("init");
   
@@ -485,7 +539,7 @@ var kcex = {
     if (s) {
       kcex.ship_master = JSON.parse(s);
     }
-    var s = kcex.getStorage("ship_list");
+    s = kcex.getStorage("ship_list");
     if (s) {
       kcex.ship_list = JSON.parse(s);
     }
@@ -529,7 +583,7 @@ var kcex = {
       log("DOMloaded:", url);
       var game_frame = event.originalTarget.getElementById('game_frame');
       if (game_frame) {
-        game_frame.style.width = '970px';
+        game_frame.style.width = '980px';
       }
     }
   },

@@ -28,11 +28,11 @@ function ship2str(ship) {
 
 function kouku_damage(deck, kouku)
 {
-  if (kouku.api_stage3) {
-    var damage_list = kouku.api_stage3.api_fdam;
+  if (kouku) {
+    var damage_list = kouku.api_fdam;
     var id_list = deck.api_ship;
     for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
-      if (damage_list[i + 1] >= 0 && (kouku.api_stage3.api_frai_flag[i + 1] > 0 || kouku.api_stage3.api_fbak_flag[i + 1] > 0)) {
+      if (damage_list[i + 1] >= 0 && (kouku.api_frai_flag[i + 1] > 0 || kouku.api_fbak_flag[i + 1] > 0)) {
         var damage = Math.floor(damage_list[i + 1]);
         log("    ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
         var ship = kcex.ship_list[String(id)];
@@ -82,13 +82,19 @@ function damage(url, json) {
       if (deck.api_id == deck_id) {
         if (json.api_data.api_kouku) {
           log("  kouku");
-          // TODO combined battle
-          kouku_damage(deck, json.api_data.api_kouku);
+          kouku_damage(deck, json.api_data.api_kouku.api_stage3);
+          if (url.indexOf("combined") != -1 && json.api_data.api_kouku.api_stage3_combined) {
+            // must be 2nd fleet
+            kouku_damage(kcex.deck_list[1], json.api_data.api_kouku.api_stage3_combined);
+          }
         }
         if (json.api_data.api_kouku2) { // combined air battle
           log("  kouku");
-          // TODO combined battle
-          kouku_damage(deck, json.api_data.api_kouku);
+          kouku_damage(deck, json.api_data.api_kouku2.api_stage3);
+          if (url.indexOf("combined") != -1 && json.api_data.api_kouku2.api_stage3_combined) {
+            // must be 2nd fleet
+            kouku_damage(kcex.deck_list[1], json.api_data.api_kouku2.api_stage3_combined);
+          }
         }
         if (json.api_data.api_opening_atack) {
           log("  opening");
@@ -118,10 +124,6 @@ function damage(url, json) {
           log("  hougeki2");
           hougeki_damage(deck, json.api_data.api_hougeki2);
         }
-        if (json.api_data.api_hougeki3) { // combined battle
-          log("  hougeki3");
-          hougeki_damage(deck, json.api_data.api_hougeki3);
-        }
         if (json.api_data.api_raigeki) {
           log("  raigeki");
           if (url.indexOf("combined") != -1) {
@@ -131,6 +133,10 @@ function damage(url, json) {
           else {
             raigeki_damage(deck, json.api_data.api_raigeki);
           }
+        }
+        if (json.api_data.api_hougeki3) { // combined battle
+          log("  hougeki3");
+          hougeki_damage(deck, json.api_data.api_hougeki3);
         }
         break;
       }
@@ -499,7 +505,7 @@ var kcexHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship2|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(getship|destroyship|createitem|destroyitem2)|api_req_kaisou\/powerup|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air)?battle|sp_midnight))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship2|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(getship|destroyship|createitem|destroyitem2)|api_req_kaisou\/powerup|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);

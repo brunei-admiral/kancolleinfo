@@ -161,7 +161,12 @@ function kcexCallback(request, content, query) {
   if (url.indexOf("/deck_port") != -1 || url.indexOf("/deck") != -1) {
     var deck_list = json.api_data;
     for (var i = 0, deck; deck = deck_list[i]; i++) {
-      kcex.mission[i] = deck.api_mission[2];
+      if (dec.api_mission[2] > 0) {
+        kcex.mission[i] = deck.api_mission[2];
+      }
+      else if (!isNaN(Number(kcex.mission[i]))) {
+        kcex.mission[i] = null;
+      }
       log("deck mission: " + i + ": " + kcex.mission[i]);
     }
   } else if (url.indexOf("/kdock") != -1 || url.indexOf("/getship") != -1) {
@@ -229,10 +234,11 @@ function kcexCallback(request, content, query) {
   } else if (url.indexOf("battle") != -1) {
     log("damage: " + url);
     damage(url, json);
-  } else if (url.indexOf("ship2") != -1 || url.indexOf("port") != -1) {
+  } else if (url.indexOf("/ship") != -1 || url.indexOf("/port") != -1) {
     var port = url.indexOf("/port") != -1;
-    var data_list = port ? json.api_data.api_ship : json.api_data;
-    var deck_list = port ? json.api_data.api_deck_port : json.api_data_deck;
+    var ship2 = url.indexOf("/ship2") != -1;
+    var data_list = port ? json.api_data.api_ship : ship2 ? json.api_data : json.api_data.api_ship_data;
+    var deck_list = port ? json.api_data.api_deck_port : ship2 ? json.api_data_deck : json.api_data.api_deck_data;
     if (port) {
       for (var i = 0, deck; deck = deck_list[i]; i++) {
         kcex.mission[i] = deck.api_mission[2];
@@ -248,12 +254,11 @@ function kcexCallback(request, content, query) {
     }
     kcex.deck_list = deck_list;
 
-    var ship_list = {};
     var i = 0;
     for (var data; data = data_list[i]; i++) {
       var api_id = String(data.api_id);
       var ship = kcex.ship_list[api_id];
-      ship_list[api_id] = {
+      kcex.ship_list[api_id] = {
         ship_id: data.api_ship_id,
         level: data.api_lv,
         p_cond: ship ? ship.c_cond : 49,
@@ -263,17 +268,18 @@ function kcexCallback(request, content, query) {
         slot: data.api_slot
       };
       if (kcex.ship_master[data.api_ship_id]) {
-        ship_list[api_id].name = kcex.ship_master[data.api_ship_id].name;
+        kcex.ship_list[api_id].name = kcex.ship_master[data.api_ship_id].name;
       }
     }
-    kcex.ship_num = i;
+    if (port || ship2) {
+      kcex.ship_num = i;
+    }
 
-    kcex.ship_list = ship_list;
-    kcex.putStorage("ship_list", JSON.stringify(ship_list));
-    log("etc: " + String(kcex.ship_num) + " ships (port=" + port + ")");
+    kcex.putStorage("ship_list", JSON.stringify(kcex.ship_list));
+    log("etc: " + String(kcex.ship_num) + " ships (" + (port ? "port" : ship2 ? "ship2" : "ship3") + ")");
   }
   else {
-    log("timer(?)");
+    log("timer(?): " + url + " , query: " + query);
   }
 
   var p = [];
@@ -352,7 +358,7 @@ function kcexCallback(request, content, query) {
     var r = [];
     r.push("<b>" + String(i + 1) + ":" + deck.api_name + "</b>");
     var t = kcex.mission[i];
-    if (t) {
+    if (t && !isNaN(Number(kcex.mission[i]))) {
       var dt = new Date(t);
       var now = new Date().getTime();
       var s = "[" + time2str(dt) + "]";
@@ -362,6 +368,9 @@ function kcexCallback(request, content, query) {
         s = "<font color='#c60'>" + s + "</font>";
       }
       r.push(s);
+    }
+    else if (t) {
+      r.push(t);
     }
     var id_list = deck.api_ship;
     for (var j = 0, id; id = id_list[j]; j++) {

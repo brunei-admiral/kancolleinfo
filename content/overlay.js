@@ -10,6 +10,53 @@ function log() {
   Services.console.logStringMessage("[kcex]: " + Array.join(arguments, " "));
 }
 
+function capture(elem, parent, scale) {
+  log("capture start");
+  var rect = elem.getBoundingClientRect();
+  var rect2 = parent.getBoundingClientRect();
+  var canvas = document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+  scale = scale || 1.0;
+  canvas.mozOpaque = true;
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  var context = canvas.getContext("2d");
+  context.scale(scale, scale);
+  context.drawWindow(window.content, rect.left + rect2.left + window.content.scrollX + 1, rect.top + rect2.top + window.content.scrollY, rect.width, rect.height, "white");
+  return canvas.mozGetAsFile("imagedata", "image/png");
+}
+
+function saveFile(dataFile, path) {
+  log("saveFile start: data=" + dataFile + ", path=" + path);
+  var reader = new FileReader();
+  reader.onloadend = function() {
+    var file = CCIN("@mozilla.org/file/local;1", "nsILocalFile");
+    file.initWithPath(path);
+    file.createUnique(Ci.nsIFile.NORMAL_FILE_TYPE, 0644);
+    var stream = CCIN("@mozilla.org/network/safe-file-output-stream;1", "nsIFileOutputStream");
+    stream.init(file, 0x04 | 0x08 | 0x20, 0644, 0);
+    var binary = reader.result;
+    log("saveFile size=" + binary.length + ", [" + binary.substr(1, 3) + "]");
+    stream.write(binary, binary.length);
+    if (stream instanceof Ci.nsISafeOutputStream) {
+      stream.finish();
+    }
+    else {
+      stream.close();
+    }
+  }
+  reader.readAsBinaryString(dataFile);
+}
+
+function captureAndSave() {
+  log("captureAndSave start");
+  var png = capture(kcex.flash, kcex.game_frame, 1.0);
+
+  var tmpdir = Cc["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("TmpD", Components.interfaces.nsIFile);
+  var filename = tmpdir.path + "\\kancolle.png";
+  saveFile(png, filename);
+  log("captureAndSave finish");
+}
+
 function time2str(dt) {
   var week = "SunMonTueWedThuFriSat";
   var s = dt.toLocaleFormat("%H:%M");
@@ -309,8 +356,14 @@ function kcexCallback(request, content, query) {
     log("timer(?): " + url + " , query: " + hash2str(query));
   }
 
+  // construct HTML
   var p = [];
-  var r = [];
+
+  var r = []
+  r.push("<button id='capture'>capture</button>");
+  p.push(r);
+
+  r = [];
   r.push("<b>" + kcex.timeStamp() + "</b>");
   if (kcex.ship_num) {
     var sh = String(kcex.ship_num) + "/" + String(kcex.ship_max);
@@ -466,7 +519,7 @@ function readPostTextFromRequest(request, context) {
     var offset = stream.tell();
     ss.seek(Ci.nsISeekableStream.NS_SEEK_SET, 0);
 
-    var sis = Cc["@mozilla.org/scriptableinputstream;1"].createInstance(Ci.nsIScriptableInputStream);
+    var sis = CCIN("@mozilla.org/scriptableinputstream;1", "nsIScriptableInputStream");
     sis.init(stream);
 
     var segments = [];
@@ -569,6 +622,8 @@ var kcexHttpObserver = {
 };
 
 var kcex = {
+  game_frame: null,
+  flash: null,
   div: null,
   storage: null,
   ship_master: {},
@@ -632,17 +687,24 @@ var kcex = {
       div.style.textAlign = "left";
       div.style.whiteSpace = "nowrap";
       div.style.fontSize = '11px';
-      div.innerHTML = kcex.timeStamp();
+      div.innerHTML = "<button id='capture'>capture</button><hr>" + kcex.timeStamp();
       doc.body.style.width = '848px';
       doc.body.appendChild(div);
       kcex.div = div;
       log("create div");
+      kcex.flash = doc.getElementById("flashWrap");
+
+      var elem = kcex.div.querySelectorAll("button")[0];
+      if (elem) {
+        elem.addEventListener("click", captureAndSave, false, true);
+      }
     }
     else if (url.match(/\/app_id=854854\//)) {
       log("DOMloaded:", url);
       var game_frame = event.originalTarget.getElementById('game_frame');
       if (game_frame) {
         game_frame.style.width = '980px';
+        kcex.game_frame = game_frame;
       }
     }
   },
@@ -655,6 +717,11 @@ var kcex = {
            + p[i].join("<br>") + "</p>";
       }
       kcex.div.innerHTML = html;
+
+      var elem = kcex.div.querySelectorAll("button")[0];
+      if (elem) {
+        elem.addEventListener("click", captureAndSave, false, true);
+      }
     }
   },
   

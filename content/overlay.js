@@ -337,6 +337,7 @@ function kcexCallback(request, content, query) {
         level: data.api_lv,
         p_cond: ship ? ship.c_cond : 49,
         c_cond: data.api_cond,
+        prehp: ship ? ship.nowhp : data.api_nowhp,
         nowhp: data.api_nowhp,
         maxhp: data.api_maxhp,
         slot: data.api_slot
@@ -467,6 +468,9 @@ function kcexCallback(request, content, query) {
           shp = "<font color='#a90'>" + shp + "</font>";
         } else if (ship.nowhp >= ship.maxhp) {
           shp = "<font color='#0d0'>" + shp + "</font>";
+        }
+        if (ship.prehp != ship.nowhp) {
+          shp = "<span style='background-color: #d8d8d8;'>" + shp + "</span>";
         }
         var scd = ship.c_cond;
         var diff = ship.c_cond - ship.p_cond;

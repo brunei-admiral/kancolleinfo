@@ -21,7 +21,7 @@ function capture(elem, parent, scale) {
   canvas.height = rect.height;
   var context = canvas.getContext("2d");
   context.scale(scale, scale);
-  context.drawWindow(window.content, rect.left + rect2.left + 1, rect.top + rect2.top, rect.width, rect.height, "white");
+  context.drawWindow(window.content, rect.left + rect2.left + window.content.scrollX + 1, rect.top + rect2.top + window.content.scrollY, rect.width, rect.height, "white");
   return canvas.mozGetAsFile("imagedata", "image/png");
 }
 
@@ -470,7 +470,7 @@ function kcexCallback(request, content, query) {
           shp = "<font color='#0d0'>" + shp + "</font>";
         }
         if (ship.prehp != ship.nowhp) {
-          shp = "<span style='background-color: #d8d8d8;'>" + shp + "</span>";
+          shp = "<span style='background-color: #ddf;'>" + shp + "</span>";
         }
         var scd = ship.c_cond;
         var diff = ship.c_cond - ship.p_cond;
@@ -691,12 +691,17 @@ var kcex = {
       div.style.textAlign = "left";
       div.style.whiteSpace = "nowrap";
       div.style.fontSize = '11px';
-      div.innerHTML = kcex.timeStamp();
+      div.innerHTML = "<button id='capture'>capture</button><hr>" + kcex.timeStamp();
       doc.body.style.width = '848px';
       doc.body.appendChild(div);
       kcex.div = div;
       log("create div");
       kcex.flash = doc.getElementById("flashWrap");
+
+      var elem = kcex.div.querySelectorAll("button")[0];
+      if (elem) {
+        elem.addEventListener("click", captureAndSave, false, true);
+      }
     }
     else if (url.match(/\/app_id=854854\//)) {
       log("DOMloaded:", url);
@@ -716,6 +721,7 @@ var kcex = {
            + p[i].join("<br>") + "</p>";
       }
       kcex.div.innerHTML = html;
+
       var elem = kcex.div.querySelectorAll("button")[0];
       if (elem) {
         elem.addEventListener("click", captureAndSave, false, true);

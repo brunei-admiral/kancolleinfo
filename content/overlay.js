@@ -361,12 +361,7 @@ function kcexCallback(request, content, query) {
 
   // construct HTML
   var p = [];
-
   var r = []
-  r.push("<button id='capture'>capture</button>");
-  p.push(r);
-
-  r = [];
   r.push("<b>" + kcex.timeStamp() + "</b>");
   if (kcex.ship_num) {
     var sh = String(kcex.ship_num) + "/" + String(kcex.ship_max);
@@ -693,24 +688,28 @@ var kcex = {
       div.style.textAlign = "left";
       div.style.whiteSpace = "nowrap";
       div.style.fontSize = '11px';
-      div.innerHTML = "<button id='capture'>capture</button><hr>" + kcex.timeStamp();
+      div.innerHTML = kcex.timeStamp();
       doc.body.style.width = '848px';
       doc.body.appendChild(div);
       kcex.div = div;
       log("create div");
       kcex.flash = doc.getElementById("flashWrap");
-
-      var elem = kcex.div.querySelectorAll("button")[0];
-      if (elem) {
-        elem.addEventListener("click", captureAndSave, false, true);
-      }
     }
     else if (url.match(/\/app_id=854854\//)) {
       log("DOMloaded:", url);
-      var game_frame = event.originalTarget.getElementById('game_frame');
+      var game_frame = doc.getElementById("game_frame");
       if (game_frame) {
         game_frame.style.width = '980px';
         kcex.game_frame = game_frame;
+      }
+
+      var navi_right = doc.getElementsByClassName("navi_right")[0];
+      if (navi_right) {
+        navi_right.innerHTML = "<li><button id='capture'>capture</button></li>" + navi_right.innerHTML;
+        var elem = navi_right.querySelectorAll("button.capture")[0];
+        if (elem) {
+          elem.addEventListener("click", captureAndSave, false, true);
+        }
       }
     }
   },
@@ -723,11 +722,6 @@ var kcex = {
            + p[i].join("<br>") + "</p>";
       }
       kcex.div.innerHTML = html;
-
-      var elem = kcex.div.querySelectorAll("button")[0];
-      if (elem) {
-        elem.addEventListener("click", captureAndSave, false, true);
-      }
     }
   },
   

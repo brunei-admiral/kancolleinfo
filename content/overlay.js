@@ -51,8 +51,10 @@ function captureAndSave() {
   log("captureAndSave start");
   var png = capture(kcex.flash, kcex.game_frame, 1.0);
 
-  var tmpdir = Cc["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("TmpD", Components.interfaces.nsIFile);
-  var filename = tmpdir.path + "\\kancolle.png";
+  var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getBranch("extensions.kancolleEx.");
+  var dir = prefs.getCharPref("capture.directory") || Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
+  var s = new Date().toLocaleFormat("%Y%m%d%H%M%S");
+  var filename = dir + "\\kancolle-" + s + ".png";
   saveFile(png, filename);
   log("captureAndSave finish");
 }
@@ -81,7 +83,7 @@ function ship2str(ship) {
   if (!ship || !ship.ship_id) {
     return "";
   }
-  return "<b>" + (ship.name ? ship.name : "(" + ship.ship_id + ")") + "</b>(" + (ship.level ? ship.level : 1) + ")";
+  return "<b>" + (ship.name || "(" + ship.ship_id + ")") + "</b>(" + (ship.level || 1) + ")";
 }
 
 function map2str(map) {
@@ -135,7 +137,7 @@ function hougeki_damage(deck, hougeki)
 
 function damage(url, json) {
   try {
-    var deck_id = json.api_data.api_dock_id ? json.api_data.api_dock_id : json.api_data.api_deck_id;
+    var deck_id = json.api_data.api_dock_id || json.api_data.api_deck_id;
     if (url.indexOf("combined") != -1 && url.indexOf("midnight") != -1) {
       // if it's combined fleet and midnight battle, it must be 2nd fleet.
       deck_id = 2;

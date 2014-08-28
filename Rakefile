@@ -1,6 +1,6 @@
 # -*- Ruby -*-
 
-DEPENDS = %w[chrome.manifest content install.rdf]
+DEPENDS = %w[chrome.manifest content defaults install.rdf]
 
 desc "make package"
 task :pack do

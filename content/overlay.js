@@ -87,7 +87,14 @@ function ship2str(ship) {
 }
 
 function map2str(map) {
-  return map.api_maparea_id + "-" + map.api_mapinfo_no + "-" + map.api_no;
+  var cell = "-";
+  if (map.api_no == map.api_bosscell_no) {
+    cell = "*";
+  }
+  else if (map.api_enemy) {
+    cell = "+";
+  }
+  return cell + " " + map.api_maparea_id + "-" + map.api_mapinfo_no + "-" + map.api_no;
 }
 
 function kouku_damage(deck, kouku)
@@ -141,6 +148,24 @@ function damage(url, json) {
     if (url.indexOf("combined") != -1 && url.indexOf("midnight") != -1) {
       // if it's combined fleet and midnight battle, it must be 2nd fleet.
       deck_id = 2;
+    }
+    if (json.api_data.api_formation) {
+      var s = "";
+      switch (json.api_data.api_formation[2]) {
+        case 1:
+          s = "同航戦";
+          break;
+        case 2:
+          s = "反航戦";
+          break;
+        case 3:
+          s = "T字有利";
+          break;
+        case 4:
+          s = "T字不利";
+          break;
+      }
+      kcex.mission[deck_id - 1] += " " + s;
     }
     for (var i = 0, deck; deck = kcex.deck_list[i]; i++) {
       if (deck.api_id == deck_id) {
@@ -301,12 +326,12 @@ function kcexCallback(request, content, query) {
   } else if (url.indexOf("_map/start") != -1) {
     var deck = Number(query["api_deck_id"]);
     if (deck > 0) {
-      kcex.mission[deck - 1] = "* " + map2str(json.api_data);
+      kcex.mission[deck - 1] = map2str(json.api_data);
     }
   } else if (url.indexOf("_map/next") != -1) {
     for (var i = 0, deck; deck = kcex.mission[i]; i++) {
       if (deck && isNaN(Number(deck))) {
-        kcex.mission[i] = "* " + map2str(json.api_data);
+        kcex.mission[i] = map2str(json.api_data);
         break;
       }
     }

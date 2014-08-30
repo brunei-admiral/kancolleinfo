@@ -52,7 +52,7 @@ function captureAndSave() {
   var png = capture(kcex.flash, kcex.game_frame, 1.0);
 
   var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getBranch("extensions.kancolleEx.");
-  var dir = prefs.getCharPref("capture.directory") || Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
+  var dir = prefs.getComplexValue("capture.directory", Ci.nsISupportsString).data || Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
   var s = new Date().toLocaleFormat("%Y%m%d%H%M%S");
   var filename = dir + "\\kancolle-" + s + ".png";
   saveFile(png, filename);
@@ -706,11 +706,13 @@ var kcex = {
       var navi_right = doc.getElementsByClassName("navi_right")[0];
       if (navi_right) {
         navi_right.innerHTML = "<li><button id='capture'>capture</button></li>" + navi_right.innerHTML;
-        var elem = navi_right.querySelectorAll("button.capture")[0];
+        var elem = navi_right.querySelectorAll("button#capture")[0];
         if (elem) {
           elem.addEventListener("click", captureAndSave, false, true);
         }
       }
+
+      doc.body.setAttribute("onload", "if (DMM && DMM.netgame) DMM.netgame.reloadDialog = function(){};");
     }
   },
   

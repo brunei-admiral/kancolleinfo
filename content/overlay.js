@@ -224,6 +224,27 @@ function battle(url, json) {
             kouku_damage(kcex.deck_list[1], json.api_data.api_kouku2.api_stage3_combined);
           }
         }
+        if (json.api_data.api_support_info) {
+          var support = json.api_data.api_support_info;
+          if (support.api_support_airatack) {
+            log("  support (airatack)");
+            var damage = support.api_support_airatack.api_damage;
+            for (var i = 0; i < 6; i++) {
+              if (damage[i + 1] > 0 && enemies[i]) {
+                enemies[i].nowhp -= Math.floor(damage[i + 1]);
+              }
+            }
+          }
+          else if (support.api_support_hourai) {
+            log("  support (hourai)");
+            var damage = support.api_support_hourai.api_damage;
+            for (var i = 0; i < 6; i++) {
+              if (damage[i + 1] > 0 && enemies[i]) {
+                enemies[i].nowhp -= Math.floor(damage[i + 1]);
+              }
+            }
+          }
+        }
         if (json.api_data.api_opening_atack) {
           log("  opening");
           if (url.indexOf("combined") != -1) {

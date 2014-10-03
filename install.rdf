@@ -2,12 +2,12 @@
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	 xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 	<Description about="urn:mozilla:install-manifest">
-		<em:id>kancolleEx@vcraft.jp</em:id>
-		<em:name>kancolleEx</em:name>
-		<em:version>0.2.1</em:version>
-		<em:description>KanColle condition.</em:description>
-		<em:creator>c.mos</em:creator>
-		<em:homepageURL>http://vcraft.jp/</em:homepageURL>
+		<em:id>kancolleinfo@example.jp</em:id>
+		<em:name>kancolleinfo</em:name>
+		<em:version>1.0.0</em:version>
+		<em:description>KanColle Information Viewer</em:description>
+		<em:creator>Burunei no toaru teitoku</em:creator>
+		<em:homepageURL>http://kancollegadgets.web.fc2.com/</em:homepageURL>
 		<em:bootstrap>false</em:bootstrap>
 		<em:targetApplication>
 			<Description>

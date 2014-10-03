@@ -1,2 +1,2 @@
-content	kancolleEx	content/
-overlay	chrome://browser/content/browser.xul	chrome://kancolleEx/content/overlay.xul
+content	kancolleinfo	content/
+overlay	chrome://browser/content/browser.xul	chrome://kancolleinfo/content/overlay.xul

@@ -187,7 +187,7 @@ sheet.insertRule('#kancolle-info .color-orange { color: orange; }', sheet.length
 sheet.insertRule('#kancolle-info .color-red { color: red; }', sheet.length);
 sheet.insertRule('#kancolle-info .color-gray { color: silver; }', sheet.length);
 sheet.insertRule('#kancolle-info .blink { -moz-animation: blink 1.0s ease-in-out infinite alternate; }', sheet.length);
-sheet.insertRule('@-moz-keyframes blink { 0% {opacity: 0.2;} 60% {opacity: 1;} 100% {opacity: 1;} }', sheet.length);
+sheet.insertRule('@-moz-keyframes blink { 0% {background-color: rgba(240,208,0,0.5);} 60% {background-color: inherit;} 100% {background-color: inherit;} }', sheet.length);
 
 // ボタン
 doc.querySelector("#capture").addEventListener("click", capture, true);

@@ -46,6 +46,34 @@ function select_fleet(){
   kcif.current_fleet = fleet.id;
 }
 
+function saveConfig() {
+  var str = CCIN("@mozilla.org/supports-string;1", "nsISupportsString");
+
+  var elem = kcif.info_div.querySelector("#capture-save-dir");
+  if (elem) {
+    str.data = elem.value;
+    myPref().setComplexValue("capture.directory", Ci.nsISupportsString, str);
+  }
+
+  elem = kcif.info_div.querySelector("#capture-save-base");
+  if (elem) {
+    str.data = elem.value;
+    myPref().setComplexValue("capture.basename", Ci.nsISupportsString, str);
+  }
+}
+
+function resetConfig() {
+  var elem = kcif.info_div.querySelector("#capture-save-dir");
+  if (elem) {
+    elem.value = getCaptureSaveDir();
+  }
+
+  elem = kcif.info_div.querySelector("#capture-save-base");
+  if (elem) {
+    elem.value = getCaptureSaveBase();
+  }
+}
+
 function capture(elem, parent, scale) {
   log("capture start");
   var rect = elem.getBoundingClientRect();
@@ -87,11 +115,11 @@ function myPref() {
   return Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getBranch("extensions.kancolleinfo.");
 }
 
-function captureSaveDir() {
+function getCaptureSaveDir() {
   return myPref().getComplexValue("capture.directory", Ci.nsISupportsString).data || Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
 }
 
-function captureSaveBase() {
+function getCaptureSaveBase() {
   return myPref().getComplexValue("capture.basename", Ci.nsISupportsString).data || "kancolle-";
 }
 
@@ -99,8 +127,8 @@ function captureAndSave() {
   log("captureAndSave start");
   var png = capture(kcif.flash, kcif.game_frame, 1.0);
 
-  var dir = captureSaveDir();
-  var base = captureSaveBase();
+  var dir = getCaptureSaveDir();
+  var base = getCaptureSaveBase();
   var s = new Date().toLocaleFormat("%Y%m%d%H%M%S");
   var filename = dir + "\\" + base + s + ".png";
   saveFile(png, filename);
@@ -531,6 +559,7 @@ function kcifCallback(request, content, query) {
     kcif.ship_max = Number(json.api_data.api_max_chara);
     kcif.item_max = Number(json.api_data.api_max_slotitem) + 3;
     log("basic: ship_max=" + String(kcif.ship_max) + ", item_max=" + String(kcif.item_max));
+    return;
   } else if (url.indexOf("/record") != -1) {
     kcif.ship_num = Number(json.api_data.api_ship[0]);
     kcif.ship_max = Number(json.api_data.api_ship[1]);
@@ -910,10 +939,12 @@ var kcif = {
       sheet.insertRule('#kancolle-info .color-gray { color: silver; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-default { color: inherit; }', sheet.length);
       sheet.insertRule('#kancolle-info .blink { -moz-animation: blink 1.0s ease-in-out infinite alternate; }', sheet.length);
-      sheet.insertRule('@-moz-keyframes blink { 0% {opacity: 0.2;} 60% {opacity: 1;} 100% {opacity: 1;} }', sheet.length);
+      sheet.insertRule('@-moz-keyframes blink { 0% {background-color: rgba(240,208,0,0.5);} 60% {background-color: inherit;} 100% {background-color: inherit;} }', sheet.length);
 
       log("create div");
       kcif.flash = doc.querySelector("#flashWrap");
+
+      kcif.render_frame();
     }
     else if (url.match(/\/app_id=854854\//)) {
       log("DOMloaded:", url);
@@ -936,9 +967,8 @@ var kcif = {
     return dt.toLocaleFormat("%H:%M");
   },
 
-  render_info: function() {
+  render_frame: function() {
     if (kcif.info_div) {
-      kcif.game_frame.style.height = '920px';
       var html = "";
       html += '<div id="kancolle-info">';
       html += '<div id="tab-headers">';
@@ -946,6 +976,74 @@ var kcif = {
       html += '<div id="tab-header-ships" class="tab-header"><a href="#">艦娘</a></div>';
       html += '<div id="tab-header-items" class="tab-header"><a href="#">装備</a></div>';
       html += '<div id="tab-header-config" class="tab-header"><a href="#">設定</a></div>';
+      html += '<div id="base-info"><button id="capture">画面キャプチャ</button></div>';
+      html += '</div>';
+
+      html += '<div id="tab-main" class="tab">';
+      html += '<span class="color-yellow blink">Loading...</span>';
+      html += '</div>';
+
+      html += '<div id="tab-ships" class="tab">';
+      html += '<span class="color-red">※未実装です。表示内容に意味はありません。</span>';
+      html += '</div>';
+
+      html += '<div id="tab-items" class="tab">';
+      html += '<span class="color-red">※未実装です。表示内容に意味はありません。</span>';
+      html += '</div>';
+
+      html += '<div id="tab-config" class="tab">';
+      html += '<table>';
+      html += '<tr><td>&nbsp;</td><td></td></tr>';
+      html += '<tr><td class="config-label">画面キャプチャ保存先</td><td class="config-input"><input id="capture-save-dir" class="input-text" value="' + getCaptureSaveDir() + '"></td></tr>';
+      html += '<tr><td class="config-label">画面キャプチャベース名</td><td class="config-input"><input id="capture-save-base" class="input-text" value="' + getCaptureSaveBase() + '"></td></tr>';
+      html += '</table>';
+      html += '<div class="config-buttons">';
+      html += '<button id="config-save">保存</button>';
+      html += '<button id="config-reset">クリア</button>';
+      html += '</div>';
+      html += '</div>';
+
+      html += '</div>';
+
+      kcif.info_div.innerHTML = html;
+
+      // キャプチャボタン
+      var elem = kcif.info_div.querySelector("#capture");
+      if (elem) {
+        elem.addEventListener("click", captureAndSave, false, true);
+      }
+
+      // タブ
+      var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header a");
+      for (var i = 0; i < elems.length; i++) {
+        elems[i].addEventListener("click", select_tab, true);
+      }
+      var elem = kcif.info_div.querySelector("#kancolle-info #" + kcif.current_tab.replace("-", "-header-") + " a");
+      if (elem) {
+        elem.click();
+      }
+
+      // 設定:保存
+      var elem = kcif.info_div.querySelector("#config-save");
+      if (elem) {
+        elem.addEventListener("click", saveConfig, true, true);
+      }
+
+      // 設定:クリア
+      var elem = kcif.info_div.querySelector("#config-reset");
+      if (elem) {
+        elem.addEventListener("click", resetConfig, true, true);
+      }
+    }
+  },
+
+  render_info: function() {
+    if (kcif.info_div) {
+      kcif.game_frame.style.height = '920px'; // なぜかここでないとダメ
+      var base = kcif.info_div.querySelector("#base-info");
+      var main = kcif.info_div.querySelector("#tab-main");
+
+      var html = "";
       var ship_col = 'color-default';
       if (kcif.ship_num >= kcif.ship_max) {
         ship_col = 'color-red';
@@ -966,10 +1064,10 @@ var kcif = {
       else if (kcif.item_num >= kcif.item_max - 8 * 4 - 3) {
         item_col = 'color-yellow';
       }
-      html += '<div id="base-info"><span class="' + ship_col + '">' + kcif.ship_num + '</span>/' + kcif.ship_max + ' ships; <span class="' + item_col + '">' + kcif.item_num + '</span>/' + kcif.item_max + ' items <span id="updated">' + (new Date()).toLocaleFormat("%H:%M") + '更新</span> <button id="capture">画面キャプチャ</button></div>';
-      html += '</div>';
+      html += '<span class="' + ship_col + '">' + kcif.ship_num + '</span>/' + kcif.ship_max + ' ships; <span class="' + item_col + '">' + kcif.item_num + '</span>/' + kcif.item_max + ' items <span id="updated">' + (new Date()).toLocaleFormat("%H:%M") + '更新</span> <button id="capture">画面キャプチャ</button>';
+      base.innerHTML = html;
 
-      html += '<div id="tab-main" class="tab">';
+      html = "";
       for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
         html += '<div id="fleet' + (i + 1) + '" class="fleet">';
         var col = 'color-default';
@@ -1074,49 +1172,12 @@ var kcif = {
         }
       }
       html += '</table>';
-      html += '</div>';
+      main.innerHTML = html;
 
-      html += '</div>';
-
-      html += '<div id="tab-ships" class="tab">';
-      html += '<span class="color-red">※未実装です。表示内容に意味はありません。</span>';
-      html += '</div>';
-
-      html += '<div id="tab-items" class="tab">';
-      html += '<span class="color-red">※未実装です。表示内容に意味はありません。</span>';
-      html += '</div>';
-
-      html += '<div id="tab-config" class="tab">';
-      html += '<table>';
-      html += '<tr><td>&nbsp;</td><td></td></tr>';
-      html += '<tr><td class="config-label">画面キャプチャ保存先</td><td class="config-input"><input id="capture-save-dir" class="input-text" value="' + captureSaveDir() + '"></td></tr>';
-      html += '<tr><td class="config-label">画面キャプチャベース名</td><td class="config-input"><input id="capture-save-base" class="input-text" value="' + captureSaveBase() + '"></td></tr>';
-      html += '</table>';
-      html += '<div class="config-buttons">';
-      html += '<button id="config-save">保存</button>';
-      html += '<button id="config-reset">クリア</button>';
-      html += '</div>';
-      html += '<span class="color-red">※未実装です。表示内容に意味はありません。</span>';
-      html += '</div>';
-
-      html += '</div>';
-
-      kcif.info_div.innerHTML = html;
-
-      // ボタン
+      // キャプチャボタン
       var elem = kcif.info_div.querySelector("#capture");
       if (elem) {
         elem.addEventListener("click", captureAndSave, false, true);
-      }
-
-      // タブ
-      var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header a");
-      for (var i = 0; i < elems.length; i++) {
-        elems[i].addEventListener("click", select_tab, true);
-      }
-      var elem = kcif.info_div.querySelector("#kancolle-info #" + kcif.current_tab.replace("-", "-header-") + " a");
-      if (elem) {
-        elem.click();
       }
 
       // メイン:艦隊

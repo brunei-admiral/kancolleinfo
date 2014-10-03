@@ -7,7 +7,43 @@
 //  http://fartersoft.com/blog/2011/03/07/using-localstorage-in-firefox-extensions-for-persistent-data-storage/
 
 function log() {
-  Services.console.logStringMessage("[kcex]: " + Array.join(arguments, " "));
+  Services.console.logStringMessage("[kcif]: " + Array.join(arguments, " "));
+}
+
+function select_tab(){
+  var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header");
+  for (var i = 0; i < elems.length; i++) {
+    elems[i].style.color = "inherit";
+    elems[i].style.backgroundColor = "inherit";
+  }
+  elems = kcif.info_div.querySelectorAll("#kancolle-info .tab")
+  for (var i = 0; i < elems.length; i++) {
+    elems[i].style.display = "none";
+  }
+
+  var tab = this.parentNode;
+  tab.style.color = "white";
+  tab.style.backgroundColor = "black";
+  kcif.current_tab = tab.id.replace("-header", "");
+  var elem = kcif.info_div.querySelector("#kancolle-info #" + kcif.current_tab);
+  if (elem) {
+    elem.style.display = "block";
+  }
+}
+
+function select_fleet(){
+  var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main .fleet table");
+  for (var i = 0; i < elems.length; i++) {
+    elems[i].style.display = "none";
+  }
+
+  var fleet = this.parentNode.parentNode;
+  var elem = kcif.info_div.querySelector("#kancolle-info #" + fleet.id + " table");
+  if (elem) {
+    elem.style.display = "block";
+  }
+
+  kcif.current_fleet = fleet.id;
 }
 
 function capture(elem, parent, scale) {
@@ -47,12 +83,16 @@ function saveFile(dataFile, path) {
   reader.readAsBinaryString(dataFile);
 }
 
+function captureSaveDir() {
+  var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getBranch("extensions.kancolleEx.");
+  return prefs.getComplexValue("capture.directory", Ci.nsISupportsString).data || Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
+}
+
 function captureAndSave() {
   log("captureAndSave start");
-  var png = capture(kcex.flash, kcex.game_frame, 1.0);
+  var png = capture(kcif.flash, kcif.game_frame, 1.0);
 
-  var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getBranch("extensions.kancolleEx.");
-  var dir = prefs.getComplexValue("capture.directory", Ci.nsISupportsString).data || Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
+  var dir = captureSaveDir();
   var s = new Date().toLocaleFormat("%Y%m%d%H%M%S");
   var filename = dir + "\\kancolle-" + s + ".png";
   saveFile(png, filename);
@@ -83,7 +123,94 @@ function ship2str(ship) {
   if (!ship || !ship.ship_id) {
     return "";
   }
-  return "<b>" + (ship.name || "(" + ship.ship_id + ")") + "</b>(" + (ship.level || 1) + ")";
+  return ship.name || "(" + ship.ship_id + ")";
+}
+
+function ship_type(ship) {
+  if (!ship || !ship.ship_id) {
+    return "";
+  }
+  switch (ship.type) {
+    case 2:
+      return "駆逐";
+    case 3:
+      return "軽巡";
+    case 4:
+      return "雷巡";
+    case 5:
+      return "重巡";
+    case 6:
+      return "航巡";
+    case 7:
+      return "軽空";
+    case 8:
+      return "高戦";
+    case 9:
+      return "戦艦";
+    case 10:
+      return "航戦";
+    case 11:
+      return "正空";
+    case 13:
+      return "潜水";
+    case 14:
+      return "潜空";
+    case 15:
+      return "輸送";
+    case 16:
+      return "水母";
+    case 17:
+      return "揚陸";
+    case 18:
+      return "装空";
+    case 19:
+      return "工作";
+    case 20:
+      return "潜母";
+    default:
+      return "(" + ship.type + ")";
+  }
+}
+
+function ship_hp(ship) {
+  var shp = ship.nowhp + '/' + ship.maxhp +'&nbsp;';
+  var col = "color-default";
+  if (ship.nowhp <= ship.maxhp / 4) {
+    col = "color-red";
+  } else if (ship.nowhp <= ship.maxhp / 2) {
+    col = "color-orange";
+  } else if (ship.nowhp <= ship.maxhp * 3 / 4) {
+    col = "color-yellow";
+  } else if (ship.nowhp >= ship.maxhp) {
+    col = "color-green";
+  }
+  if (ship.prehp != ship.nowhp) {
+    col += " blink";
+  }
+  return '<td class="ship-hp ' + col + '">' + shp + '</td>';
+}
+
+function ship_cond(ship) {
+  var scd = ship.c_cond;
+  var col = "color-default";
+  if (ship.c_cond < 20) {
+    col = "color-red";
+  }
+  else if (ship.c_cond < 30) {
+    col = "color-orange";
+  }
+  else if (ship.c_cond < 40) {
+    col = "color-yellow";
+  }
+  else if (ship.c_cond >= 50) {
+    col = "color-green";
+  }
+  var diff = ship.c_cond - ship.p_cond;
+  if (diff != 0) {
+    col += " blink";
+    scd += "&nbsp;(" + ((diff > 0) ? '+' : '') + diff + ")";
+  }
+  return '<td class="ship-cond ' + col + '">' + scd + '</td>';
 }
 
 function map2str(map) {
@@ -106,7 +233,7 @@ function kouku_damage(deck, enemies, kouku)
       if (damage_list[i + 1] >= 0 && (kouku.api_frai_flag[i + 1] > 0 || kouku.api_fbak_flag[i + 1] > 0)) {
         var damage = Math.floor(damage_list[i + 1]);
         log("    ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
-        var ship = kcex.ship_list[String(id)];
+        var ship = kcif.ship_list[String(id)];
         ship.nowhp -= damage;
       }
     }
@@ -131,7 +258,7 @@ function raigeki_damage(deck, enemies, raigeki)
     if (damage_list[i + 1] >= 0 && raigeki.api_erai.indexOf(i + 1) != -1) {
       var damage = Math.floor(damage_list[i + 1]);
       log("    ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
-      var ship = kcex.ship_list[String(id)];
+      var ship = kcif.ship_list[String(id)];
       ship.nowhp -= damage;
     }
   }
@@ -155,7 +282,7 @@ function hougeki_damage(deck, enemies, hougeki)
       if (target >= 1 && target <= 6) {
         var id = deck.api_ship[target - 1];
         log("    ship " + target + "(" + String(id) + ") damaged " + damage);
-        var ship = kcex.ship_list[String(id)];
+        var ship = kcif.ship_list[String(id)];
         ship.nowhp -= damage;
       }
       else if (target >= 7 && target <= 12) {
@@ -190,7 +317,7 @@ function battle(url, json) {
           s = "T字不利";
           break;
       }
-      kcex.mission[deck_id - 1] += " " + s;
+      kcif.mission[deck_id - 1] += " " + s;
     }
 
     // enemies
@@ -204,7 +331,7 @@ function battle(url, json) {
       }
     }
 
-    for (var i = 0, deck; deck = kcex.deck_list[i]; i++) {
+    for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
       if (deck.api_id == deck_id) {
         if (json.api_data.api_kouku) {
           log("  kouku");
@@ -212,7 +339,7 @@ function battle(url, json) {
           if (url.indexOf("combined") != -1 && json.api_data.api_kouku.api_stage3_combined) {
             // must be 2nd fleet
             log("  kouku (2nd)");
-            kouku_damage(kcex.deck_list[1], json.api_data.api_kouku.api_stage3_combined);
+            kouku_damage(kcif.deck_list[1], json.api_data.api_kouku.api_stage3_combined);
           }
         }
         if (json.api_data.api_kouku2) { // combined air battle
@@ -221,7 +348,7 @@ function battle(url, json) {
           if (url.indexOf("combined") != -1 && json.api_data.api_kouku2.api_stage3_combined) {
             // must be 2nd fleet
             log("  kouku2 (2nd)");
-            kouku_damage(kcex.deck_list[1], json.api_data.api_kouku2.api_stage3_combined);
+            kouku_damage(kcif.deck_list[1], json.api_data.api_kouku2.api_stage3_combined);
           }
         }
         if (json.api_data.api_support_info) {
@@ -249,7 +376,7 @@ function battle(url, json) {
           log("  opening");
           if (url.indexOf("combined") != -1) {
             // must be 2nd fleet
-            raigeki_damage(kcex.deck_list[1], enemies, json.api_data.api_opening_atack);
+            raigeki_damage(kcif.deck_list[1], enemies, json.api_data.api_opening_atack);
           }
           else {
             raigeki_damage(deck, enemies, json.api_data.api_opening_atack);
@@ -263,7 +390,7 @@ function battle(url, json) {
           log("  hougeki1");
           if (url.indexOf("combined") != -1) {
             // must be 2nd fleet
-            hougeki_damage(kcex.deck_list[1], enemies, json.api_data.api_hougeki1);
+            hougeki_damage(kcif.deck_list[1], enemies, json.api_data.api_hougeki1);
           }
           else {
             hougeki_damage(deck, enemies, json.api_data.api_hougeki1);
@@ -277,7 +404,7 @@ function battle(url, json) {
           log("  raigeki");
           if (url.indexOf("combined") != -1) {
             // must be 2nd fleet
-            raigeki_damage(kcex.deck_list[1], enemies, json.api_data.api_raigeki);
+            raigeki_damage(kcif.deck_list[1], enemies, json.api_data.api_raigeki);
           }
           else {
             raigeki_damage(deck, enemies, json.api_data.api_raigeki);
@@ -294,35 +421,38 @@ function battle(url, json) {
     var s = "";
     for (var i = 0; i < 6; i++) {
       if (enemies[i] && enemies[i].maxhp > 0) {
-        if (enemies[i].nowhp > enemies[i].maxhp / 2) {
-          s += "<font color='#0d0'>◎</font>";
+        if (enemies[i].nowhp > enemies[i].maxhp * 3 / 4) {
+          s += "<span class='color-green'>◎</span>";
+        }
+        else if (enemies[i].nowhp > enemies[i].maxhp / 2) {
+          s += "<span class='color-yellow'>◎</span>";
         }
         else if (enemies[i].nowhp > enemies[i].maxhp / 4) {
-          s += "<font color='#a90'>○</font>";
+          s += "<span class='color-orange'>○</span>";
         }
         else if (enemies[i].nowhp > 0) {
-          s += "<font color='#d00'>△</font>";
+          s += "<span class='color-red'>△</span>";
         }
         else if (enemies[i].nowhp <= 0) {
-          s += "<font color='#888'>×</font>";
+          s += "<span class='color-gray'>×</span>";
         }
       }
     }
-    var n = kcex.mission[deck_id - 1].indexOf(" <span style=");
+    var n = kcif.mission[deck_id - 1].indexOf(" <span style=");
     if (n != -1) {
-      kcex.mission[deck_id - 1] = kcex.mission[deck_id - 1].substring(0, n);
+      kcif.mission[deck_id - 1] = kcif.mission[deck_id - 1].substring(0, n);
     }
-    kcex.mission[deck_id - 1] += " <span style='font-size: 9px; font-family: monospace; letter-spacing: -2px;'>" + s + "</span>";
+    kcif.mission[deck_id - 1] += " <span style='letter-spacing: -2px;'>" + s + "</span>";
   }
   catch (exc) {
     log("  failed: " + String(exc));
   }
 }
 
-function kcexCallback(request, content, query) {
-  if (kcex.timer) {
-    window.clearTimeout(kcex.timer);
-    kcex.timer = null;
+function kcifCallback(request, content, query) {
+  if (kcif.timer) {
+    window.clearTimeout(kcif.timer);
+    kcif.timer = null;
   }
 
   var url = request ? request.name : "";
@@ -332,92 +462,93 @@ function kcexCallback(request, content, query) {
     var deck_list = json.api_data;
     for (var i = 0, deck; deck = deck_list[i]; i++) {
       if (deck.api_mission[2] > 0) {
-        kcex.mission[i] = deck.api_mission[2];
+        kcif.mission[i] = deck.api_mission[2];
       }
-      else if (!isNaN(Number(kcex.mission[i]))) {
-        kcex.mission[i] = null;
+      else if (!isNaN(Number(kcif.mission[i]))) {
+        kcif.mission[i] = null;
       }
-      log("deck mission: " + i + ": " + kcex.mission[i]);
+      log("deck mission: " + i + ": " + kcif.mission[i]);
     }
   } else if (url.indexOf("/kdock") != -1 || url.indexOf("/getship") != -1) {
     var dock_list = url.indexOf("/kdock") != -1 ? json.api_data : json.api_data.api_kdock;
     for (var i = 0, dock; dock = dock_list[i]; i++) {
-      kcex.build[i] = dock;
-      log("kdock: " + kcex.build[i].api_id + ": " + kcex.build[i].api_complete_time);
+      kcif.build[i] = dock;
+      log("kdock: " + kcif.build[i].api_id + ": " + kcif.build[i].api_complete_time);
     }
     if (url.indexOf("/getship") != -1) {
-      kcex.ship_num++;
-      kcex.item_num += json.api_data.api_slotitem.length;
-      log("getship: " + String(kcex.ship_num) + " ships, " + String(kcex.item_num) + " items");
+      kcif.ship_num++;
+      kcif.item_num += json.api_data.api_slotitem.length;
+      log("getship: " + String(kcif.ship_num) + " ships, " + String(kcif.item_num) + " items");
     }
   } else if (url.indexOf("/ndock") != -1) {
     var dock_list = json.api_data;
     for (var i = 0, dock; dock = dock_list[i]; i++) {
-      kcex.repair[i] = dock;
-      log("ndock: " + kcex.repair[i].api_id + ": " + kcex.repair[i].api_complete_time);
+      kcif.repair[i] = dock;
+      log("ndock: " + kcif.repair[i].api_id + ": " + kcif.repair[i].api_complete_time);
     }
   } else if (url.indexOf("/destroyship") != -1) {
-    kcex.ship_num--;
-    kcex.item_num -= kcex.ship_list[String(query.api_ship_id)].slot.filter(function(e){return e >= 0;}).length;
-    log("destroyship: " + String(kcex.ship_num) + " ships, " + String(kcex.item_num) + " items");
+    kcif.ship_num--;
+    kcif.item_num -= kcif.ship_list[String(query.api_ship_id)].slot.filter(function(e){return e >= 0;}).length;
+    log("destroyship: " + String(kcif.ship_num) + " ships, " + String(kcif.item_num) + " items");
   } else if (url.indexOf("/createitem") != -1) {
     if (json.api_data.api_create_flag > 0) {
-      kcex.item_num++;
+      kcif.item_num++;
     }
-    log("createitem: " + String(kcex.item_num) + " items");
+    log("createitem: " + String(kcif.item_num) + " items");
   } else if (url.indexOf("/destroyitem2") != -1) {
-    kcex.item_num -= query.api_slotitem_ids.split(",").length;
-    log("destroyitem2: " + String(kcex.item_num) + " items");
+    kcif.item_num -= query.api_slotitem_ids.split(",").length;
+    log("destroyitem2: " + String(kcif.item_num) + " items");
   } else if (url.indexOf("/powerup") != -1) {
     var id_list = query["api_id_items"].split(",");
-    kcex.ship_num -= id_list.length;
+    kcif.ship_num -= id_list.length;
     for (var i = 0, id; (id = id_list[i]) && i < id_list.length; i++) {
-      kcex.item_num -= kcex.ship_list[String(id)].slot.filter(function(e){return e >= 0;}).length;
+      kcif.item_num -= kcif.ship_list[String(id)].slot.filter(function(e){return e >= 0;}).length;
     }
-    log("powerup: " + String(kcex.ship_num) + " ships, " + String(kcex.item_num) + " items");
+    log("powerup: " + String(kcif.ship_num) + " ships, " + String(kcif.item_num) + " items");
   } else if (url.indexOf("/api_start2") != -1) {
     var mst_ship = json.api_data.api_mst_ship;
     var master = {};
     for (var i = 0, ship; ship = mst_ship[i]; i++) {
       master[ship.api_id] = {
         ship_id: ship.api_id,
-        name: ship.api_name
+        name: ship.api_name,
+        type: ship.api_stype
       };
     }
-    kcex.ship_master = master;
-    kcex.putStorage("ship_master", JSON.stringify(master));
+    kcif.ship_master = master;
+    kcif.putStorage("ship_master", JSON.stringify(master));
     log("ship_master parsed");
     return;
   } else if (url.indexOf("/basic") != -1) {
-    kcex.ship_max = Number(json.api_data.api_max_chara);
-    kcex.item_max = Number(json.api_data.api_max_slotitem) + 3;
-    log("basic: ship_max=" + String(kcex.ship_max) + ", item_max=" + String(kcex.item_max));
+    kcif.ship_max = Number(json.api_data.api_max_chara);
+    kcif.item_max = Number(json.api_data.api_max_slotitem) + 3;
+    log("basic: ship_max=" + String(kcif.ship_max) + ", item_max=" + String(kcif.item_max));
   } else if (url.indexOf("/record") != -1) {
-    kcex.ship_num = Number(json.api_data.api_ship[0]);
-    kcex.ship_max = Number(json.api_data.api_ship[1]);
-    kcex.item_num = Number(json.api_data.api_slotitem[0]);
-    kcex.item_max = Number(json.api_data.api_slotitem[1]) + 3;
-    log("record: ship=" + String(kcex.ship_num) + "/" + String(kcex.ship_max) + ", item=" + String(kcex.item_num) + "/" + String(kcex.item_max));
+    kcif.ship_num = Number(json.api_data.api_ship[0]);
+    kcif.ship_max = Number(json.api_data.api_ship[1]);
+    kcif.item_num = Number(json.api_data.api_slotitem[0]);
+    kcif.item_max = Number(json.api_data.api_slotitem[1]) + 3;
+    log("record: ship=" + String(kcif.ship_num) + "/" + String(kcif.ship_max) + ", item=" + String(kcif.item_num) + "/" + String(kcif.item_max));
   } else if (url.indexOf("/slot_item") != -1) {
-    kcex.item_num = json.api_data.length;
-    log("slot_item: " + String(kcex.item_num) + " items");
+    kcif.item_num = json.api_data.length;
+    log("slot_item: " + String(kcif.item_num) + " items");
   } else if (url.indexOf("battle") != -1) {
     log("battle: " + url);
     var deck_id = json.api_data.api_dock_id || json.api_data.api_deck_id;
     var deck = Number(deck_id);
-    if (url.indexOf("practice") != -1 && (!kcex.mission[deck - 1] || kcex.mission[deck - 1].indexOf("演習") == -1)) {
-      kcex.mission[deck - 1] = "演習";
+    if (url.indexOf("practice") != -1 && (!kcif.mission[deck - 1] || kcif.mission[deck - 1].indexOf("演習") == -1)) {
+      kcif.mission[deck - 1] = "演習";
     }
     battle(url, json);
   } else if (url.indexOf("_map/start") != -1) {
     var deck = Number(query["api_deck_id"]);
     if (deck > 0) {
-      kcex.mission[deck - 1] = map2str(json.api_data);
+      kcif.mission[deck - 1] = map2str(json.api_data);
     }
   } else if (url.indexOf("_map/next") != -1) {
-    for (var i = 0, deck; deck = kcex.mission[i]; i++) {
+    for (var i = 0, deck; deck = kcif.mission[i]; i++) {
       if (deck && isNaN(Number(deck))) {
-        kcex.mission[i] = map2str(json.api_data);
+        kcif.mission[i] = map2str(json.api_data);
         break;
       }
     }
@@ -428,24 +559,24 @@ function kcexCallback(request, content, query) {
     var deck_list = port ? json.api_data.api_deck_port : ship2 ? json.api_data_deck : json.api_data.api_deck_data;
     if (port) {
       for (var i = 0, deck; deck = deck_list[i]; i++) {
-        kcex.mission[i] = deck.api_mission[2];
+        kcif.mission[i] = deck.api_mission[2];
       }
 
       var dock_list = json.api_data.api_ndock;
       for (var i = 0, dock; dock = dock_list[i]; i++) {
-        kcex.repair[i] = dock;
+        kcif.repair[i] = dock;
       }
 
-      kcex.ship_max = Number(json.api_data.api_basic.api_max_chara);
-      kcex.item_max = Number(json.api_data.api_basic.api_max_slotitem) + 3;
+      kcif.ship_max = Number(json.api_data.api_basic.api_max_chara);
+      kcif.item_max = Number(json.api_data.api_basic.api_max_slotitem) + 3;
     }
-    kcex.deck_list = deck_list;
+    kcif.deck_list = deck_list;
 
     var i = 0;
     for (var data; data = data_list[i]; i++) {
       var api_id = String(data.api_id);
-      var ship = kcex.ship_list[api_id];
-      kcex.ship_list[api_id] = {
+      var ship = kcif.ship_list[api_id];
+      kcif.ship_list[api_id] = {
         ship_id: data.api_ship_id,
         level: data.api_lv,
         p_cond: ship ? ship.c_cond : 49,
@@ -455,157 +586,29 @@ function kcexCallback(request, content, query) {
         maxhp: data.api_maxhp,
         slot: data.api_slot
       };
-      if (kcex.ship_master[data.api_ship_id]) {
-        kcex.ship_list[api_id].name = kcex.ship_master[data.api_ship_id].name;
+      if (kcif.ship_master[data.api_ship_id]) {
+        kcif.ship_list[api_id].name = kcif.ship_master[data.api_ship_id].name;
+        kcif.ship_list[api_id].type = kcif.ship_master[data.api_ship_id].type;
       }
     }
     if (port || ship2) {
-      kcex.ship_num = i;
+      kcif.ship_num = i;
     }
 
-    kcex.putStorage("ship_list", JSON.stringify(kcex.ship_list));
-    log("etc: " + String(kcex.ship_num) + " ships (" + (port ? "port" : ship2 ? "ship2" : "ship3") + ")");
+    kcif.putStorage("ship_list", JSON.stringify(kcif.ship_list));
+    log("etc: " + String(kcif.ship_num) + " ships (" + (port ? "port" : ship2 ? "ship2" : "ship3") + ")");
   }
   else {
-    log("timer(?): " + url + " , query: " + hash2str(query));
+    //log("timer(?): " + url + " , query: " + hash2str(query));
   }
 
-  // construct HTML
-  var p = [];
-  var r = []
-  r.push("<b>" + kcex.timeStamp() + "</b>");
-  if (kcex.ship_num) {
-    var sh = String(kcex.ship_num) + "/" + String(kcex.ship_max);
-    if (kcex.ship_num >= kcex.ship_max) {
-      sh = "<font color='#d00'><b>" + sh + "</b></font>";
-    }
-    else if (kcex.ship_num >= kcex.ship_max - 4) {
-      sh = "<font color='#c60'>" + sh + "</font>";
-    }
-    else if (kcex.ship_num >= kcex.ship_max - 8) {
-      sh = "<font color='#a90'>" + sh + "</font>";
-    }
-    var it = String(kcex.item_num) + "/" + String(kcex.item_max);
-    if (kcex.item_num >= kcex.item_max - 3) {
-      it = "<font color='#d00'><b>" + it + "</b></font>";
-    }
-    else if (kcex.item_num >= kcex.item_max - 4 * 4 - 3) {
-      it = "<font color='#c60'>" + it + "</font>";
-    }
-    else if (kcex.item_num >= kcex.item_max - 8 * 4 - 3) {
-      it = "<font color='#a90'>" + it + "</font>";
-    }
-    r.push(sh + " ships, " + it + " items");
-  }
-  else {
-    r.push("loading...");
-  }
-  p.push(r);
+  kcif.render_info();
 
-  r = []
-  r.push("<b>建造</b>");
-  for (var i = 0; kcex.build[i]; i++) {
-    if (kcex.build[i].api_complete_time > 0 || kcex.build[i].api_state == 3) {
-      var now = new Date().getTime();
-      var dt;
-      var s;
-      if (kcex.build[i].api_complete_time > 0) {
-        dt = new Date(kcex.build[i].api_complete_time);
-        s = kcex.build[i].api_id + ".&nbsp;" + time2str(dt);
-      }
-      else {
-        s = "--:--";
-      }
-      if (kcex.build[i].api_complete_time <= now) {
-        s = "<font color='#d00'>" + s + "</font>";
-      } else if (dt.getTime() - 60000 <= now) {
-        s = "<font color='#c60'>" + s + "</font>";
-      }
-      r.push(s + " " + ship2str(kcex.ship_master[kcex.build[i].api_created_ship_id]));
-    }
+  if (kcif.timer) {
+    window.clearTimeout(kcif.timer);
+    kcif.timer = null;
   }
-  p.push(r);
-
-  r = []
-  r.push("<b>入渠</b>");
-  for (var i = 0; kcex.repair[i]; i++) {
-    if (kcex.repair[i].api_complete_time > 0) {
-      var dt = new Date(kcex.repair[i].api_complete_time);
-      var now = new Date().getTime();
-      var s = kcex.repair[i].api_id + ".&nbsp;" + time2str(dt);
-      if (dt.getTime() <= now) {
-        s = "<font color='#d00'>" + s + "</font>";
-      } else if (dt.getTime() - 60000 <= now) {
-        s = "<font color='#c60'>" + s + "</font>";
-      }
-      r.push(s + " " + ship2str(kcex.ship_list[kcex.repair[i].api_ship_id]));
-    }
-  }
-  p.push(r);
-
-  for (var i = 0, deck; deck = kcex.deck_list[i]; i++) {
-    var r = [];
-    r.push("<b>" + String(i + 1) + ":" + deck.api_name + "</b>");
-    var t = kcex.mission[i];
-    if (t && !isNaN(Number(kcex.mission[i]))) {
-      var dt = new Date(t);
-      var now = new Date().getTime();
-      var s = "[" + time2str(dt) + "]";
-      if (dt.getTime() <= now) {
-        s = "<font color='#d00'>" + s + "</font>";
-      } else if (dt.getTime() - 60000 <= now) {
-        s = "<font color='#c60'>" + s + "</font>";
-      }
-      r.push(s);
-    }
-    else if (t) {
-      r.push("<b>" + t + "</b>");
-    }
-    var id_list = deck.api_ship;
-    for (var j = 0, id; id = id_list[j]; j++) {
-      if (id === -1) break;
-      var ship = kcex.ship_list[String(id)];
-      if (ship != null) {
-        var s = String(j + 1) + '.&nbsp;';
-        var shp = ship.nowhp + '/' + ship.maxhp +'&nbsp;';
-        if (ship.nowhp <= ship.maxhp / 4) {
-          shp = "<font color='#d00'><b>" + shp + "</b></font>";
-        } else if (ship.nowhp <= ship.maxhp / 2) {
-          shp = "<font color='#c60'>" + shp + "</font>";
-        } else if (ship.nowhp <= ship.maxhp * 3 / 4) {
-          shp = "<font color='#a90'>" + shp + "</font>";
-        } else if (ship.nowhp >= ship.maxhp) {
-          shp = "<font color='#0d0'>" + shp + "</font>";
-        }
-        if (ship.prehp != ship.nowhp) {
-          shp = "<span style='background-color: #ddf;'>" + shp + "</span>";
-        }
-        var scd = ship.c_cond;
-        var diff = ship.c_cond - ship.p_cond;
-        if (diff != 0) {
-          scd += "&nbsp;(" + ((diff > 0) ? '+' : '') + diff + ")";
-        }
-        if (ship.c_cond < 20) {
-          scd = "<font color='#d00'>" + scd + "</font>";
-        } else if (ship.c_cond < 30) {
-          scd = "<font color='#c60'>" + scd + "</font>";
-        } else if (ship.c_cond < 40) {
-          scd = "<font color='#a90'>" + scd + "</font>";
-        } else if (ship.c_cond >= 50) {
-          scd = "<font color='#0d0'>" + scd + "</font>";
-        }
-        r.push(s + shp + scd + " " + ship2str(ship));
-      }
-    }
-    p.push(r);
-  }
-  kcex.render(p);
-
-  if (kcex.timer) {
-    window.clearTimeout(kcex.timer);
-    kcex.timer = null;
-  }
-  kcex.timer = window.setTimeout(kcexCallback, 60 * 1000);
+  kcif.timer = window.setTimeout(kcifCallback, 30 * 1000);
 }
 
 function parseQuery(query) {
@@ -702,7 +705,7 @@ TracingListener.prototype = {
     // Get entire response
     var responseSource = this.receivedData.join("");
 
-    kcexCallback(request, responseSource, query);
+    kcifCallback(request, responseSource, query);
   },
 
   QueryInterface: function(aIID) {
@@ -716,7 +719,7 @@ TracingListener.prototype = {
 
 const TOPIC = "http-on-examine-response";
 
-var kcexHttpObserver = {
+var kcifHttpObserver = {
   observe: function (aSubject, aTopic, aData) {
     if (aTopic !== TOPIC) return;
 
@@ -733,10 +736,12 @@ var kcexHttpObserver = {
   QueryInterface: XPCOMUtils.generateQI(["nsIObserver"])
 };
 
-var kcex = {
+var kcif = {
   game_frame: null,
   flash: null,
-  div: null,
+  info_div: null,
+  current_tab: "tab-main",
+  current_fleet: "fleet1",
   storage: null,
   ship_master: {},
   ship_list: {},
@@ -759,31 +764,31 @@ var kcex = {
     var dsm = Cc["@mozilla.org/dom/storagemanager;1"].getService(Ci.nsIDOMStorageManager);
     var uri = ios.newURI(url, "", null);
     var principal = ssm.getCodebasePrincipal(uri);
-    kcex.storage = dsm.getLocalStorageForPrincipal(principal, "");
+    kcif.storage = dsm.getLocalStorageForPrincipal(principal, "");
 
-    var s = kcex.getStorage("ship_master");
+    var s = kcif.getStorage("ship_master");
     if (s) {
-      kcex.ship_master = JSON.parse(s);
+      kcif.ship_master = JSON.parse(s);
     }
-    s = kcex.getStorage("ship_list");
+    s = kcif.getStorage("ship_list");
     if (s) {
-      kcex.ship_list = JSON.parse(s);
+      kcif.ship_list = JSON.parse(s);
     }
 
-    Services.obs.addObserver(kcexHttpObserver, TOPIC, false);
+    Services.obs.addObserver(kcifHttpObserver, TOPIC, false);
   },
   
   destroy: function(event) {
     log("destroy");
-    Services.obs.removeObserver(kcexHttpObserver, TOPIC);
+    Services.obs.removeObserver(kcifHttpObserver, TOPIC);
   },
   
   putStorage: function(key, s) {
-    kcex.storage.setItem(key, s);
+    kcif.storage.setItem(key, s);
   },
 
   getStorage: function(key) {
-    return kcex.storage.getItem(key);
+    return kcif.storage.getItem(key);
   },
 
   onLoad: function(event) {
@@ -791,59 +796,282 @@ var kcex = {
     var url = doc.location.href;
     if (url.match(/osapi\.dmm\.com\//)) {
       log("DOMloaded:", url);
-      var div = doc.createElement('div');
-      div.style.whiteSpace = 'pre';
-      div.style.position = 'absolute';
-      div.style.top = '16px';
-      div.style.left = '830px';
-      div.style.textAlign = "left";
-      div.style.whiteSpace = "nowrap";
-      div.style.fontSize = '11px';
-      div.innerHTML = kcex.timeStamp();
-      doc.body.style.width = '848px';
-      doc.body.appendChild(div);
-      kcex.div = div;
+
+      var div = doc.createElement("div");
+      var elem = doc.querySelector("#sectionWrap");
+      if (elem) {
+        elem.parentNode.insertBefore(div, elem);
+      }
+      else {
+        doc.body.appendChild(div);
+      }
+      kcif.info_div = div;
+
+      // スタイルシート
+      var sheet = (function(){
+        var style = doc.createElement("style");
+        doc.head.appendChild(style);
+        return style.sheet;
+      })();
+      sheet.insertRule('#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; text-align: left; }', sheet.length);
+      sheet.insertRule('#kancolle-info * { font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-headers { color: #ccc; background-color: #444; line-height: 1.5; font-weight: bold; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; padding: 1px 12px 2px 12px; }', sheet.length);
+      sheet.insertRule('#kancolle-info #base-info { float: right; margin-right: 8px; color: white; font-weight: normal; }', sheet.length);
+      sheet.insertRule('#kancolle-info #base-info button { height: 21px; position: relative; top: -1px; font-size: 10px; }', sheet.length);
+      sheet.insertRule('#kancolle-info #updated { font-weight: bold; color: lightgreen; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab-header a { color: inherit; text-decoration: none; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab-header a:hover { color: yellow; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab { padding: 2px 8px 2px 8px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab h2 a { color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab h2 a:hover { color: yellow; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab h2 .fleet-name { float: right; color: #ccc; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab #ndock { width: 482px; float: left; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab #kdock { width: 302px; float: left; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; position: relative; top: -3px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab table tr { padding: 0; margin: 0; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab table td { padding: 0; margin: 0; line-height: 1.2; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.ship-no { text-align: right; padding: 0 6px 0 4px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.ship-type { width: 2.7em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.ship-name { font-weight: bold; width: 140px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.ship-level { text-align: right; width: 2em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.ship-hp { text-align: right; width: 4em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.ship-cond { text-align: left; width: 5em; padding-left: 12px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.ship-at { text-align: right; width: 5em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.config-input { text-align: left; width: 40em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.config-input .input-text { width: 100%; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab div.config-buttons { text-align: center; }', sheet.length);
+      sheet.insertRule('#kancolle-info .color-green { color: lightgreen; }', sheet.length);
+      sheet.insertRule('#kancolle-info .color-yellow { color: yellow; }', sheet.length);
+      sheet.insertRule('#kancolle-info .color-orange { color: orange; }', sheet.length);
+      sheet.insertRule('#kancolle-info .color-red { color: red; }', sheet.length);
+      sheet.insertRule('#kancolle-info .color-gray { color: silver; }', sheet.length);
+      sheet.insertRule('#kancolle-info .color-default { color: inherit; }', sheet.length);
+      sheet.insertRule('#kancolle-info .blink { -moz-animation: blink 1.0s ease-in-out infinite alternate; }', sheet.length);
+      sheet.insertRule('@-moz-keyframes blink { 0% {opacity: 0.2;} 60% {opacity: 1;} 100% {opacity: 1;} }', sheet.length);
+
       log("create div");
-      kcex.flash = doc.getElementById("flashWrap");
+      kcif.flash = doc.querySelector("#flashWrap");
     }
     else if (url.match(/\/app_id=854854\//)) {
       log("DOMloaded:", url);
-      var game_frame = doc.getElementById("game_frame");
-      if (game_frame) {
-        game_frame.style.width = '980px';
-        kcex.game_frame = game_frame;
+      var area_game = doc.querySelector("#area-game");
+      if (area_game) {
+        area_game.style.height = '920px';
       }
-
-      var navi_right = doc.getElementsByClassName("navi_right")[0];
-      if (navi_right) {
-        navi_right.innerHTML = "<li><button id='capture'>capture</button></li>" + navi_right.innerHTML;
-        var elem = navi_right.querySelectorAll("button#capture")[0];
-        if (elem) {
-          elem.addEventListener("click", captureAndSave, false, true);
-        }
+      var game_frame = doc.querySelector("#game_frame");
+      if (game_frame) {
+        game_frame.style.height = '920px';
+        kcif.game_frame = game_frame;
       }
 
       doc.body.setAttribute("onload", "if (DMM && DMM.netgame) DMM.netgame.reloadDialog = function(){};");
     }
   },
   
-  render: function(p) {
-    if (kcex.div) {
-      var html = "";
-      for (var i = 0; i < p.length; i++) {
-        html += "<p style='border-bottom:1px solid #AAA;margin:2px 0;'>"
-           + p[i].join("<br>") + "</p>";
-      }
-      kcex.div.innerHTML = html;
-    }
-  },
-  
   timeStamp: function() {
     var dt = new Date();
     return dt.toLocaleFormat("%H:%M");
+  },
+
+  render_info: function() {
+    if (kcif.info_div) {
+      kcif.game_frame.style.height = '920px';
+      var html = "";
+      html += '<div id="kancolle-info">';
+      html += '<div id="tab-headers">';
+      html += '<div id="tab-header-main" class="tab-header"><a href="#">メイン</a></div>';
+      html += '<div id="tab-header-ships" class="tab-header"><a href="#">艦娘</a></div>';
+      html += '<div id="tab-header-items" class="tab-header"><a href="#">装備</a></div>';
+      html += '<div id="tab-header-config" class="tab-header"><a href="#">設定</a></div>';
+      var ship_col = 'color-default';
+      if (kcif.ship_num >= kcif.ship_max) {
+        ship_col = 'color-red';
+      }
+      else if (kcif.ship_num >= kcif.ship_max - 4) {
+        ship_col = 'color-orange';
+      }
+      else if (kcif.ship_num >= kcif.ship_max - 8) {
+        ship_col = 'color-yellow';
+      }
+      var item_col = 'color-default';
+      if (kcif.item_num >= kcif.item_max - 3) {
+        item_col = 'color-red';
+      }
+      else if (kcif.item_num >= kcif.item_max - 4 * 4 -3) {
+        item_col = 'color-orange';
+      }
+      else if (kcif.item_num >= kcif.item_max - 8 * 4 - 3) {
+        item_col = 'color-yellow';
+      }
+      html += '<div id="base-info"><span class="' + ship_col + '">' + kcif.ship_num + '</span>/' + kcif.ship_max + ' ships; <span class="' + item_col + '">' + kcif.item_num + '</span>/' + kcif.item_max + ' items <span id="updated">' + (new Date()).toLocaleFormat("%H:%M") + '更新</span> <button id="capture">画面キャプチャ</button></div>';
+      html += '</div>';
+
+      html += '<div id="tab-main" class="tab">';
+      for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
+        html += '<div id="fleet' + (i + 1) + '" class="fleet">';
+        var col = 'color-default';
+        var t = kcif.mission[i];
+        var s = null;
+        if (t && !isNaN(Number(t))) {
+          var dt = new Date(t);
+          var now = new Date().getTime();
+          s = "[遠征中 " + time2str(dt) + "]";
+          if (dt.getTime() <= now) {
+            col = "color-red";
+          }
+          else if (dt.getTime() - 60000 <= now) {
+            col = "color-orange";
+          }
+          else if (dt.getTime() - 5 * 60000 <= now) {
+            col = "color-yellow";
+          }
+        }
+        else if (t) {
+          s = "[出撃中 " + t + "]";
+          col = "color-green";
+        }
+        if (s) {
+          s = '<span class="' + col + '">' + s + '</span>';
+        }
+        else {
+          s = "";
+        }
+        html += '<h2><a href="#">第' + (i + 1) + '艦隊</a> ' + s + '<span class="fleet-name">「' + deck.api_name + '」</span></h2>';
+
+        html += '<table>';
+        var id_list = deck.api_ship;
+        for (var j = 0, id; id = id_list[j]; j++) {
+          if (id === -1) break;
+          var ship = kcif.ship_list[String(id)];
+          if (ship != null) {
+            html += '<tr><td class="ship-no">' + (j + 1) + '</td>';
+            html += '<td class="ship-type">' + ship_type(ship) + '</td>';
+            html += '<td class="ship-name">' + ship2str(ship) + '</td>';
+            html += '<td class="ship-level">' + (ship.level || 1) + '</td>';
+            html += ship_hp(ship);
+            html += ship_cond(ship) + '</tr>';
+          }
+        }
+        html += '</table>';
+        html += '</div>';
+      }
+
+      html += '<div id="ndock">';
+      html += '<h2><a href="#">入渠</a></h2>';
+      html += '<table>';
+      for (var i = 0; kcif.repair[i]; i++) {
+        if (kcif.repair[i].api_complete_time > 0) {
+          html += '<tr><td class="ship-no">' + kcif.repair[i].api_id + '</td>';
+          var ship = kcif.ship_list[kcif.repair[i].api_ship_id];
+          html += '<td class="ship-type">' + ship_type(ship) + '</td>';
+          html += '<td class="ship-name">' + ship2str(ship) + '</td>';
+          html += '<td class="ship-level">' + (ship.level || 1) + '</td>';
+          html += ship_hp(ship);
+          html += ship_cond(ship);
+          var dt = new Date(kcif.repair[i].api_complete_time);
+          var now = new Date().getTime();
+          var col = "color-default";
+          if (dt.getTime() <= now) {
+            col = "color-red";
+          } else if (dt.getTime() - 60000 <= now) {
+            col = "color-orange";
+          }
+          html += '<td class="ship-at ' + col + '">' + time2str(dt) + '</td>';
+        }
+      }
+      html += '</table>';
+      html += '</div>';
+
+      html += '<div id="kdock">';
+      html += '<h2><a href="#">建造</a></h2>';
+      html += '<table>';
+      for (var i = 0; kcif.build[i]; i++) {
+        if (kcif.build[i].api_complete_time > 0 || kcif.build[i].api_state == 3) {
+          html += '<tr><td class="ship-no">' + kcif.build[i].api_id + '</td>';
+          var ship = kcif.ship_master[kcif.build[i].api_created_ship_id];
+          html += '<td class="ship-type">' + ship_type(ship) + '</td>';
+          html += '<td class="ship-name">' + ship2str(ship) + '</td>';
+          var now = new Date().getTime();
+          var dt;
+          var s;
+          if (kcif.build[i].api_complete_time > 0) {
+            dt = new Date(kcif.build[i].api_complete_time);
+            s = time2str(dt);
+          }
+          else {
+            s = "--:--";
+          }
+          var col = "color-default";
+          if (kcif.build[i].api_complete_time <= now) {
+            col = "color-red";
+          } else if (dt.getTime() - 60000 <= now) {
+            col = "color-orange";
+          }
+          html += '<td class="ship-at ' + col + '">' + s + '</td>';
+        }
+      }
+      html += '</table>';
+      html += '</div>';
+
+      html += '</div>';
+
+      html += '<div id="tab-ships" class="tab">';
+      html += '<span class="color-red">※未実装です。表示内容に意味はありません。</span>';
+      html += '</div>';
+
+      html += '<div id="tab-items" class="tab">';
+      html += '<span class="color-red">※未実装です。表示内容に意味はありません。</span>';
+      html += '</div>';
+
+      html += '<div id="tab-config" class="tab">';
+      html += '<table>';
+      html += '<tr><td>&nbsp;</td><td></td></tr>';
+      html += '<tr><td class="config-label">画面キャプチャ保存先</td><td class="config-input"><input id="capture-save-dir" class="input-text" value="' + captureSaveDir() + '"></td></tr>';
+      html += '<tr><td class="config-label">画面キャプチャベース名</td><td class="config-input"><input id="capture-save-base" class="input-text" value="kancolle-"></td></tr>';
+      html += '</table>';
+      html += '<div class="config-buttons">';
+      html += '<button id="config-save">保存</button>';
+      html += '<button id="config-reset">クリア</button>';
+      html += '</div>';
+      html += '<span class="color-red">※未実装です。表示内容に意味はありません。</span>';
+      html += '</div>';
+
+      html += '</div>';
+
+      kcif.info_div.innerHTML = html;
+
+      // ボタン
+      var elem = kcif.info_div.querySelector("#capture");
+      if (elem) {
+        elem.addEventListener("click", captureAndSave, false, true);
+      }
+
+      // タブ
+      var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header a");
+      for (var i = 0; i < elems.length; i++) {
+        elems[i].addEventListener("click", select_tab, true);
+      }
+      var elem = kcif.info_div.querySelector("#kancolle-info #" + kcif.current_tab.replace("-", "-header-") + " a");
+      if (elem) {
+        elem.click();
+      }
+
+      // メイン:艦隊
+      elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main .fleet h2 a");
+      for (var i = 0; i < elems.length; i++) {
+        elems[i].addEventListener("click", select_fleet, true);
+      }
+      var elem = kcif.info_div.querySelector("#kancolle-info #" + kcif.current_fleet + " h2 a");
+       if (elem) {
+         elem.click();
+       }
+    }
   }
 };
 
-window.addEventListener("load", kcex.init, false);
-window.addEventListener("unload", kcex.destroy, false);
-document.addEventListener("DOMContentLoaded", kcex.onLoad, true);
+window.addEventListener("load", kcif.init, false);
+window.addEventListener("unload", kcif.destroy, false);
+document.addEventListener("DOMContentLoaded", kcif.onLoad, true);

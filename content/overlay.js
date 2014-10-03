@@ -83,9 +83,16 @@ function saveFile(dataFile, path) {
   reader.readAsBinaryString(dataFile);
 }
 
+function myPref() {
+  return Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getBranch("extensions.kancolleinfo.");
+}
+
 function captureSaveDir() {
-  var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getBranch("extensions.kancolleEx.");
-  return prefs.getComplexValue("capture.directory", Ci.nsISupportsString).data || Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
+  return myPref().getComplexValue("capture.directory", Ci.nsISupportsString).data || Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
+}
+
+function captureSaveBase() {
+  return myPref().getComplexValue("capture.basename", Ci.nsISupportsString).data || "kancolle-";
 }
 
 function captureAndSave() {
@@ -93,8 +100,9 @@ function captureAndSave() {
   var png = capture(kcif.flash, kcif.game_frame, 1.0);
 
   var dir = captureSaveDir();
+  var base = captureSaveBase();
   var s = new Date().toLocaleFormat("%Y%m%d%H%M%S");
-  var filename = dir + "\\kancolle-" + s + ".png";
+  var filename = dir + "\\" + base + s + ".png";
   saveFile(png, filename);
   log("captureAndSave finish");
 }
@@ -1082,7 +1090,7 @@ var kcif = {
       html += '<table>';
       html += '<tr><td>&nbsp;</td><td></td></tr>';
       html += '<tr><td class="config-label">画面キャプチャ保存先</td><td class="config-input"><input id="capture-save-dir" class="input-text" value="' + captureSaveDir() + '"></td></tr>';
-      html += '<tr><td class="config-label">画面キャプチャベース名</td><td class="config-input"><input id="capture-save-base" class="input-text" value="kancolle-"></td></tr>';
+      html += '<tr><td class="config-label">画面キャプチャベース名</td><td class="config-input"><input id="capture-save-base" class="input-text" value="' + captureSaveBase() + '"></td></tr>';
       html += '</table>';
       html += '<div class="config-buttons">';
       html += '<button id="config-save">保存</button>';

@@ -60,6 +60,35 @@ function saveConfig() {
     str.data = elem.value;
     myPref().setComplexValue("capture.basename", Ci.nsISupportsString, str);
   }
+
+  elem = kcif.info_div.querySelector("#beep-url");
+  if (elem) {
+    str.data = elem.value;
+    myPref().setComplexValue("beep.url", Ci.nsISupportsString, str);
+  }
+
+  elem = kcif.info_div.querySelector("#beep-volume");
+  if (elem) {
+    myPref().setIntPref("beep.volume", elem.value);
+  }
+
+  elem = kcif.info_div.querySelector("#beep-expedition");
+  if (elem) {
+    myPref().setBoolPref("beep.expedition", elem.checked);
+  }
+
+  elem = kcif.info_div.querySelector("#beep-dock");
+  if (elem) {
+    myPref().setBoolPref("beep.dock", elem.checked);
+  }
+
+  elem = kcif.info_div.querySelector("#beep-built");
+  if (elem) {
+    myPref().setBoolPref("beep.built", elem.checked);
+  }
+
+  restoreCheckboxes(saveCheckboxes());
+  beepOnOff();
 }
 
 function resetConfig() {
@@ -71,6 +100,176 @@ function resetConfig() {
   elem = kcif.info_div.querySelector("#capture-save-base");
   if (elem) {
     elem.value = getCaptureSaveBase();
+  }
+
+  elem = kcif.info_div.querySelector("#beep-url");
+  if (elem) {
+    elem.value = getBeepUrl();
+  }
+
+  elem = kcif.info_div.querySelector("#beep-volume");
+  if (elem) {
+    elem.value = getBeepVolume();
+  }
+
+  elem = kcif.info_div.querySelector("#beep-expedition");
+  if (elem) {
+    elem.checked = getBeepExpedition();
+  }
+
+  elem = kcif.info_div.querySelector("#beep-dock");
+  if (elem) {
+    elem.checked = getBeepDock();
+  }
+
+  elem = kcif.info_div.querySelector("#beep-built");
+  if (elem) {
+    elem.checked = getBeepBuilt();
+  }
+}
+
+function checkConfigChanged() {
+  var changed = false;
+
+  var elem = kcif.info_div.querySelector("#capture-save-dir");
+  if (elem) {
+    if (elem.value != getCaptureSaveDir()) {
+      changed = true;
+    }
+  }
+
+  var elem = kcif.info_div.querySelector("#capture-save-base");
+  if (elem) {
+    if (elem.value != getCaptureSaveBase()) {
+      changed = true;
+    }
+  }
+
+  var elem = kcif.info_div.querySelector("#beep-url");
+  if (elem) {
+    if (elem.value != getBeepUrl()) {
+      changed = true;
+    }
+  }
+
+  var elem = kcif.info_div.querySelector("#beep-volume");
+  if (elem) {
+    if (elem.value != getBeepVolume()) {
+      log("checkConfigChaned: beep-volume: [" + elem.value + "] <- [" + getBeepVolume() + "] : " + elem.value != getBeepVolume());
+      changed = true;
+    }
+  }
+
+  var elem = kcif.info_div.querySelector("#beep-expedition");
+  if (elem) {
+    if (elem.checked != getBeepExpedition()) {
+      changed = true;
+    }
+  }
+
+  var elem = kcif.info_div.querySelector("#beep-dock");
+  if (elem) {
+    if (elem.checked != getBeepDock()) {
+      changed = true;
+    }
+  }
+
+  var elem = kcif.info_div.querySelector("#beep-built");
+  if (elem) {
+    if (elem.checked != getBeepDock()) {
+      changed = true;
+    }
+  }
+
+  return changed;
+}
+
+function myPref() {
+  return Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getBranch("extensions.kancolleinfo.");
+}
+
+function getCaptureSaveDir() {
+  return myPref().getComplexValue("capture.directory", Ci.nsISupportsString).data || Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
+}
+
+function getCaptureSaveBase() {
+  return myPref().getComplexValue("capture.basename", Ci.nsISupportsString).data || "kancolle-";
+}
+
+function getBeepUrl() {
+  return myPref().getComplexValue("beep.url", Ci.nsISupportsString).data || "file:///C:/Windows/Media/ringout.wav";
+}
+
+function getBeepVolume() {
+  return myPref().getIntPref("beep.volume");
+}
+
+function getBeepExpedition() {
+  return myPref().getBoolPref("beep.expedition");
+}
+
+function getBeepDock() {
+  return myPref().getBoolPref("beep.dock");
+}
+
+function getBeepBuilt() {
+  return myPref().getBoolPref("beep.built");
+}
+
+function saveCheckboxes() {
+  var checks = {};
+  var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main input.check-timer");
+  for (var i = 0; i < elems.length; i++) {
+    checks[elems[i].id] = elems[i].checked;
+  }
+  return checks;
+}
+
+function restoreCheckboxes(checks) {
+  var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main input.check-timer");
+  for (var i = 0; i < elems.length; i++) {
+    if (elems[i].className.indexOf("check-expedition") >= 0) {
+      elems[i].checked = getBeepExpedition() && checks[elems[i].id] == null || checks[elems[i].id];
+    }
+    else if (elems[i].className.indexOf("check-dock") >= 0) {
+      elems[i].checked = getBeepDock() && checks[elems[i].id] == null || checks[elems[i].id];
+    }
+    else if (elems[i].className.indexOf("check-built") >= 0) {
+      elems[i].checked = getBeepBuilt() && checks[elems[i].id] == null || checks[elems[i].id];
+    }
+  }
+}
+
+function beepOnOff() {
+  var url = getBeepUrl();
+  if (kcif.beep && kcif.beep.src != url) {
+    kcif.beep.pause();
+    kcif.beep = null;
+  }
+  if (!kcif.beep) {
+    kcif.beep = new Audio(url);
+    kcif.beep.loop = true;
+    kcif.load();
+  }
+  kcif.beep.volume = getBeepVolume() / 100.0;
+
+  var found = false;
+  var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main input.check-timer");
+  for (var i = 0; i < elems.length; i++) {
+    if (elems[i].checked) {
+      var parent = elems[i].parentNode.parentNode;
+      if (parent.className.indexOf("color-orange") >= 0 || parent.className.indexOf("color-red") >= 0) {
+        found = true;
+        break;
+      }
+    }
+  }
+
+  if (found) {
+    kcif.beep.play();
+  }
+  else {
+    kcif.beep.pause();
   }
 }
 
@@ -111,16 +310,11 @@ function saveFile(dataFile, path) {
   reader.readAsBinaryString(dataFile);
 }
 
-function myPref() {
-  return Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getBranch("extensions.kancolleinfo.");
-}
-
-function getCaptureSaveDir() {
-  return myPref().getComplexValue("capture.directory", Ci.nsISupportsString).data || Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
-}
-
-function getCaptureSaveBase() {
-  return myPref().getComplexValue("capture.basename", Ci.nsISupportsString).data || "kancolle-";
+function getPathSeparator() {
+  var profD = Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("ProfD", Ci.nsIFile);
+  profD.append("dummy");
+  profD.append("dummy");
+  return profD.path.substr(profD.path.length - ("dummy".length) - 1, 1);
 }
 
 function captureAndSave() {
@@ -130,7 +324,7 @@ function captureAndSave() {
   var dir = getCaptureSaveDir();
   var base = getCaptureSaveBase();
   var s = new Date().toLocaleFormat("%Y%m%d%H%M%S");
-  var filename = dir + "\\" + base + s + ".png";
+  var filename = dir + getPathSeparator() + base + s + ".png";
   saveFile(png, filename);
   log("captureAndSave finish");
 }
@@ -142,6 +336,21 @@ function time2str(dt) {
     s = week.substr(dt.getDay() * 3, 3) + "&nbsp;" + s;
   }
   return s;
+}
+
+function getTimeColor(dt) {
+  var now = new Date().getTime();
+  var col = "color-default";
+  if (dt.getTime() <= now) {
+    col = "color-red";
+  }
+  else if (dt.getTime() - 60000 <= now) {
+    col = "color-orange";
+  }
+  else if (dt.getTime() - 5 * 60000 <= now) {
+    col = "color-yellow";
+  }
+  return col;
 }
 
 function hash2str(obj) {
@@ -569,6 +778,7 @@ function kcifCallback(request, content, query) {
   } else if (url.indexOf("/slot_item") != -1) {
     kcif.item_num = json.api_data.length;
     log("slot_item: " + String(kcif.item_num) + " items");
+    return;
   } else if (url.indexOf("battle") != -1) {
     log("battle: " + url);
     var deck_id = json.api_data.api_dock_id || json.api_data.api_deck_id;
@@ -697,7 +907,7 @@ function kcifCallback(request, content, query) {
     }
     p.push(r);
   }
-  kcif.timer = window.setTimeout(kcifCallback, 30 * 1000);
+  kcif.timer = window.setTimeout(kcifCallback, 10 * 1000);
 }
 
 function parseQuery(query) {
@@ -831,6 +1041,7 @@ var kcif = {
   info_div: null,
   current_tab: "tab-main",
   current_fleet: "fleet1",
+  beep: null,
   storage: null,
   ship_master: {},
   ship_list: {},
@@ -927,10 +1138,14 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab td.ship-level { text-align: right; width: 2em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab td.ship-hp { text-align: right; width: 4em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab td.ship-cond { text-align: left; width: 5em; padding-left: 12px; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.ship-at { text-align: right; width: 5em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.ship-at { text-align: right; width: 7em; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-main input.check-timer { padding: 0; margin: 0 0 0 4px; position: relative; top: 2px;}', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.config-header { text-align: right; width: 12em; padding: 2px 16px 0 0; color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab td.config-input { text-align: left; width: 40em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab td.config-input .input-text { width: 100%; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab td.config-input .input-number { width: 4em !important; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab div.config-buttons { text-align: center; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-green { color: lightgreen; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-yellow { color: yellow; }', sheet.length);
@@ -993,9 +1208,15 @@ var kcif = {
 
       html += '<div id="tab-config" class="tab">';
       html += '<table>';
-      html += '<tr><td>&nbsp;</td><td></td></tr>';
-      html += '<tr><td class="config-label">画面キャプチャ保存先</td><td class="config-input"><input id="capture-save-dir" class="input-text" value="' + getCaptureSaveDir() + '"></td></tr>';
-      html += '<tr><td class="config-label">画面キャプチャベース名</td><td class="config-input"><input id="capture-save-base" class="input-text" value="' + getCaptureSaveBase() + '"></td></tr>';
+      html += '<tr><td class="config-header">画面キャプチャ</td><td></td></tr>';
+      html += '<tr><td class="config-label">保存先</td><td class="config-input"><input id="capture-save-dir" class="input-text" value="' + getCaptureSaveDir() + '"></td></tr>';
+      html += '<tr><td class="config-label">ベース名</td><td class="config-input"><input id="capture-save-base" class="input-text" value="' + getCaptureSaveBase() + '"></td></tr>';
+      html += '<tr><td class="config-header">タイマーサウンド</td><td></td></tr>';
+      html += '<tr><td class="config-label">サウンドファイルURL</td><td class="config-input"><input id="beep-url" class="input-text" value="' + getBeepUrl() + '"></td></tr>';
+      html += '<tr><td class="config-label">ボリューム(0～100)</td><td class="config-input"><input id="beep-volume" class="input-text input-number" type="number" max="100" min="0" value="' + getBeepVolume() + '"> <button id="beep-test">テスト</button></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-expedition" type="checkbox" class="input-checkbox"' + (getBeepExpedition() ? ' checked' : '') + '>遠征帰還時のサウンド再生を自動でONにする</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-dock" type="checkbox" class="input-checkbox"' + (getBeepDock() ? ' checked' : '') + '>入渠終了時のサウンド再生を自動でONにする</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-built" type="checkbox" class="input-checkbox"' + (getBeepBuilt() ? ' checked' : '') + '>建造終了時のサウンド再生を自動でONにする</label></td></tr>';
       html += '</table>';
       html += '<div class="config-buttons">';
       html += '<button id="config-save">保存</button>';
@@ -1023,16 +1244,67 @@ var kcif = {
         elem.click();
       }
 
+      // 設定:テキスト
+      var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-config input.input-text");
+      for (var i = 0; i < elems.length; i++) {
+        elems[i].addEventListener("input", function() {
+          kcif.info_div.querySelector("#config-save").disabled = !checkConfigChanged();
+        }, false);
+      }
+
+      // 設定:チェックボックス
+      var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-config input.input-checkbox");
+      for (var i = 0; i < elems.length; i++) {
+        elems[i].addEventListener("click", function() {
+          kcif.info_div.querySelector("#config-save").disabled = !checkConfigChanged();
+        }, false);
+      }
+
       // 設定:保存
       var elem = kcif.info_div.querySelector("#config-save");
       if (elem) {
         elem.addEventListener("click", saveConfig, true, true);
+        elem.disabled = true;
       }
 
       // 設定:クリア
       var elem = kcif.info_div.querySelector("#config-reset");
       if (elem) {
         elem.addEventListener("click", resetConfig, true, true);
+      }
+
+      // 設定:タイマーサウンドテスト
+      var elem = kcif.info_div.querySelector("#beep-test");
+      if (elem) {
+        var beeptest = null;
+        elem.addEventListener("click", function() {
+          var url = kcif.info_div.querySelector("#beep-url").value;
+          if (beeptest && beeptest.src != url) {
+            log("beeptest: url=[" + url + "], src=[" + beeptest.src + "]");
+            beeptest.pause();
+            beeptest = null;
+          }
+          if (!beeptest) {
+            beeptest = new Audio(url);
+            beeptest.loop = true;
+            beeptest.volume = kcif.info_div.querySelector("#beep-volume").value / 100.0;
+            beeptest.load();
+          }
+          if (beeptest.paused) {
+             beeptest.play();
+          }
+          else {
+             beeptest.pause();
+          }
+        }, true, true);
+      }
+
+      // タイマーサウンド設定
+      kcif.beep = new Audio(getBeepUrl());
+      if (kcif.beep) {
+        kcif.beep.loop = true;
+        kcif.beep.volume = getBeepVolume() / 100.0;
+        kcif.beep.load();
       }
     }
   },
@@ -1042,6 +1314,8 @@ var kcif = {
       kcif.game_frame.style.height = '920px'; // なぜかここでないとダメ
       var base = kcif.info_div.querySelector("#base-info");
       var main = kcif.info_div.querySelector("#tab-main");
+
+      var checks = saveCheckboxes();
 
       var html = "";
       var ship_col = 'color-default';
@@ -1070,22 +1344,13 @@ var kcif = {
       html = "";
       for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
         html += '<div id="fleet' + (i + 1) + '" class="fleet">';
-        var col = 'color-default';
+        var col = "color-default";
         var t = kcif.mission[i];
         var s = null;
         if (t && !isNaN(Number(t))) {
           var dt = new Date(t);
-          var now = new Date().getTime();
-          s = "[遠征中 " + time2str(dt) + "]";
-          if (dt.getTime() <= now) {
-            col = "color-red";
-          }
-          else if (dt.getTime() - 60000 <= now) {
-            col = "color-orange";
-          }
-          else if (dt.getTime() - 5 * 60000 <= now) {
-            col = "color-yellow";
-          }
+          s = "[遠征中 <label>" + time2str(dt) + "<input id='check-fleet" + (i + 1) + "' type='checkbox' class='check-timer check-expedition'></label>]";
+          col = getTimeColor(dt);
         }
         else if (t) {
           s = "[出撃中 " + t + "]";
@@ -1130,14 +1395,7 @@ var kcif = {
           html += ship_hp(ship);
           html += ship_cond(ship);
           var dt = new Date(kcif.repair[i].api_complete_time);
-          var now = new Date().getTime();
-          var col = "color-default";
-          if (dt.getTime() <= now) {
-            col = "color-red";
-          } else if (dt.getTime() - 60000 <= now) {
-            col = "color-orange";
-          }
-          html += '<td class="ship-at ' + col + '">' + time2str(dt) + '</td>';
+          html += '<td class="ship-at ' + getTimeColor(dt) + '"><label>' + time2str(dt) + '<input id="check-dock' + kcif.repair[i].api_id + '" type="checkbox" class="check-timer check-dock"></label></td>';
         }
       }
       html += '</table>';
@@ -1152,23 +1410,18 @@ var kcif = {
           var ship = kcif.ship_master[kcif.build[i].api_created_ship_id];
           html += '<td class="ship-type">' + ship_type(ship) + '</td>';
           html += '<td class="ship-name">' + ship2str(ship) + '</td>';
-          var now = new Date().getTime();
-          var dt;
+          var col;
           var s;
           if (kcif.build[i].api_complete_time > 0) {
-            dt = new Date(kcif.build[i].api_complete_time);
+            var dt = new Date(kcif.build[i].api_complete_time);
             s = time2str(dt);
+            col = getTimeColor(dt);
           }
           else {
             s = "--:--";
-          }
-          var col = "color-default";
-          if (kcif.build[i].api_complete_time <= now) {
             col = "color-red";
-          } else if (dt.getTime() - 60000 <= now) {
-            col = "color-orange";
           }
-          html += '<td class="ship-at ' + col + '">' + s + '</td>';
+          html += '<td class="ship-at ' + col + '"><label>' + s + '<input id="check-built' + kcif.build[i].api_id + '" type="checkbox" class="check-timer check-built"></label></td>';
         }
       }
       html += '</table>';
@@ -1186,9 +1439,19 @@ var kcif = {
         elems[i].addEventListener("click", select_fleet, true);
       }
       var elem = kcif.info_div.querySelector("#kancolle-info #" + kcif.current_fleet + " h2 a");
-       if (elem) {
-         elem.click();
-       }
+      if (elem) {
+        elem.click();
+      }
+
+      // メイン:タイマーチェックボックス
+      elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main input.check-timer");
+      for (var i = 0; i < elems.length; i++) {
+        elems[i].addEventListener("click", beepOnOff, false);
+      }
+
+      // チェックボックス復元
+      restoreCheckboxes(checks);
+      beepOnOff();
     }
   }
 };

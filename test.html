@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional //EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ja">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>kancolleinfo テスト画面</title>
@@ -31,7 +32,7 @@
       </table>
     </div>
     <div id="fleet2" class="fleet">
-      <h2><a href="#">第2艦隊</a> <span class="color-red">[遠征中 02:33帰還]</span><span class="fleet-name">「第2艦隊」</span></h2>
+      <h2><a href="#">第2艦隊</a> <span class="color-red">[遠征中 <label>02:33帰還<input class="check-timer" type="checkbox"></label>]</span><span class="fleet-name">「第2艦隊」</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-name">Bismarck drei</td><td class="ship-level">105</td><td class="ship-hp color-green">96/96</td><td class="ship-cond color-green">53</td></tr>
         <tr><td class="ship-no">2</td><td class="ship-name">千代田航改二</td><td class="ship-level">90</td><td class="ship-hp blink">56/58</td><td class="ship-cond">49</td></tr>
@@ -42,7 +43,7 @@
       </table>
     </div>
     <div id="fleet3" class="fleet">
-      <h2><a href="#">第3艦隊</a> <span class="color-yellow">[遠征中 02:40帰還]</span><span class="fleet-name">「第3艦隊」</span></h2>
+      <h2><a href="#">第3艦隊</a> <span class="color-yellow">[遠征中 <label>02:40帰還<input class="check-timer" type="checkbox"></label>]</span><span class="fleet-name">「第3艦隊」</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-name">Bismarck drei</td><td class="ship-level">105</td><td class="ship-hp color-green">96/96</td><td class="ship-cond color-green">53</td></tr>
         <tr><td class="ship-no">2</td><td class="ship-name">千代田航改二</td><td class="ship-level">90</td><td class="ship-hp blink">56/58</td><td class="ship-cond">49</td></tr>
@@ -66,19 +67,19 @@
     <div id="ndock">
       <h2><a href="#">入渠</a></h2>
       <table>
-        <tr><td class="ship-no">1</td><td class="ship-type">高戦</td><td class="ship-name">Bismarck drei</td><td class="ship-level">105</td><td class="ship-hp color-yellow">50/96</td><td class="ship-cond color-green">53</td><td class="ship-at color-red">--:--</td></tr>
-        <tr><td class="ship-no">2</td><td class="ship-type">軽空</td><td class="ship-name">千代田航改二</td><td class="ship-level">90</td><td class="ship-hp color-red">1/58</td><td class="ship-cond">49</td><td class="ship-at color-orange">02:36</td></tr>
-        <tr><td class="ship-no">3</td><td class="ship-type">戦艦</td><td class="ship-name">大和改</td><td class="ship-level">90</td><td class="ship-hp color-default">90/96</td><td class="ship-cond color-yellow blink">30 (+12)</td><td class="ship-at">Sat 02:34</td></tr>
-        <tr><td class="ship-no">4</td><td class="ship-type">潜水</td><td class="ship-name">伊168改</td><td class="ship-level">90</td><td class="ship-hp color-orange">7/15</td><td class="ship-cond color-orange">20</td><td class="ship-at color-red">02:34</td></tr>
+        <tr><td class="ship-no">1</td><td class="ship-type">高戦</td><td class="ship-name">Bismarck drei</td><td class="ship-level">105</td><td class="ship-hp color-yellow">50/96</td><td class="ship-cond color-green">53</td><td class="ship-at color-red"><label>--:--<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">2</td><td class="ship-type">軽空</td><td class="ship-name">千代田航改二</td><td class="ship-level">90</td><td class="ship-hp color-red">1/58</td><td class="ship-cond">49</td><td class="ship-at color-orange"><label>02:36<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">3</td><td class="ship-type">戦艦</td><td class="ship-name">大和改</td><td class="ship-level">90</td><td class="ship-hp color-default">90/96</td><td class="ship-cond color-yellow blink">30 (+12)</td><td class="ship-at"><label>Sat 02:34<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">4</td><td class="ship-type">潜水</td><td class="ship-name">伊168改</td><td class="ship-level">90</td><td class="ship-hp color-orange">7/15</td><td class="ship-cond color-orange">20</td><td class="ship-at color-red"><label>02:34<input class="check-timer" type="checkbox"></label></td></tr>
       </table>
     </div>
     <div id="kdock">
       <h2><a href="#">建造</a></h2>
       <table>
-        <tr><td class="ship-no">1</td><td class="ship-type">高戦</td><td class="ship-name">Bismarck</td><td class="ship-at color-red">--:--</td></tr>
-        <tr><td class="ship-no">2</td><td class="ship-type">軽空</td><td class="ship-name">千代田</td><td class="ship-at color-orange">02:36</td></tr>
-        <tr><td class="ship-no">3</td><td class="ship-type">戦艦</td><td class="ship-name">大和</td><td class="ship-at">Sat 02:34</td></tr>
-        <tr><td class="ship-no">4</td><td class="ship-type">潜水</td><td class="ship-name">伊168</td><td class="ship-at color-red">02:34</td></tr>
+        <tr><td class="ship-no">1</td><td class="ship-type">高戦</td><td class="ship-name">Bismarck</td><td class="ship-at color-red"><label>--:--<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">2</td><td class="ship-type">軽空</td><td class="ship-name">千代田</td><td class="ship-at color-orange"><label>02:36<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">3</td><td class="ship-type">戦艦</td><td class="ship-name">大和</td><td class="ship-at"><label>Sat 02:34<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">4</td><td class="ship-type">潜水</td><td class="ship-name">伊168</td><td class="ship-at color-red"><label>02:34<input class="check-timer" type="checkbox"></label></td></tr>
       </table>
     </div>
   </div>
@@ -90,34 +91,46 @@
   </div>
   <div id="tab-config" class="tab">
     <table>
-      <tr><td>&nbsp;</td><td></td></tr>
-      <tr><td class="config-label">画面キャプチャ保存先</td><td class="config-input"><input id="capture-save-dir" class="input-text" value="D:\tmp"></td></tr>
-      <tr><td class="config-label">画面キャプチャベース名</td><td class="config-input"><input id="capture-save-base" class="input-text" value="kancolle-"></td></tr>
+      <tr><td class="config-header">画面キャプチャ</td><td></td></tr>
+      <tr><td class="config-label">保存先</td><td class="config-input"><input id="capture-save-dir" class="input-text" value="D:\tmp"></td></tr>
+      <tr><td class="config-label">ベース名</td><td class="config-input"><input id="capture-save-base" class="input-text" value="kancolle-"></td></tr>
+      <tr><td class="config-header">タイマーサウンド</td><td></td></tr>
+      <tr><td class="config-label">サウンドファイルURL</td><td class="config-input"><input id="beep-url" class="input-text" value="file://C:/Windows/Media/ringout.wav"></td></tr>
+      <tr><td class="config-label">ボリューム(0～100)</td><td class="config-input"><input id="beep-volume" class="input-text input-number" type="number" max="100" min="0" value="100"></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-expedition" type="checkbox" class="input-checkbox" checked>遠征帰還時にサウンドを再生する</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-dock" type="checkbox" class="input-checkbox" checked>入渠終了時にサウンドを再生する</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-built" type="checkbox" class="input-checkbox" checked>建造終了時にサウンドを再生する</label></td></tr>
     </table>
     <div class="config-buttons">
       <button id="config-save">保存</button>
       <button id="config-reset">クリア</button>
     </div>
-    <span class="color-red">※未実装です。表示内容に意味はありません。</span>
   </div>
+  <audio id="beep" src="file://C:/Windows/Media/ringout.wav" loop></audio>
 </div>
 </div>
+
 <script type="text/javascript"><!--
-var doc = document;
-var current_tab = "tab-main";
-var current_fleet = "fleet1";
+var kcif = {
+  info_div: null,
+  current_tab: "tab-main",
+  current_fleet: "fleet1"
+};
+kcif.info_div = document;
 
 function capture(){
   alert("DEBUG!");
 }
 
+
+
 function select_tab(){
-  var elems = doc.querySelectorAll("#kancolle-info .tab-header");
+  var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header");
   for (var i = 0; i < elems.length; i++) {
     elems[i].style.color = "inherit";
     elems[i].style.backgroundColor = "inherit";
   }
-  elems = doc.querySelectorAll("#kancolle-info .tab")
+  elems = kcif.info_div.querySelectorAll("#kancolle-info .tab")
   for (var i = 0; i < elems.length; i++) {
     elems[i].style.display = "none";
   }
@@ -125,30 +138,49 @@ function select_tab(){
   var tab = this.parentNode;
   tab.style.color = "white";
   tab.style.backgroundColor = "black";
-  doc.querySelector("#kancolle-info #" + tab.id.replace("-header", "")).style.display = "block";
+  kcif.info_div.querySelector("#kancolle-info #" + tab.id.replace("-header", "")).style.display = "block";
 
-  current_tab = tab.id;
+  kcif.current_tab = tab.id;
 }
 
 function select_fleet(){
-  var elems = doc.querySelectorAll("#kancolle-info #tab-main .fleet table");
+  var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main .fleet table");
   for (var i = 0; i < elems.length; i++) {
     elems[i].style.display = "none";
   }
 
   var fleet = this.parentNode.parentNode;
-  doc.querySelector("#kancolle-info #" + fleet.id + " table").style.display = "block";
+  kcif.info_div.querySelector("#kancolle-info #" + fleet.id + " table").style.display = "block";
 
-  current_fleet = fleet.id;
+  kcif.current_fleet = fleet.id;
 }
 
+function beep_timer() {
+  var beep = kcif.info_div.querySelector("#kancolle-info #beep");
+  if (beep) {
+    var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main input.check-timer");
+    var play = false;
+    for (var i = 0; i < elems.length; i++) {
+      var parent = elems[i].parentNode.parentNode;
+      if (elems[i].checked && (parent.className.indexOf("color-red") >= 0 || parent.className.indexOf("color-orange") >= 0)) {
+        play = true;
+      }
+    }
+    if (play) {
+      beep.play();
+    }
+    else {
+      beep.pause();
+    }
+  }
+}
 
 
 
 // スタイルシート
 var sheet = (function(){
-  var style = doc.createElement("style");
-  doc.head.appendChild(style);
+  var style = kcif.info_div.createElement("style");
+  kcif.info_div.head.appendChild(style);
   return style.sheet;
 })();
 sheet.insertRule('#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; text-align: left; }', sheet.length);
@@ -176,10 +208,13 @@ sheet.insertRule('#kancolle-info .tab td.ship-name { font-weight: bold; width: 1
 sheet.insertRule('#kancolle-info .tab td.ship-level { text-align: right; width: 2em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab td.ship-hp { text-align: right; width: 4em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab td.ship-cond { text-align: left; width: 5em; padding-left: 12px; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab td.ship-at { text-align: right; width: 5em; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab td.ship-at { text-align: right; width: 7em; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-main input.check-timer { padding: 0; margin: 0 0 0 4px; position: relative; top: 2px;}', sheet.length);
+sheet.insertRule('#kancolle-info .tab td.config-header { text-align: right; width: 12em; padding: 2px 16px 0 0; color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab td.config-input { text-align: left; width: 40em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab td.config-input .input-text { width: 100%; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab td.config-input .input-number { width: 4em !important; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab div.config-buttons { text-align: center; }', sheet.length);
 sheet.insertRule('#kancolle-info .color-green { color: lightgreen; }', sheet.length);
 sheet.insertRule('#kancolle-info .color-yellow { color: yellow; }', sheet.length);
@@ -190,26 +225,34 @@ sheet.insertRule('#kancolle-info .blink { -moz-animation: blink 1.0s ease-in-out
 sheet.insertRule('@-moz-keyframes blink { 0% {background-color: rgba(240,208,0,0.5);} 60% {background-color: inherit;} 100% {background-color: inherit;} }', sheet.length);
 
 // ボタン
-doc.querySelector("#capture").addEventListener("click", capture, true);
+kcif.info_div.querySelector("#capture").addEventListener("click", capture, true);
 
 // タブ
-var elems = doc.querySelectorAll("#kancolle-info .tab-header a");
+var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header a");
 for (var i = 0; i < elems.length; i++) {
   elems[i].addEventListener("click", select_tab, true);
 }
-doc.querySelector("#kancolle-info #" + current_tab.replace("-", "-header-") + " a").click();
+kcif.info_div.querySelector("#kancolle-info #" + kcif.current_tab.replace("-", "-header-") + " a").click();
 
 // メイン:艦隊
-elems = doc.querySelectorAll("#kancolle-info #tab-main .fleet h2 a");
+elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main .fleet h2 a");
 for (var i = 0; i < elems.length; i++) {
   elems[i].addEventListener("click", select_fleet, true);
 }
-doc.querySelector("#kancolle-info #" + current_fleet + " h2 a").click();
+kcif.info_div.querySelector("#kancolle-info #" + kcif.current_fleet + " h2 a").click();
+
+// タイマーサウンド
+elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main input.check-timer");
+for (var i = 0; i < elems.length; i++) {
+  elems[i].addEventListener("click", beep_timer, true);
+}
+beep_timer();
+
 //--></script>
 </body>
 </html>
 <!--
-var node = doc.querySelector("#sectionWrap");
+var node = kcif.info_div.querySelector("#sectionWrap");
 var parent = node.parentNode;
 parent.insertBefore(mydiv, node);
 -->

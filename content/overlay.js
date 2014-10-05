@@ -1291,7 +1291,8 @@ var kcif = {
       base.innerHTML = html;
 
       html = "";
-      for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
+      for (var i = 0; i < 4; i++) {
+        var deck = kcif.deck_list[i];
         html += '<div id="fleet' + (i + 1) + '" class="fleet">';
         var col = "color-default";
         var t = kcif.mission[i];
@@ -1311,20 +1312,30 @@ var kcif = {
         else {
           s = "";
         }
-        html += '<h2><a href="#">第' + (i + 1) + '艦隊</a> ' + s + '<span class="fleet-name">「' + deck.api_name + '」</span></h2>';
+        if (deck) {
+          html += '<h2><a href="#">第' + (i + 1) + '艦隊</a> ' + s + '<span class="fleet-name">「' + deck.api_name + '」</span></h2>';
+        }
+        else {
+          html += '<h2><a href="#">第' + (i + 1) + '艦隊</a> <span class="color-gray">[未解放]</span></h2>';
+        }
 
         html += '<table>';
-        var id_list = deck.api_ship;
-        for (var j = 0, id; id = id_list[j]; j++) {
-          if (id === -1) break;
-          var ship = kcif.ship_list[String(id)];
-          if (ship != null) {
-            html += '<tr><td class="ship-no">' + (j + 1) + '</td>';
-            html += '<td class="ship-type">' + ship_type(ship) + '</td>';
-            html += '<td class="ship-name">' + ship2str(ship) + '</td>';
-            html += '<td class="ship-level' + (ship.level != ship.p_level ? ' blink' : '') + '">' + ship.level + '</td>';
-            html += ship_hp(ship);
-            html += ship_cond(ship) + '</tr>';
+        var id_list = deck ? deck.api_ship : [];
+        for (var j = 0; j < 6; j++) {
+          var id = id_list[j]
+          if (id === -1 || id == null) {
+            html += '<tr><td class="ship-no">' + (j + 1) + '</td><td colspan="5"></td></tr>';
+          }
+          else {
+            var ship = kcif.ship_list[String(id)];
+            if (ship != null) {
+              html += '<tr><td class="ship-no">' + (j + 1) + '</td>';
+              html += '<td class="ship-type">' + ship_type(ship) + '</td>';
+              html += '<td class="ship-name">' + ship2str(ship) + '</td>';
+              html += '<td class="ship-level' + (ship.level != ship.p_level ? ' blink' : '') + '">' + ship.level + '</td>';
+              html += ship_hp(ship);
+              html += ship_cond(ship) + '</tr>';
+            }
           }
         }
         html += '</table>';
@@ -1345,6 +1356,9 @@ var kcif = {
           html += ship_cond(ship);
           var dt = new Date(kcif.repair[i].api_complete_time);
           html += '<td class="ship-at ' + getTimeColor(dt) + '"><label>' + time2str(dt) + '<input id="check-dock' + kcif.repair[i].api_id + '" type="checkbox" class="check-timer check-dock"></label></td>';
+        }
+        else {
+          html += '<tr><td class="ship-no">' + kcif.repair[i].api_id + '</td><td colspan="6"></tr>';
         }
       }
       html += '</table>';
@@ -1371,6 +1385,9 @@ var kcif = {
             col = "color-red";
           }
           html += '<td class="ship-at ' + col + '"><label>' + s + '<input id="check-built' + kcif.build[i].api_id + '" type="checkbox" class="check-timer check-built"></label></td>';
+        }
+        else {
+          html += '<tr><td class="ship-no">' + kcif.build[i].api_id + '</td><td colspan="4"></tr>';
         }
       }
       html += '</table>';

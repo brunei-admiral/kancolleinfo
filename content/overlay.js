@@ -1023,7 +1023,12 @@ function kcifCallback(request, content, query) {
     var idx = Number(query["api_ship_idx"]);
     var ship_id = Number(query["api_ship_id"]);
     log("changed (deck:" + deck_id + ", idx:" + idx + ", ship:" + ship_id + ", prev:" + deck.api_ship[idx] + ")");
-    if (ship_id < 0) {
+    if (ship_id == -2) {
+      for (var i = 1; i < 6; i++) {
+        deck.api_ship[i] = -1;
+      }
+    }
+    else if (ship_id < 0) {
       removeFromDeck(deck.api_ship[idx]);
     }
     else {

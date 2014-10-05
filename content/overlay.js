@@ -825,6 +825,7 @@ function kcifCallback(request, content, query) {
       var ship = kcif.ship_list[api_id];
       kcif.ship_list[api_id] = {
         ship_id: data.api_ship_id,
+        p_level: ship ? ship.level : data.api_lv,
         level: data.api_lv,
         p_cond: ship ? ship.c_cond : 49,
         c_cond: data.api_cond,
@@ -1373,7 +1374,7 @@ var kcif = {
             html += '<tr><td class="ship-no">' + (j + 1) + '</td>';
             html += '<td class="ship-type">' + ship_type(ship) + '</td>';
             html += '<td class="ship-name">' + ship2str(ship) + '</td>';
-            html += '<td class="ship-level">' + (ship.level || 1) + '</td>';
+            html += '<td class="ship-level' + (ship.level != ship.p_level ? ' blink' : '') + '">' + ship.level + '</td>';
             html += ship_hp(ship);
             html += ship_cond(ship) + '</tr>';
           }
@@ -1391,7 +1392,7 @@ var kcif = {
           var ship = kcif.ship_list[kcif.repair[i].api_ship_id];
           html += '<td class="ship-type">' + ship_type(ship) + '</td>';
           html += '<td class="ship-name">' + ship2str(ship) + '</td>';
-          html += '<td class="ship-level">' + (ship.level || 1) + '</td>';
+          html += '<td class="ship-level">' + ship.level + '</td>';
           html += ship_hp(ship);
           html += ship_cond(ship);
           var dt = new Date(kcif.repair[i].api_complete_time);

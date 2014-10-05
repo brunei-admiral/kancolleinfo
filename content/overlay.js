@@ -11,12 +11,12 @@ function log() {
 }
 
 function select_tab(){
-  var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header");
+  var elems = kcif.info_div.querySelectorAll(".tab-header");
   for (var i = 0; i < elems.length; i++) {
     elems[i].style.color = "inherit";
     elems[i].style.backgroundColor = "inherit";
   }
-  elems = kcif.info_div.querySelectorAll("#kancolle-info .tab")
+  elems = kcif.info_div.querySelectorAll(".tab")
   for (var i = 0; i < elems.length; i++) {
     elems[i].style.display = "none";
   }
@@ -25,20 +25,20 @@ function select_tab(){
   tab.style.color = "white";
   tab.style.backgroundColor = "black";
   kcif.current_tab = tab.id.replace("-header", "");
-  var elem = kcif.info_div.querySelector("#kancolle-info #" + kcif.current_tab);
+  var elem = kcif.info_div.querySelector("#" + kcif.current_tab);
   if (elem) {
     elem.style.display = "block";
   }
 }
 
 function select_fleet(){
-  var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main .fleet table");
+  var elems = kcif.info_div.querySelectorAll("#tab-main .fleet table");
   for (var i = 0; i < elems.length; i++) {
     elems[i].style.display = "none";
   }
 
   var fleet = this.parentNode.parentNode;
-  var elem = kcif.info_div.querySelector("#kancolle-info #" + fleet.id + " table");
+  var elem = kcif.info_div.querySelector("#" + fleet.id + " table");
   if (elem) {
     elem.style.display = "block";
   }
@@ -218,7 +218,7 @@ function getBeepBuilt() {
 
 function saveCheckboxes() {
   var checks = {};
-  var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main input.check-timer");
+  var elems = kcif.info_div.querySelectorAll("#tab-main input.check-timer");
   for (var i = 0; i < elems.length; i++) {
     checks[elems[i].id] = elems[i].checked;
   }
@@ -226,7 +226,7 @@ function saveCheckboxes() {
 }
 
 function restoreCheckboxes(checks) {
-  var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main input.check-timer");
+  var elems = kcif.info_div.querySelectorAll("#tab-main input.check-timer");
   for (var i = 0; i < elems.length; i++) {
     if (elems[i].className.indexOf("check-expedition") >= 0) {
       elems[i].checked = getBeepExpedition() && checks[elems[i].id] == null || checks[elems[i].id];
@@ -254,7 +254,7 @@ function beepOnOff() {
   kcif.beep.volume = getBeepVolume() / 100.0;
 
   var found = false;
-  var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main input.check-timer");
+  var elems = kcif.info_div.querySelectorAll("#tab-main input.check-timer");
   for (var i = 0; i < elems.length; i++) {
     if (elems[i].checked) {
       var parent = elems[i].parentNode.parentNode;
@@ -756,6 +756,7 @@ function kcifCallback(request, content, query) {
     for (var i = 0, ship; ship = mst_ship[i]; i++) {
       master[ship.api_id] = {
         ship_id: ship.api_id,
+        sort_no: ship.api_sortno,
         name: ship.api_name,
         type: ship.api_stype
       };
@@ -824,10 +825,11 @@ function kcifCallback(request, content, query) {
       var api_id = String(data.api_id);
       var ship = kcif.ship_list[api_id];
       kcif.ship_list[api_id] = {
+        api_id: api_id,
         ship_id: data.api_ship_id,
         p_level: ship ? ship.level : data.api_lv,
         level: data.api_lv,
-        p_cond: ship ? ship.c_cond : 49,
+        p_cond: ship ? ship.c_cond : data.api_cond,
         c_cond: data.api_cond,
         prehp: ship ? ship.nowhp : data.api_nowhp,
         nowhp: data.api_nowhp,
@@ -837,6 +839,7 @@ function kcifCallback(request, content, query) {
       if (kcif.ship_master[data.api_ship_id]) {
         kcif.ship_list[api_id].name = kcif.ship_master[data.api_ship_id].name;
         kcif.ship_list[api_id].type = kcif.ship_master[data.api_ship_id].type;
+        kcif.ship_list[api_id].sort_no = kcif.ship_master[data.api_ship_id].sort_no;
       }
     }
     if (port || ship2) {
@@ -850,7 +853,7 @@ function kcifCallback(request, content, query) {
     //log("timer(?): " + url + " , query: " + hash2str(query));
   }
 
-  kcif.render_info();
+  kcif.render_info(request != null);
 
   if (kcif.timer) {
     window.clearTimeout(kcif.timer);
@@ -1019,10 +1022,6 @@ var kcif = {
     if (s) {
       kcif.ship_master = JSON.parse(s);
     }
-    s = kcif.getStorage("ship_list");
-    if (s) {
-      kcif.ship_list = JSON.parse(s);
-    }
 
     Services.obs.addObserver(kcifHttpObserver, TOPIC, false);
   },
@@ -1073,29 +1072,34 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab-header a:hover { color: yellow; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab { padding: 2px 8px 2px 8px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab h2 a { color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab h2 a:hover { color: yellow; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab a { color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab a:hover { color: yellow; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab h2 .fleet-name { float: right; color: #ccc; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab #ndock { width: 482px; float: left; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab #kdock { width: 302px; float: left; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; position: relative; top: -3px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab table tr { padding: 0; margin: 0; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab table td { padding: 0; margin: 0; line-height: 1.2; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.ship-no { text-align: right; padding: 0 6px 0 4px; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.ship-type { width: 2.7em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.ship-name { font-weight: bold; width: 140px; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.ship-level { text-align: right; width: 2em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.ship-hp { text-align: right; width: 4em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.ship-cond { text-align: left; width: 5em; padding-left: 12px; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.ship-at { text-align: right; width: 7em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab table th, #kancolle-info .tab table td { padding: 0; margin: 0; line-height: 1.2; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-no { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-type { width: 2.7em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-name { font-weight: bold; width: 120px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-level { text-align: right; width: 2em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 4em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-cond { text-align: left; width: 5em; padding-left: 12px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 6.8em; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-main #ndock { width: 482px; float: left; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-main #kdock { width: 302px; float: left; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-main table { position: relative; top: -3px; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-main input.check-timer { padding: 0; margin: 0 0 0 4px; position: relative; top: 2px;}', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.config-header { text-align: right; width: 12em; padding: 2px 16px 0 0; color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.config-input { text-align: left; width: 40em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.config-input .input-text { width: 100%; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab td.config-input .input-number { width: 4em !important; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab div.config-buttons { text-align: center; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-ships .table-outer { position: relative; padding-top: 20px; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-ships .table-inner { height: 256px; overflow: auto; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-ships table thead { position: absolute; top: 0px; left: 0px; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-ships th { text-align: left; font-weight: bold; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-ships a.sort-current { color: yellow; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config td.config-header { text-align: right; width: 12em; padding: 2px 16px 0 0; color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config td.config-input { text-align: left; width: 40em; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config td.config-input .input-text { width: 100%; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config td.config-input .input-number { width: 4em !important; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config div.config-buttons { text-align: center; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-green { color: lightgreen; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-yellow { color: yellow; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-orange { color: orange; }', sheet.length);
@@ -1148,7 +1152,7 @@ var kcif = {
       html += '</div>';
 
       html += '<div id="tab-ships" class="tab">';
-      html += '<span class="color-red">※未実装です。表示内容に意味はありません。</span>';
+      html += '<span class="color-yellow blink">Loading...</span>';
       html += '</div>';
 
       html += '<div id="tab-items" class="tab">';
@@ -1184,17 +1188,17 @@ var kcif = {
       }
 
       // タブ
-      var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header a");
+      var elems = kcif.info_div.querySelectorAll(".tab-header a");
       for (var i = 0; i < elems.length; i++) {
         elems[i].addEventListener("click", select_tab, true);
       }
-      var elem = kcif.info_div.querySelector("#kancolle-info #" + kcif.current_tab.replace("-", "-header-") + " a");
+      var elem = kcif.info_div.querySelector("#" + kcif.current_tab.replace("-", "-header-") + " a");
       if (elem) {
         elem.click();
       }
 
       // 設定:テキスト
-      var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-config input.input-text");
+      var elems = kcif.info_div.querySelectorAll("#tab-config input.input-text");
       for (var i = 0; i < elems.length; i++) {
         elems[i].addEventListener("input", function() {
           kcif.info_div.querySelector("#config-save").disabled = !checkConfigChanged();
@@ -1202,7 +1206,7 @@ var kcif = {
       }
 
       // 設定:チェックボックス
-      var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-config input.input-checkbox");
+      var elems = kcif.info_div.querySelectorAll("#tab-config input.input-checkbox");
       for (var i = 0; i < elems.length; i++) {
         elems[i].addEventListener("click", function() {
           kcif.info_div.querySelector("#config-save").disabled = !checkConfigChanged();
@@ -1258,15 +1262,13 @@ var kcif = {
     }
   },
 
-  render_info: function() {
+  render_info: function(all) {
     if (kcif.info_div) {
       kcif.game_frame.style.height = '920px'; // なぜかここでないとダメ
-      var base = kcif.info_div.querySelector("#base-info");
-      var main = kcif.info_div.querySelector("#tab-main");
-
-      var checks = saveCheckboxes();
-
       var html = "";
+
+      // ベース
+      var base = kcif.info_div.querySelector("#base-info");
       var ship_col = 'color-default';
       if (kcif.ship_num >= kcif.ship_max) {
         ship_col = 'color-red';
@@ -1290,6 +1292,15 @@ var kcif = {
       html += '<span class="' + ship_col + '">' + kcif.ship_num + '</span>/' + kcif.ship_max + ' ships; <span class="' + item_col + '">' + kcif.item_num + '</span>/' + kcif.item_max + ' items <span id="updated">' + (new Date()).toLocaleFormat("%H:%M") + '更新</span> <button id="capture">画面キャプチャ</button>';
       base.innerHTML = html;
 
+      // ベース:キャプチャボタン
+      var elem = base.querySelector("#capture");
+      if (elem) {
+        elem.addEventListener("click", captureAndSave, false, true);
+      }
+
+      // メイン
+      var maintab = kcif.info_div.querySelector("#tab-main");
+      var checks = saveCheckboxes();
       html = "";
       for (var i = 0; i < 4; i++) {
         var deck = kcif.deck_list[i];
@@ -1391,33 +1402,67 @@ var kcif = {
         }
       }
       html += '</table>';
-      main.innerHTML = html;
-
-      // キャプチャボタン
-      var elem = kcif.info_div.querySelector("#capture");
-      if (elem) {
-        elem.addEventListener("click", captureAndSave, false, true);
-      }
+      maintab.innerHTML = html;
 
       // メイン:艦隊
-      elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main .fleet h2 a");
+      elems = maintab.querySelectorAll(".fleet h2 a");
       for (var i = 0; i < elems.length; i++) {
         elems[i].addEventListener("click", select_fleet, true);
       }
-      var elem = kcif.info_div.querySelector("#kancolle-info #" + kcif.current_fleet + " h2 a");
+      var elem = maintab.querySelector("#" + kcif.current_fleet + " h2 a");
       if (elem) {
         elem.click();
       }
 
       // メイン:タイマーチェックボックス
-      elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main input.check-timer");
+      elems = maintab.querySelectorAll("input.check-timer");
       for (var i = 0; i < elems.length; i++) {
         elems[i].addEventListener("click", beepOnOff, false);
       }
 
-      // チェックボックス復元
+      // メイン:チェックボックス復元
       restoreCheckboxes(checks);
       beepOnOff();
+
+      if (!all) {
+        return;
+      }
+
+      // 艦娘
+      var shipstab = kcif.info_div.querySelector("#tab-ships");
+      html = "";
+      html += '<div class="table-outer"><div class="table-inner"><table>';
+      html += '<thead><tr><th class="ship-no"><a href="#">#</a></th><th class="ship-type"><a href="#">艦種</a></th><th class="ship-name"><a href="#">艦名</a></th><th class="ship-level"><a href="#" class="sort-current">LV</a></th><th class="ship-hp"><a href="#">耐久</a></th><th class="ship-cond"><a href="#">cond</a></th></tr></thead>';
+      html += '<tbody>';
+
+      var ships = [];
+      for (var ship in kcif.ship_list) {
+        if (ship && kcif.ship_list[ship].type) {
+          ships.push(kcif.ship_list[ship]);
+        }
+      }
+      ships.sort(function(a,b){
+        if (a.level != b.level) {
+          return b.level - a.level;
+        }
+        if (a.sort_no != b.sort_no) {
+          return a.sort_no - b.sort_no;
+        }
+        return a.api_id - b.api_id;
+      });
+
+      for (var i = 0, ship; ship = ships[i]; i++) {
+        html += '<tr><td class="ship-no">' + (i + 1) + '</td>';
+        html += '<td class="ship-type">' + ship_type(ship) + '</td>';
+        html += '<td class="ship-name">' + ship2str(ship) + '</td>';
+        html += '<td class="ship-level' + (ship.level != ship.p_level ? ' blink' : '') + '">' + ship.level + '</td>';
+        html += ship_hp(ship);
+        html += ship_cond(ship) + '</tr>';
+      }
+
+      html += '</tbody>';
+      html += '</table></div></div>';
+      shipstab.innerHTML = html;
     }
   }
 };

@@ -69,7 +69,7 @@
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type">巡戦</td><td class="ship-name">Bismarck drei</td><td class="ship-level">105</td><td class="ship-hp color-yellow">50/96</td><td class="ship-cond color-green">53</td><td class="ship-at color-red"><label>--:--<input class="check-timer" type="checkbox"></label></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">軽空</td><td class="ship-name">千代田航改二</td><td class="ship-level">90</td><td class="ship-hp color-red">1/58</td><td class="ship-cond">49</td><td class="ship-at color-orange"><label>02:36<input class="check-timer" type="checkbox"></label></td></tr>
-        <tr><td class="ship-no">3</td><td class="ship-type">戦艦</td><td class="ship-name">大和改</td><td class="ship-level">90</td><td class="ship-hp color-default">90/96</td><td class="ship-cond color-yellow blink">30</td><td class="ship-at"><label>Sat 02:34<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">3</td><td class="ship-type">戦艦</td><td class="ship-name">大和改</td><td class="ship-level">90</td><td class="ship-hp color-default">90/96</td><td class="ship-cond color-yellow blink">30</td><td class="ship-at"><label>12/30 02:34<input class="check-timer" type="checkbox"></label></td></tr>
         <tr><td class="ship-no">4</td><td class="ship-type">潜水</td><td class="ship-name">伊168改</td><td class="ship-level">90</td><td class="ship-hp color-orange">7/15</td><td class="ship-cond color-orange">20</td><td class="ship-at color-red"><label>02:34<input class="check-timer" type="checkbox"></label></td></tr>
       </table>
     </div>
@@ -93,7 +93,13 @@
     </table></div></div>
   </div>
   <div id="tab-items" class="tab">
-    <span class="color-red">※未実装です。表示内容に意味はありません。</span>
+    <div class="table-outer"><div class="table-inner"><table>
+      <thead>
+        <tr><th class="item-no"><a href="#">#</a></th><th class="item-type"><a href="#" class="sort-current">種別</a></th><th class="item-name"><a href="#">名称</a></th><th class="ship-name"><a href="#">所在</a></th><th class="ship-level"></th></tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table></div></div>
   </div>
   <div id="tab-config" class="tab">
     <table>
@@ -120,7 +126,17 @@
 var elem = document.querySelector("#tab-ships tbody");
 var html = "";
 for (var i = 0; i < 200; i++) {
-  html += '<tr><td class="ship-no">' + (i + 1) + '</td><td class="ship-type">巡戦</td><td class="ship-name">Bismarck drei</td><td class="ship-level">150</td><td class="ship-hp color-green">96/96</td><td class="ship-cond color-green">100</td><td class="ship-fuel color-green">100%</td><td class="ship-bull color-green">100%</td></tr>';
+  html += '<tr><td class="ship-no">' + (i + 1) + '</td><td class="ship-type">巡戦</td><td class="ship-name">Bismarck drei</td><td class="ship-level">150</td><td class="ship-hp color-green">96/96</td><td class="ship-cond color-green">100</td><td class="ship-fuel color-green" title="100/100">100%</td><td class="ship-bull color-green" title="120/120">100%</td></tr>';
+}
+elem.innerHTML = html;
+
+elem = document.querySelector("#tab-items tbody");
+var html = "";
+for (var i = 0; i < 900; i += 4) {
+  html += '<tr><td class="item-no">' + (i + 1) + '</td><td class="item-type">追加装甲(大型)</td><td class="item-name">増設バルジ(大型艦)</td><td class="ship-name">千代田航改二</td><td class="ship-level">150</td></tr>';
+  html += '<tr><td class="item-no">' + (i + 2) + '</td><td class="item-type">潜水艦魚雷</td><td class="item-name">潜水艦53cm艦首魚雷(8門)</td><td class="ship-name">伊168改</td><td class="ship-level">150</td></tr>';
+  html += '<tr><td class="item-no">' + (i + 3) + '</td><td class="item-type">大口径主砲</td><td class="item-name">35.6cm連装砲(ダズル迷彩)</td><td class="ship-name">Bismarck drei</td><td class="ship-level">150</td></tr>';
+  html += '<tr><td class="item-no">' + (i + 4) + '</td><td class="item-type">オートジャイロ</td><td class="item-name">カ号観測機</td><td class="ship-name">伊勢改</td><td class="ship-level">150</td></tr>';
 }
 elem.innerHTML = html;
 
@@ -214,22 +230,24 @@ sheet.insertRule('#kancolle-info .tab h2 .fleet-name { float: right; color: #ccc
 sheet.insertRule('#kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab table tr { padding: 0; margin: 0; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab table th, #kancolle-info .tab table td { padding: 0; margin: 0; line-height: 1.2; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab .ship-no { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab .table-outer { position: relative; padding-top: 20px; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab .table-inner { height: 256px; overflow: auto; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab .table-outer .table-inner table thead { position: absolute; top: 0px; left: 0px; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab .table-outer .table-inner table thead th { text-align: left; font-weight: bold; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab .ship-no, #kancolle-info .tab .item-no, #kancolle-info .tab .item-num { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-type { width: 2.7em; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab .ship-name { font-weight: bold; width: 120px; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 4em; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 7em; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 7.8em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-fuel, #kancolle-info .tab .ship-bull { text-align: right; width: 3.8em; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab .item-type { width: 8em; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab .item-name { font-weight: bold; width: 14em; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab a.sort-current { color: yellow; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-main #ndock { width: 482px; float: left; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-main #kdock { width: 302px; float: left; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-main table { position: relative; top: -3px; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-main input.check-timer { padding: 0; margin: 0 0 0 4px; position: relative; top: 2px;}', sheet.length);
-sheet.insertRule('#kancolle-info #tab-ships .table-outer { position: relative; padding-top: 20px; }', sheet.length);
-sheet.insertRule('#kancolle-info #tab-ships .table-inner { height: 256px; overflow: auto; }', sheet.length);
-sheet.insertRule('#kancolle-info #tab-ships table thead { position: absolute; top: 0px; left: 0px; }', sheet.length);
-sheet.insertRule('#kancolle-info #tab-ships th { text-align: left; font-weight: bold; }', sheet.length);
-sheet.insertRule('#kancolle-info #tab-ships a.sort-current { color: yellow; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-config td.config-header { text-align: right; width: 12em; padding: 2px 16px 0 0; color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-config td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-config td.config-input { text-align: left; width: 40em; }', sheet.length);

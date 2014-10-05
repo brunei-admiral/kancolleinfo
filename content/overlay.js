@@ -746,6 +746,29 @@ function battle(url, json) {
   }
 }
 
+function removeFromDeck(ship_id) {
+  var found = false;
+  for (var i = 0, deck; (deck = kcif.deck_list[i]) && !found; i++) {
+    if (!deck.api_ship) {
+      continue;
+    }
+    for (var j = 0; j < 6; j++) {
+      if (deck.api_ship[j] === -1) {
+        break;
+      }
+      if (deck.api_ship[j] == ship_id) {
+        for (var k = j + 1; k < 6; k++) {
+          deck.api_ship[k - 1] = deck.api_ship[k];
+        }
+        deck.api_ship[5] = -1;
+        found = true;
+        break;
+      }
+    }
+  }
+  return found;
+}
+
 function kcifCallback(request, content, query) {
   if (kcif.timer) {
     window.clearTimeout(kcif.timer);
@@ -753,6 +776,7 @@ function kcifCallback(request, content, query) {
   }
 
   var url = request ? request.name : "";
+  var update_all = url != "";
   var n = content ? content.indexOf("=") : -1;
   var json = n >= 0 ? JSON.parse(content.substring(n + 1)) : null;
   if (url.indexOf("/deck_port") != -1 || url.indexOf("/deck") != -1) {
@@ -766,6 +790,7 @@ function kcifCallback(request, content, query) {
       }
       log("deck mission: " + i + ": " + kcif.mission[i]);
     }
+    update_all = false;
   }
   else if (url.indexOf("/kdock") != -1 || url.indexOf("/getship") != -1) {
     var dock_list = url.indexOf("/kdock") != -1 ? json.api_data : json.api_data.api_kdock;
@@ -778,6 +803,9 @@ function kcifCallback(request, content, query) {
       kcif.item_num += json.api_data.api_slotitem.length;
       log("getship: " + String(kcif.ship_num) + " ships, " + String(kcif.item_num) + " items");
     }
+    else {
+      update_all = false;
+    }
   }
   else if (url.indexOf("/ndock") != -1) {
     var dock_list = json.api_data;
@@ -785,10 +813,12 @@ function kcifCallback(request, content, query) {
       kcif.repair[i] = dock;
       log("ndock: " + kcif.repair[i].api_id + ": " + kcif.repair[i].api_complete_time);
     }
+    update_all = false;
   }
   else if (url.indexOf("/destroyship") != -1) {
     kcif.ship_num--;
     kcif.item_num -= kcif.ship_list[String(query.api_ship_id)].slot.filter(function(e){return e >= 0;}).length;
+    removeFromDeck(Number(query["api_ship_id"]));
     log("destroyship: " + String(kcif.ship_num) + " ships, " + String(kcif.item_num) + " items");
   }
   else if (url.indexOf("/createitem") != -1) {
@@ -806,6 +836,7 @@ function kcifCallback(request, content, query) {
     kcif.ship_num -= id_list.length;
     for (var i = 0, id; (id = id_list[i]) && i < id_list.length; i++) {
       kcif.item_num -= kcif.ship_list[String(id)].slot.filter(function(e){return e >= 0;}).length;
+      removeFromDeck(Number(id));
     }
     log("powerup: " + String(kcif.ship_num) + " ships, " + String(kcif.item_num) + " items");
   }
@@ -839,6 +870,7 @@ function kcifCallback(request, content, query) {
     kcif.item_num = Number(json.api_data.api_slotitem[0]);
     kcif.item_max = Number(json.api_data.api_slotitem[1]) + 3;
     log("record: ship=" + String(kcif.ship_num) + "/" + String(kcif.ship_max) + ", item=" + String(kcif.item_num) + "/" + String(kcif.item_max));
+    update_all = false;
   }
   else if (url.indexOf("/slot_item") != -1) {
     kcif.item_num = json.api_data.length;
@@ -857,20 +889,37 @@ function kcifCallback(request, content, query) {
     }
     log("charged");
   }
+  else if (url.indexOf("/change") != -1) {
+    var deck_id = Number(query["api_id"]);
+    var deck = kcif.deck_list[deck_id - 1];
+    var idx = Number(query["api_ship_idx"]);
+    var ship_id = Number(query["api_ship_id"]);
+    log("changed (deck:" + deck_id + ", idx:" + idx + ", ship:" + ship_id + ", prev:" + deck.api_ship[idx] + ")");
+    if (ship_id < 0) {
+      for (var i = idx + 1; i < 6; i++) {
+        deck.api_ship[i - 1] = deck.api_ship[i];
+      }
+      deck.api_ship[5] = -1;
+    }
+    else {
+      deck.api_ship[idx] = ship_id;
+    }
+    update_all = false;
+  }
   else if (url.indexOf("battle") != -1) {
     log("battle: " + url);
-    var deck_id = json.api_data.api_dock_id || json.api_data.api_deck_id;
-    var deck = Number(deck_id);
-    if (url.indexOf("practice") != -1 && (!kcif.mission[deck - 1] || kcif.mission[deck - 1].indexOf("演習") == -1)) {
-      kcif.mission[deck - 1] = "演習";
+    var deck_id = Number(json.api_data.api_dock_id || json.api_data.api_deck_id);
+    if (url.indexOf("practice") != -1 && (!kcif.mission[deck_id - 1] || kcif.mission[deck_id - 1].indexOf("演習") == -1)) {
+      kcif.mission[deck_id - 1] = "演習";
     }
     battle(url, json);
   }
   else if (url.indexOf("_map/start") != -1) {
-    var deck = Number(query["api_deck_id"]);
-    if (deck > 0) {
-      kcif.mission[deck - 1] = map2str(json.api_data);
+    var deck_id = Number(query["api_deck_id"]);
+    if (deck_id > 0) {
+      kcif.mission[deck_id - 1] = map2str(json.api_data);
     }
+    update_all = false;
   }
   else if (url.indexOf("_map/next") != -1) {
     for (var i = 0, deck; deck = kcif.mission[i]; i++) {
@@ -879,6 +928,7 @@ function kcifCallback(request, content, query) {
         break;
       }
     }
+    update_all = false;
   }
   else if (url.indexOf("/ship") != -1 || url.indexOf("/port") != -1) {
     var port = url.indexOf("/port") != -1;
@@ -939,7 +989,7 @@ function kcifCallback(request, content, query) {
     //log("timer(?): " + url + " , query: " + hash2str(query));
   }
 
-  kcif.render_info(url != "");
+  kcif.render_info(update_all);
 
   if (kcif.timer) {
     window.clearTimeout(kcif.timer);
@@ -1062,7 +1112,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(getship|destroyship|createitem|destroyitem2)|api_req_kaisou\/powerup|api_req_hokyu\/charge|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(getship|destroyship|createitem|destroyitem2)|api_req_kaisou\/powerup|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);

@@ -86,7 +86,7 @@
   <div id="tab-ships" class="tab">
     <div class="table-outer"><div class="table-inner"><table>
       <thead>
-        <tr><th class="ship-no">#</th><th class="ship-type">艦種</th><th class="ship-name">艦名</th><th class="ship-level">LV</th><th class="ship-hp">耐久</th><th class="ship-cond">cond</th></tr>
+        <tr><th class="ship-no"><a href="#">#</a></th><th class="ship-type"><a href="#">艦種</a></th><th class="ship-name"><a href="#">艦名</a></th><th class="ship-level"><a href="#" class="sort-current">LV</a></th><th class="ship-hp"><a href="#">耐久</a></th><th class="ship-cond"><a href="#">cond</a></th></tr>
       </thead>
       <tbody>
         <tr><td class="ship-no">1</td><td class="ship-type">高戦</td><td class="ship-name">Bismarck drei</td><td class="ship-level">105</td><td class="ship-hp color-green">96/96</td><td class="ship-cond color-green blink">53 (+3)</td></tr>
@@ -230,38 +230,40 @@ sheet.insertRule('#kancolle-info .tab-header a { color: inherit; text-decoration
 sheet.insertRule('#kancolle-info .tab-header a:hover { color: yellow; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab { padding: 2px 8px 2px 8px; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab h2 a { color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab h2 a:hover { color: yellow; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab a { color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab a:hover { color: yellow; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab h2 .fleet-name { float: right; color: #ccc; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab #ndock { width: 482px; float: left; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab #kdock { width: 302px; float: left; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab table tr { padding: 0; margin: 0; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab table th, #kancolle-info .tab table td { padding: 0; margin: 0; line-height: 1.2; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-no { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-type { width: 2.7em; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab .ship-name { font-weight: bold; width: 140px; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab .ship-name { font-weight: bold; width: 120px; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-level { text-align: right; width: 2em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 4em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-cond { text-align: left; width: 5em; padding-left: 12px; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 6.8em; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-main #ndock { width: 482px; float: left; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-main #kdock { width: 302px; float: left; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-main table { position: relative; top: -3px; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-main input.check-timer { padding: 0; margin: 0 0 0 4px; position: relative; top: 2px;}', sheet.length);
 sheet.insertRule('#kancolle-info #tab-ships .table-outer { position: relative; padding-top: 20px; }', sheet.length);
-sheet.insertRule('#kancolle-info #tab-ships .table-inner { height: 240px; overflow: auto; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-ships .table-inner { height: 256px; overflow: auto; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-ships table thead { position: absolute; top: 0px; left: 0px; }', sheet.length);
-sheet.insertRule('#kancolle-info #tab-ships th { text-align: left; font-weight: bold; background-color: #444; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab td.config-header { text-align: right; width: 12em; padding: 2px 16px 0 0; color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab td.config-input { text-align: left; width: 40em; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab td.config-input .input-text { width: 100%; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab td.config-input .input-number { width: 4em !important; }', sheet.length);
-sheet.insertRule('#kancolle-info .tab div.config-buttons { text-align: center; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-ships th { text-align: left; font-weight: bold; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-ships a.sort-current { color: yellow; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-config td.config-header { text-align: right; width: 12em; padding: 2px 16px 0 0; color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-config td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-config td.config-input { text-align: left; width: 40em; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-config td.config-input .input-text { width: 100%; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-config td.config-input .input-number { width: 4em !important; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-config div.config-buttons { text-align: center; }', sheet.length);
 sheet.insertRule('#kancolle-info .color-green { color: lightgreen; }', sheet.length);
 sheet.insertRule('#kancolle-info .color-yellow { color: yellow; }', sheet.length);
 sheet.insertRule('#kancolle-info .color-orange { color: orange; }', sheet.length);
 sheet.insertRule('#kancolle-info .color-red { color: red; }', sheet.length);
 sheet.insertRule('#kancolle-info .color-gray { color: silver; }', sheet.length);
+sheet.insertRule('#kancolle-info .color-default { color: inherit; }', sheet.length);
 sheet.insertRule('#kancolle-info .blink { -moz-animation: blink 1.0s ease-in-out infinite alternate; }', sheet.length);
 sheet.insertRule('@-moz-keyframes blink { 0% {background-color: rgba(240,208,0,0.5);} 60% {background-color: inherit;} 100% {background-color: inherit;} }', sheet.length);
 

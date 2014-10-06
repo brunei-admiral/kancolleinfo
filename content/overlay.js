@@ -1683,17 +1683,62 @@ var kcif = {
         if (s) {
           s = ' <span class="' + col + '">' + s + '</span>';
         }
-        else if (deck) {
-          s = "";
+        if (deck) {
+          var ships = [];
+          var sup = false;
+          var kira = [];
+          var drum = 0;
+          var drum_ship = [];
+          var dai = 0;
+          var dai_ship = [];
           for (var j = 0, id; id = deck.api_ship[j]; j++) {
             if (id === -1 || id == null) {
               break;
             }
             var ship = kcif.ship_list[id];
+            ships.push(ship.name);
             if (ship.fuel < ship.fuel_max || ship.bull < ship.bull_max) {
-              s = ' <span class="color-orange blink">未補給艦あり</span>';
-              break;
+              sup = true;
             }
+            if (ship.cond >= 50) {
+              kira.push(ship.name);
+            }
+            var drum_p = false;
+            var dai_p = false;
+            for (var k = 0; ship.slot && k < 5; k++) {
+              if (ship.slot[k] < 0) {
+                break;
+              }
+              var item = kcif.item_list[ship.slot[k]];
+              if (item && item.item_id == 75) { // ドラム缶(輸送用)
+                drum++;
+                drum_p = true;
+              }
+              else if (item && item.item_id == 68) { // 大発動艇
+                dai++;
+                dai_p = true;
+              }
+            }
+            if (drum_p) {
+              drum_ship.push(ship.name);
+            }
+            if (dai_p) {
+              dai_ship.push(ship.name);
+            }
+          }
+
+          if (s == null && sup) {
+            s = ' <span class="color-orange blink">未補給艦あり</span>';
+          }
+          if (s == null) {
+            s = "";
+          }
+          s += ' <span class="color-gray" title="' + kira.join(' ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
+          if (drum > 0) {
+            s += ' <span class="color-gray" title="' + drum_ship.join(' ') + '">ドラム缶:' + drum + '/' + drum_ship.length + '</span>';
+          }
+          if (dai > 0) {
+            s += ' <span class="color-gray" title="' + dai_ship.join(' ') + '">大発動艇:' + dai + '</span>';
           }
         }
         if (deck) {
@@ -1719,13 +1764,13 @@ var kcif = {
                   break;
                 }
                 var item = kcif.item_list[ship.slot[k]];
-                if (item.type[2] == 23) { // 応急修理要員
+                if (item && item.type[2] == 23) { // 応急修理要員
                   kit = item.name;
                   break;
                 }
               }
               if (kit) {
-                html += '<tr><td class="ship-no color-green" title="' + kit + '">' + (j + 1) + '</td>';
+                html += '<tr><td class="ship-no color-red" title="' + kit + '">' + (j + 1) + '</td>';
               }
               else {
                 html += '<tr><td class="ship-no">' + (j + 1) + '</td>';

@@ -1687,6 +1687,7 @@ var kcif = {
         }
         if (deck) {
           var ships = [];
+          var level_sum = 0;
           var sup = false;
           var kira = [];
           var drum = 0;
@@ -1698,7 +1699,8 @@ var kcif = {
               break;
             }
             var ship = kcif.ship_list[id];
-            ships.push(ship.name);
+            ships.push(ship);
+            level_sum += ship.level;
             if (ship.fuel < ship.fuel_max || ship.bull < ship.bull_max) {
               sup = true;
             }
@@ -1729,12 +1731,15 @@ var kcif = {
             }
           }
 
-          if (s == null && sup) {
-            s = ' <span class="color-orange blink">未補給艦あり</span>';
-          }
           if (s == null) {
-            s = "";
+            if (sup) {
+              s = ' <span class="color-orange blink">未補給艦あり</span>';
+            }
+            else {
+              s = "";
+            }
           }
+          s += ' <span class="color-gray" title="旗艦 ' + ships[0].name + '">LV:' + ships[0].level + '/' + level_sum + '</span>';
           s += ' <span class="color-gray" title="' + kira.join(' ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
           if (drum > 0) {
             s += ' <span class="color-gray" title="' + drum_ship.join(' ') + '">ドラム缶:' + drum + '/' + drum_ship.length + '</span>';

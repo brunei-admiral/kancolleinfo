@@ -867,6 +867,36 @@ function isPlane(type) {
   return type >= 6 && type <= 11;
 }
 
+function compareShip(a, b) {
+  var result = 0;
+  if (kcif.sort_ships.startsWith("no")) {
+    result = a.api_id - b.api_id;
+  }
+  else if (kcif.sort_ships.startsWith("type")) {
+    result = a.type - b.type;
+  }
+  else if (kcif.sort_ships.startsWith("name")) {
+    result = a.name.localeCompare(b.name);
+  }
+  else if (kcif.sort_ships.startsWith("level")) {
+    result = a.level - b.level;
+  }
+  else if (kcif.sort_ships.startsWith("hp")) {
+    result = (a.hp / a.hp_max) - (b.hp / b.hp_max);
+  }
+
+  if (kcif.sort_ships.endsWith("-")) {
+    result = -result;
+  }
+  if (result == 0) {
+    result = a.sort_no - b.sort_no;
+  }
+  if (result == 0) {
+    result = a.api_id - b.api_id;
+  }
+  return result;
+}
+
 function kcifCallback(request, content, query) {
   if (kcif.timer) {
     window.clearTimeout(kcif.timer);
@@ -1900,35 +1930,7 @@ var kcif = {
           ships.push(kcif.ship_list[prop]);
         }
       }
-      ships.sort(function(a,b){
-        var result = 0;
-        if (kcif.sort_ships.startsWith("no")) {
-          result = a.api_id - b.api_id;
-        }
-        else if (kcif.sort_ships.startsWith("type")) {
-          result = a.type - b.type;
-        }
-        else if (kcif.sort_ships.startsWith("name")) {
-          result = a.name.localeCompare(b.name);
-        }
-        else if (kcif.sort_ships.startsWith("level")) {
-          result = a.level - b.level;
-        }
-        else if (kcif.sort_ships.startsWith("hp")) {
-          result = (a.hp / a.hp_max) - (b.hp / b.hp_max);
-        }
-
-        if (kcif.sort_ships.endsWith("-")) {
-          result = -result;
-        }
-        if (result == 0) {
-          result = a.sort_no - b.sort_no;
-        }
-        if (result == 0) {
-          result = a.api_id - b.api_id;
-        }
-        return result;
-      });
+      ships.sort(compareShip);
 
       for (var i = 0, ship; ship = ships[i]; i++) {
         html += '<tr><td class="ship-no">' + (i + 1) + '</td>';
@@ -2006,9 +2008,7 @@ var kcif = {
             result = -1;
           }
           else {
-            var a_ship = kcif.ship_list[a.ship_id];
-            var b_ship = kcif.ship_list[b.ship_id];
-            result = a.api_id - b.api_id;
+            result = compareShip(kcif.ship_list[a.ship_id], kcif.ship_list[b.ship_id]);
           }
         }
 

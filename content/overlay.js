@@ -942,6 +942,37 @@ function kcifCallback(request, content, query) {
     kcif.ship_num -= id_list.length;
     log("powerup: " + String(kcif.ship_num) + " ships, " + String(kcif.item_num) + " items");
   }
+  else if (url.indexOf("slotset") != -1) {
+    var ship = kcif.ship_list[Number(query["api_id"])];
+    if (ship) {
+      var item_id = Number(query["api_item_id"]);
+      var idx = Number(query["api_slot_idx"]);
+      if (ship.slot[idx] >= 0 && kcif.item_list[ship.slot[idx]]) {
+        kcif.item_list[ship.slot[idx]].ship_id = null;
+      }
+      ship.slot[idx] = item_id;
+      if (item_id >= 0 && kcif.item_list[ship.slot[item_id]]) {
+        kcif.item_list[ship.slot[item_id]].ship_id = ship.api_id;
+      }
+      else if (item_id < 0) {
+        for (var i = idx + 1; i < 5; i++) {
+          ship.slot[i - 1] = ship.slot[i];
+        }
+        ship.slot[4] = -1;
+      }
+    }
+  }
+  else if (url.indexOf("unsetslot_all") != -1) {
+    var ship = kcif.ship_list[Number(query["api_id"])];
+    if (ship) {
+      for (var i = 0; i < 5; i++) {
+        var item_id = ship.slot[i];
+        if (item_id >= 0 && kcif.item_list[item_id]) {
+          kcif.item_list[item_id].ship_id = -1;
+        }
+      }
+    }
+  }
   else if (url.indexOf("/api_start2") != -1) {
     var mst_ship = json.api_data.api_mst_ship;
     var master = {};
@@ -1102,7 +1133,7 @@ function kcifCallback(request, content, query) {
     for (var i = 0, data; data = data_list[i]; i++) {
       var ship = makeShip(data);
       for (var j = 0, slot; slot = data.api_slot[j]; j++) {
-        if (kcif.item_list[slot]) {
+        if (slot >= 0 && kcif.item_list[slot]) {
           kcif.item_list[slot].ship_id = ship.api_id;
         }
       }
@@ -1292,7 +1323,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(getship|destroyship|createitem|destroyitem2)|api_req_kaisou\/powerup|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(getship|destroyship|createitem|destroyitem2)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);

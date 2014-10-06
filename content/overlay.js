@@ -823,6 +823,7 @@ function makeItem(data, ship_id) {
     name: kcif.item_master[data.api_slotitem_id].name,
     type: kcif.item_master[data.api_slotitem_id].type,
     sort_no: kcif.item_master[data.api_slotitem_id].sort_no,
+    taiku: kcif.item_master[data.api_slotitem_id].taiku,
     type_name: kcif.item_master[data.api_slotitem_id].type_name,
     ship_id: ship_id
   };
@@ -846,7 +847,8 @@ function makeShip(data) {
     fuel: data.api_fuel,
     p_bull: prev ? prev.bull : data.api_bull,
     bull: data.api_bull,
-    slot: data.api_slot
+    slot: data.api_slot,
+    equip: data.api_onslot
   };
   if (kcif.ship_master[data.api_ship_id]) {
     ship.name = kcif.ship_master[data.api_ship_id].name;
@@ -855,9 +857,14 @@ function makeShip(data) {
     ship.sort_no = kcif.ship_master[data.api_ship_id].sort_no;
     ship.fuel_max = kcif.ship_master[data.api_ship_id].fuel_max;
     ship.bull_max = kcif.ship_master[data.api_ship_id].bull_max;
+    ship.equip_max = kcif.ship_master[data.api_ship_id].equip_max;
   }
   kcif.ship_list[data.api_id] = ship;
   return ship;
+}
+
+function isPlane(type) {
+  return type >= 6 && type <= 11;
 }
 
 function kcifCallback(request, content, query) {
@@ -1001,7 +1008,8 @@ function kcifCallback(request, content, query) {
         afterlv: ship.api_afterlv,
         sort_no: ship.api_sortno,
         fuel_max: ship.api_fuel_max,
-        bull_max: ship.api_bull_max
+        bull_max: ship.api_bull_max,
+        equip_max: ship.api_maxeq
       };
     }
     kcif.ship_master = master;
@@ -1022,6 +1030,7 @@ function kcifCallback(request, content, query) {
         name: item.api_name,
         type: item.api_type,
         sort_no: item.api_sortno,
+        taiku: item.api_tyku,
         type_name: item_type[item.api_type[2]].name
       };
     }
@@ -1642,6 +1651,7 @@ var kcif = {
           var drum_ship = [];
           var dai = 0;
           var dai_ship = [];
+          var seiku = 0;
           for (var j = 0, id; id = deck.api_ship[j]; j++) {
             if (id === -1 || id == null) {
               break;
@@ -1662,13 +1672,18 @@ var kcif = {
                 break;
               }
               var item = kcif.item_list[ship.slot[k]];
-              if (item && item.item_id == 75) { // ドラム缶(輸送用)
-                drum++;
-                drum_p = true;
-              }
-              else if (item && item.item_id == 68) { // 大発動艇
-                dai++;
-                dai_p = true;
+              if (item) {
+                if (item.item_id == 75) { // ドラム缶(輸送用)
+                  drum++;
+                  drum_p = true;
+                }
+                else if (item.item_id == 68) { // 大発動艇
+                  dai++;
+                  dai_p = true;
+                }
+                else if (isPlane(item.type[2]) && ship.equip[k] > 0) {
+                  seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
+                }
               }
             }
             if (drum_p) {
@@ -1688,6 +1703,7 @@ var kcif = {
             }
           }
           s += ' <span class="color-gray" title="旗艦 ' + ships[0].name + '">LV:' + ships[0].level + '/' + level_sum + '</span>';
+          s += ' <span class="color-gray"">制空:' + seiku + '</span>';
           s += ' <span class="color-gray" title="' + kira.join(' ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
           if (drum > 0) {
             s += ' <span class="color-gray" title="' + drum_ship.join(' ') + '">ドラム缶:' + drum + '/' + drum_ship.length + '</span>';

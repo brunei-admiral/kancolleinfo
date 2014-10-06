@@ -440,13 +440,30 @@ function ship_type(ship) {
 
 function ship_name(ship) {
   var s;
+  var items = null;
   if (!ship || !ship.ship_id) {
     s = "";
   }
   else {
     s = ship.name || "(" + ship.ship_id + ")";
+    for (var i = 0; i < 5; i++) {
+      if (ship.slot[i] >= 0 && kcif.item_list[ship.slot[i]]) {
+        if (!items) {
+          items = kcif.item_list[ship.slot[i]].name;
+        }
+        else {
+          items += " " + kcif.item_list[ship.slot[i]].name;
+        }
+      }
+    }
   }
-  return '<td class="ship-name">' + s + '</td>';
+  if (items) {
+    items = ' title="' + items + '"';
+  }
+  else {
+    items = null;
+  }
+  return '<td class="ship-name"' + items + '>' + s + '</td>';
 }
 
 function ship_level(ship) {

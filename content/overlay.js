@@ -1669,9 +1669,6 @@ var kcif = {
           s = "[出撃中 " + t + "]";
           col = "color-green";
         }
-        if (s) {
-          s = ' <span class="' + col + '">' + s + '</span>';
-        }
         if (deck) {
           var ships = [];
           var level_sum = 0;
@@ -1724,25 +1721,33 @@ var kcif = {
             }
           }
 
-          if (s == null) {
-            if (sup) {
-              s = ' <span class="color-orange blink">未補給艦あり</span>';
+          if (s) {
+            s = ' <span class="' + col + '">' + s + '</span>';
+          }
+          else {
+            if (ships.length > 0 && ships[0].type == 19) { // 工作艦
+              s = ' <span class="color-yellow">[修理中]</span>';
             }
             else {
               s = "";
             }
+            if (sup) {
+              s += ' <span class="color-orange blink">未補給艦あり</span>';
+            }
           }
-          s += ' <span class="color-gray" title="旗艦 ' + ships[0].name + '">LV:' + ships[0].level + '/' + level_sum + '</span>';
-          s += ' <span class="color-gray"">制空:' + seiku + '</span>';
-          s += ' <span class="color-gray" title="' + kira.join(' ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
-          if (drum > 0) {
-            s += ' <span class="color-gray" title="' + drum_ship.join(' ') + '">ドラム缶:' + drum + '/' + drum_ship.length + '</span>';
+
+          if (ships.length > 0) {
+            s += ' <span class="color-gray" title="旗艦 ' + ships[0].name + '">LV:' + ships[0].level + '/' + level_sum + '</span>';
+            s += ' <span class="color-gray"">制空:' + seiku + '</span>';
+            s += ' <span class="color-gray" title="' + kira.join(' ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
+            if (drum > 0) {
+              s += ' <span class="color-gray" title="' + drum_ship.join(' ') + '">ドラム缶:' + drum + '/' + drum_ship.length + '</span>';
+            }
+            if (dai > 0) {
+              s += ' <span class="color-gray" title="' + dai_ship.join(' ') + '">大発動艇:' + dai + '</span>';
+            }
           }
-          if (dai > 0) {
-            s += ' <span class="color-gray" title="' + dai_ship.join(' ') + '">大発動艇:' + dai + '</span>';
-          }
-        }
-        if (deck) {
+
           html += '<h2><a href="#">第' + (i + 1) + '艦隊</a>' + s + '<span class="fleet-name">「' + deck.api_name + '」</span></h2>';
         }
         else {

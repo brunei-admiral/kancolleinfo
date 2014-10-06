@@ -1306,6 +1306,8 @@ var kcif = {
   current_tab: "tab-main",
   current_fleet: "fleet1",
   beep: null,
+  sort_ships: "level-",
+  sort_items: "type+",
   storage: null,
   ship_master: {},
   item_master: {},
@@ -1816,7 +1818,7 @@ var kcif = {
       var shipstab = kcif.info_div.querySelector("#tab-ships");
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="ship-no"><a href="#">#</a></th><th class="ship-type"><a href="#">艦種</a></th><th class="ship-name"><a href="#">艦名</a></th><th class="ship-level"><a href="#" class="sort-current">LV</a></th><th class="ship-hp"><a href="#">耐久</a></th><th class="ship-cond">疲労</th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th></tr></thead>';
+      html += '<thead><tr><th class="ship-no"><a href="#"' + (kcif.sort_ships.indexOf("no") == 0 ? ' class="sort-current"' : '') + '>#</a></th><th class="ship-type"><a href="#"' + (kcif.sort_ships.indexOf("type") == 0 ? ' class="sort-current"' : '') + '>艦種</a></th><th class="ship-name"><a href="#"' + (kcif.sort_ships.indexOf("name") == 0 ? ' class="sort-current"' : '') + '>艦名</a></th><th class="ship-level"><a href="#"' + (kcif.sort_ships.indexOf("level") == 0 ? ' class="sort-current"' : '') + '>LV</a></th><th class="ship-hp"' + (kcif.sort_ships.indexOf("hp") == 0 ? ' class="sort-current"' : '') + '><a href="#">耐久</a></th><th class="ship-cond">疲労</th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th></tr></thead>';
       html += '<tbody>';
 
       var ships = [];
@@ -1826,13 +1828,33 @@ var kcif = {
         }
       }
       ships.sort(function(a,b){
-        if (a.level != b.level) {
-          return b.level - a.level;
+        var result = 0;
+        if (kcif.sort_ships.startsWith("no")) {
+          result = a.api_id - b.api_id;
         }
-        if (a.sort_no != b.sort_no) {
-          return a.sort_no - b.sort_no;
+        else if (kcif.sort_ships.startsWith("type")) {
+          result = a.type - b.type;
         }
-        return a.api_id - b.api_id;
+        else if (kcif.sort_ships.startsWith("name")) {
+          result = a.name.localeCompare(b.name);
+        }
+        else if (kcif.sort_ships.startsWith("level")) {
+          result = a.level - b.level;
+        }
+        else if (kcif.sort_ships.startsWith("hp")) {
+          result = (a.hp / a.hp_max) - (b.hp / b.hp_max);
+        }
+
+        if (kcif.sort_ships.endsWith("-")) {
+          result = -result;
+        }
+        if (result == 0) {
+          result = a.sort_no - b.sort_no;
+        }
+        if (result == 0) {
+          result = a.api_id - b.api_id;
+        }
+        return result;
       });
 
       for (var i = 0, ship; ship = ships[i]; i++) {
@@ -1850,11 +1872,35 @@ var kcif = {
       html += '</table></div></div>';
       shipstab.innerHTML = html;
 
+      // 艦娘:ヘッダ行リンク
+      var elems = shipstab.querySelectorAll("th a");
+      for (var i = 0; i < elems.length; i++) {
+        elems[i].addEventListener("click", function(){
+          var sort = this.parentNode.className.replace(/^.*-/, "");
+          log("sort (ships) [" + kcif.sort_ships + "] -> [" + sort + "]");
+          if (kcif.sort_ships.startsWith(sort)) {
+            if (kcif.sort_ships.endsWith("+")) {
+              kcif.sort_ships = sort + "-";
+            }
+            else {
+              kcif.sort_ships = sort + "+";
+            }
+          }
+          else if (sort == "no" || sort == "level") {
+            kcif.sort_ships = sort + "-";
+          }
+          else {
+            kcif.sort_ships = sort + "+";
+          }
+          kcif.render_info(true);
+        }, true);
+      }
+
       // アイテム
       var itemstab = kcif.info_div.querySelector("#tab-items");
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="item-no"><a href="#">#</a></th><th class="item-type"><a href="#" class="sort-current">種別</a></th><th class="item-name"><a href="#">名称</a></th><th class="ship-name"><a href="#">所在</a></th><th class="ship-level"></th></tr></thead>';
+      html += '<thead><tr><th class="item-no"><a href="#"' + (kcif.sort_items.indexOf("no") == 0 ? ' class="sort-current"' : '') + '>#</a></th><th class="item-type"><a href="#"' + (kcif.sort_items.indexOf("type") == 0 ? ' class="sort-current"' : '') + '>種別</a></th><th class="item-name"><a href="#"' + (kcif.sort_items.indexOf("name") == 0 ? ' class="sort-current"' : '') + '>名称</a></th><th class="ship-name"><a href="#"' + (kcif.sort_items.indexOf("holder") == 0 ? ' class="sort-current"' : '') + '>所在</a></th><th class="ship-level"></th></tr></thead>';
       html += '<tbody>';
 
       var items = [];
@@ -1864,13 +1910,45 @@ var kcif = {
         }
       }
       items.sort(function(a,b){
-        if (a.type[2] != b.type[2]) {
-          return a.type[2] - b.type[2];
+        var result = 0;
+        if (kcif.sort_items.startsWith("no")) {
+          result = a.api_id - b.api_id;
         }
-        if (a.sort_no != b.sort_no) {
-          return a.sort_no - b.sort_no;
+        else if (kcif.sort_items.startsWith("type")) {
+          result = a.type[2] - b.type[2];
         }
-        return a.api_id - b.api_id;
+        else if (kcif.sort_items.startsWith("name")) {
+          result = a.name.localeCompare(b.name);
+        }
+        else if (kcif.sort_items.startsWith("holder")) {
+          if (a.ship_id == null || a.ship_id < 0) {
+            if (b.ship_id == null || b.ship_id < 0) {
+              result = 0;
+            }
+            else {
+              result = 1;
+            }
+          }
+          else if (b.ship_id == null || b.ship_id < 0) {
+            result = -1;
+          }
+          else {
+            var a_ship = kcif.ship_list[a.ship_id];
+            var b_ship = kcif.ship_list[b.ship_id];
+            result = a.api_id - b.api_id;
+          }
+        }
+
+        if (kcif.sort_items.endsWith("-")) {
+          result = -result;
+        }
+        if (result == 0) {
+          result = a.sort_no - b.sort_no;
+        }
+        if (result == 0) {
+          result = a.api_id - b.api_id;
+        }
+        return result;
       });
 
       for (var i = 0, item; item = items[i]; i++) {
@@ -1885,6 +1963,34 @@ var kcif = {
       html += '</tbody>';
       html += '</table></div></div>';
       itemstab.innerHTML = html;
+
+      // アイテム:ヘッダ行リンク
+      var elems = itemstab.querySelectorAll("th a");
+      for (var i = 0; i < elems.length; i++) {
+        elems[i].addEventListener("click", function(){
+          var parentClass = this.parentNode.className;
+          var sort = parentClass.replace(/^.*-/, "");
+          log("sort (items) [" + kcif.sort_items + "] -> [" + sort + "]");
+          if (parentClass == "ship-name") {
+            sort = "holder";
+          }
+          if (kcif.sort_items.startsWith(sort)) {
+            if (kcif.sort_items.endsWith("+")) {
+              kcif.sort_items = sort + "-";
+            }
+            else {
+              kcif.sort_items = sort + "+";
+            }
+          }
+          else if (sort == "no") {
+            kcif.sort_items = sort + "-";
+          }
+          else {
+            kcif.sort_items = sort + "+";
+          }
+          kcif.render_info(true);
+        }, true);
+      }
     }
   }
 };

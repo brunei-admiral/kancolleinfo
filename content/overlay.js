@@ -446,7 +446,7 @@ function ship_name(ship) {
   }
   else {
     s = ship.name || "(" + ship.ship_id + ")";
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; ship.slot && i < 5; i++) {
       if (ship.slot[i] >= 0 && kcif.item_list[ship.slot[i]]) {
         if (!items) {
           items = kcif.item_list[ship.slot[i]].name;
@@ -1713,7 +1713,23 @@ var kcif = {
           else {
             var ship = kcif.ship_list[id];
             if (ship != null) {
-              html += '<tr><td class="ship-no">' + (j + 1) + '</td>';
+              var kit = null;
+              for (var k = 0; ship.slot && k < 5; k++) {
+                if (ship.slot[k] < 0) {
+                  break;
+                }
+                var item = kcif.item_list[ship.slot[k]];
+                if (item.type[2] == 23) { // 応急修理要員
+                  kit = item.name;
+                  break;
+                }
+              }
+              if (kit) {
+                html += '<tr><td class="ship-no color-green" title="' + kit + '">' + (j + 1) + '</td>';
+              }
+              else {
+                html += '<tr><td class="ship-no">' + (j + 1) + '</td>';
+              }
               html += ship_type(ship);
               html += ship_name(ship);
               html += ship_level(ship);

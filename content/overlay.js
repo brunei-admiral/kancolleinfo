@@ -863,8 +863,8 @@ function makeShip(data) {
   return ship;
 }
 
-function isPlane(type) {
-  return type >= 6 && type <= 11;
+function hasSeiku(type) {
+  return (type >= 6 && type <= 8) || type == 11;
 }
 
 function compareShip(a, b) {
@@ -1760,7 +1760,7 @@ var kcif = {
                   dai++;
                   dai_p = true;
                 }
-                else if (isPlane(item.type[2]) && ship.equip[k] > 0) {
+                else if (hasSeiku(item.type[2]) && ship.equip[k] > 0) {
                   seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
                 }
               }

@@ -304,6 +304,9 @@ function beepOnOff() {
     kcif.beep.pause();
     kcif.beep = null;
   }
+  if (!/^[a-z]+:\/\//.test(url)) {
+    return;
+  }
   if (!kcif.beep) {
     kcif.beep = new Audio(url);
     kcif.beep.loop = true;
@@ -1730,6 +1733,9 @@ var kcif = {
             log("beeptest: url=[" + url + "], src=[" + beeptest.src + "]");
             beeptest.pause();
             beeptest = null;
+          }
+          if (!/^[a-z]+:\/\//.test(url)) {
+            return;
           }
           if (!beeptest) {
             beeptest = new Audio(url);

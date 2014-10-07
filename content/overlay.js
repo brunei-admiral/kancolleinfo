@@ -935,7 +935,7 @@ function compareShip(a, b) {
     result = a.type - b.type;
   }
   else if (kcif.sort_ships.startsWith("name")) {
-    result = a.name.localeCompare(b.name);
+    result = a.sort_no - b.sort_no;
   }
   else if (kcif.sort_ships.startsWith("level")) {
     result = a.level - b.level;
@@ -2070,7 +2070,7 @@ var kcif = {
           result = a.type[2] - b.type[2];
         }
         else if (kcif.sort_items.startsWith("name")) {
-          result = a.name.localeCompare(b.name);
+          result = a.sort_no - b.sort_no;
         }
         else if (kcif.sort_items.startsWith("holder")) {
           if (a.ship_id == null || a.ship_id < 0) {
@@ -2091,6 +2091,10 @@ var kcif = {
 
         if (kcif.sort_items.endsWith("-")) {
           result = -result;
+        }
+        if (result == 0 && kcif.sort_items.startsWith("holder") && a.ship_id > 0) {
+          var slot = kcif.ship_list[a.ship_id].slot;
+          result = slot.indexOf(a.api_id) - slot.indexOf(b.api_id);
         }
         if (result == 0) {
           result = a.sort_no - b.sort_no;

@@ -104,14 +104,17 @@
   <div id="tab-config" class="tab">
     <table>
       <tr><td class="config-header">画面キャプチャ</td><td></td></tr>
-      <tr><td class="config-label">保存先</td><td class="config-input"><input id="capture-save-dir" class="input-text" value="D:\tmp"></td></tr>
-      <tr><td class="config-label">ベース名</td><td class="config-input"><input id="capture-save-base" class="input-text" value="kancolle-"></td></tr>
+      <tr><td class="config-label">保存先</td><td class="config-input"><input id="capture-save-dir" type="text" value="C:\Users\提督\AppData\Local\Temp"></td></tr>
+      <tr><td class="config-label">ベース名</td><td class="config-input"><input id="capture-save-base" type="text" value="kancolle-"></td></tr>
       <tr><td class="config-header">タイマーサウンド</td><td></td></tr>
-      <tr><td class="config-label">サウンドファイルURL</td><td class="config-input"><input id="beep-url" class="input-text" value="file://C:/Windows/Media/ringout.wav"></td></tr>
-      <tr><td class="config-label">ボリューム(0～100)</td><td class="config-input"><input id="beep-volume" class="input-text input-number" type="number" max="100" min="0" value="100"></td></tr>
-      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-expedition" type="checkbox" class="input-checkbox" checked>遠征帰還時にサウンドを再生する</label></td></tr>
-      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-dock" type="checkbox" class="input-checkbox" checked>入渠終了時にサウンドを再生する</label></td></tr>
-      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-built" type="checkbox" class="input-checkbox" checked>建造終了時にサウンドを再生する</label></td></tr>
+      <tr><td class="config-label">サウンドファイルURL</td><td class="config-input"><input id="beep-url" type="text" value="file://C:/Windows/Media/ringout.wav"></td></tr>
+      <tr><td class="config-label">ボリューム(0～100)</td><td class="config-input"><input id="beep-volume" type="number" max="100" min="0" value="100"> <button>テスト</button></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-expedition" type="checkbox">遠征帰還時のサウンド再生を自動でONにする</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-dock" type="checkbox">入渠終了時のサウンド再生を自動でONにする</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-built" type="checkbox">建造終了時のサウンド再生を自動でONにする</label></td></tr>
+      <tr><td class="config-header">情報表示</td><td></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="show-battle" type="checkbox" checked>戦闘結果を表示する</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="show-built" type="checkbox" checked>建造結果を表示する</label></td></tr>
     </table>
     <div class="config-buttons">
       <button id="config-save">保存</button>
@@ -241,6 +244,7 @@ sheet.insertRule('#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-con
 sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 4em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 7.8em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .ship-fuel, #kancolle-info .tab .ship-bull { text-align: right; width: 3.8em; }', sheet.length);
+sheet.insertRule('#kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .item-type { width: 8em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab .item-name { font-weight: bold; width: 14em; }', sheet.length);
 sheet.insertRule('#kancolle-info .tab a.sort-current { color: yellow; }', sheet.length);
@@ -251,9 +255,11 @@ sheet.insertRule('#kancolle-info #tab-main input.check-timer { padding: 0; margi
 sheet.insertRule('#kancolle-info #tab-config td.config-header { text-align: right; width: 12em; padding: 2px 16px 0 0; color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-config td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-config td.config-input { text-align: left; width: 40em; }', sheet.length);
-sheet.insertRule('#kancolle-info #tab-config td.config-input .input-text { width: 100%; }', sheet.length);
-sheet.insertRule('#kancolle-info #tab-config td.config-input .input-number { width: 4em !important; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-config td.config-input input[type=text] { width: 100%; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-config td.config-input input[type=number] { width: 4em; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-config td.config-input input[type=checkbox] { padding: 0; margin: 0 4px 0 0; position: relative; top: 2px; }', sheet.length);
 sheet.insertRule('#kancolle-info #tab-config div.config-buttons { text-align: center; }', sheet.length);
+sheet.insertRule('#kancolle-info #tab-config button { width: 5em; padding: 0; margin: 0; height: 24px; font-size: 10.5px; }', sheet.length);
 sheet.insertRule('#kancolle-info .color-green { color: lightgreen; }', sheet.length);
 sheet.insertRule('#kancolle-info .color-yellow { color: yellow; }', sheet.length);
 sheet.insertRule('#kancolle-info .color-orange { color: orange; }', sheet.length);

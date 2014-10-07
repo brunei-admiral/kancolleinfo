@@ -10,7 +10,8 @@ function log() {
   Services.console.logStringMessage("[kcif]: " + Array.join(arguments, " "));
 }
 
-function select_tab() {
+function select_tab(evt) {
+  evt.preventDefault();
   var elems = kcif.info_div.querySelectorAll(".tab-header");
   for (var i = 0; i < elems.length; i++) {
     elems[i].style.color = "inherit";
@@ -31,7 +32,8 @@ function select_tab() {
   }
 }
 
-function select_fleet() {
+function select_fleet(evt) {
+  evt.preventDefault();
   var elems = kcif.info_div.querySelectorAll("#tab-main .fleet table");
   for (var i = 0; i < elems.length; i++) {
     elems[i].style.display = "none";
@@ -46,7 +48,8 @@ function select_fleet() {
   kcif.current_fleet = fleet.id;
 }
 
-function saveConfig() {
+function saveConfig(evt) {
+  evt.preventDefault();
   var str = CCIN("@mozilla.org/supports-string;1", "nsISupportsString");
 
   var elem = kcif.info_div.querySelector("#capture-save-dir");
@@ -108,7 +111,8 @@ function saveConfig() {
   kcif.render_info(false);
 }
 
-function resetConfig() {
+function resetConfig(evt) {
+  evt.preventDefault();
   var elem = kcif.info_div.querySelector("#capture-save-dir");
   if (elem) {
     elem.value = getCaptureSaveDir();
@@ -371,8 +375,9 @@ function getPathSeparator() {
   return profD.path.substr(profD.path.length - ("dummy".length) - 1, 1);
 }
 
-function captureAndSave() {
+function captureAndSave(evt) {
   log("captureAndSave start");
+  evt.preventDefault();
   var png = capture(kcif.flash, kcif.game_frame, 1.0);
 
   var dir = getCaptureSaveDir();
@@ -1662,7 +1667,7 @@ var kcif = {
       // タブ
       var elems = kcif.info_div.querySelectorAll(".tab-header a");
       for (var i = 0; i < elems.length; i++) {
-        elems[i].addEventListener("click", select_tab, true);
+        elems[i].addEventListener("click", select_tab, false);
       }
       var elem = kcif.info_div.querySelector("#" + kcif.current_tab.replace("-", "-header-") + " a");
       if (elem) {
@@ -1690,14 +1695,14 @@ var kcif = {
       // 設定:保存
       var elem = kcif.info_div.querySelector("#config-save");
       if (elem) {
-        elem.addEventListener("click", saveConfig, true, true);
+        elem.addEventListener("click", saveConfig, false, true);
         elem.disabled = true;
       }
 
       // 設定:クリア
       var elem = kcif.info_div.querySelector("#config-reset");
       if (elem) {
-        elem.addEventListener("click", resetConfig, true, true);
+        elem.addEventListener("click", resetConfig, false);
         elem.disabled = true;
       }
 
@@ -1705,7 +1710,8 @@ var kcif = {
       var elem = kcif.info_div.querySelector("#beep-test");
       if (elem) {
         var beeptest = null;
-        elem.addEventListener("click", function() {
+        elem.addEventListener("click", function(evt) {
+          evt.preventDefault();
           var url = kcif.info_div.querySelector("#beep-url").value;
           if (beeptest && beeptest.src != url) {
             log("beeptest: url=[" + url + "], src=[" + beeptest.src + "]");
@@ -1724,7 +1730,7 @@ var kcif = {
           else {
              beeptest.pause();
           }
-        }, true, true);
+        }, false, true);
       }
 
       // タイマーサウンド設定
@@ -1988,7 +1994,7 @@ var kcif = {
       // メイン:艦隊
       elems = maintab.querySelectorAll(".fleet h2 a");
       for (var i = 0; i < elems.length; i++) {
-        elems[i].addEventListener("click", select_fleet, true);
+        elems[i].addEventListener("click", select_fleet, false);
       }
       var elem = maintab.querySelector("#" + kcif.current_fleet + " h2 a");
       if (elem) {
@@ -2059,7 +2065,8 @@ var kcif = {
       // 艦娘:ヘッダ行リンク
       var elems = shipstab.querySelectorAll("th a");
       for (var i = 0; i < elems.length; i++) {
-        elems[i].addEventListener("click", function(){
+        elems[i].addEventListener("click", function(evt){
+          evt.preventDefault();
           var sort = this.parentNode.className.replace(/^.*-/, "");
           log("sort (ships) [" + kcif.sort_ships + "] -> [" + sort + "]");
           if (kcif.sort_ships.startsWith(sort)) {
@@ -2077,7 +2084,7 @@ var kcif = {
             kcif.sort_ships = sort + "+";
           }
           kcif.render_info(true);
-        }, true);
+        }, false);
       }
 
       // アイテム
@@ -2149,7 +2156,8 @@ var kcif = {
       // アイテム:ヘッダ行リンク
       var elems = itemstab.querySelectorAll("th a");
       for (var i = 0; i < elems.length; i++) {
-        elems[i].addEventListener("click", function(){
+        elems[i].addEventListener("click", function(evt){
+          evt.preventDefault();
           var parentClass = this.parentNode.className;
           var sort = parentClass.replace(/^.*-/, "");
           log("sort (items) [" + kcif.sort_items + "] -> [" + sort + "]");
@@ -2171,7 +2179,7 @@ var kcif = {
             kcif.sort_items = sort + "+";
           }
           kcif.render_info(true);
-        }, true);
+        }, false);
       }
     }
   }

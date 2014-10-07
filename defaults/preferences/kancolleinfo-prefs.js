@@ -5,3 +5,5 @@ pref("extensions.kancolleinfo.beep.volume", 100);
 pref("extensions.kancolleinfo.beep.expedition", false);
 pref("extensions.kancolleinfo.beep.dock", false);
 pref("extensions.kancolleinfo.beep.built", false);
+pref("extensions.kancolleinfo.show.battle", false);
+pref("extensions.kancolleinfo.show.built", false);

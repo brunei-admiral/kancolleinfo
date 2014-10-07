@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>kancolleinfo</title>
+<script type="application/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-161239-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<style type="text/css"><!--
+body {
+  font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  font-size: 12pt;
+  line-height: 1.3;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbs {
+  font-size: 10pt;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 24pt;
+  margin: 4px 0 4px 0;
+  padding: 4px 0 4px 0;
+  color: green;
+  text-shadow: darkgreen 1px 1px 0px, darkgreen -1px 1px 0px, darkgreen 1px -1px 0px, darkgreen -1px -1px 0px;
+}
+
+h1 small {
+  font-weight: bold;
+  font-size: 18pt;
+  color: darkgray;
+  text-shadow: none;
+}
+
+h2 {
+  font-weight: bold;
+  font-size: 16pt;
+  margin: 8px 0 0 0;
+  padding: 8px 0 0 0;
+  color: green;
+}
+
+h3 {
+  font-weight: bold;
+  font-size: 14pt;
+  margin: 4px 0 0 0;
+  padding: 4px 0 0 0;
+}
+
+h4 {
+  font-weight: bold;
+  font-size: 12pt;
+  margin: 4px 0 0 0;
+  padding: 4px 0 0 0;
+}
+
+p, dl {
+  margin: 4px 0 0 2em;
+  padding: 4px 0 0 0;
+}
+
+dt {
+  width: 9em;
+  text-align: right;
+  padding: 2px 0 0 0;
+}
+
+dd {
+  margin: -21px 0 0 10em;
+  padding: 0;
+}
+
+ul {
+  margin: 4px 0 0 3em;
+  padding: 4px 0 0 0;
+}
+
+samp {
+  font-family: inherit;
+  color: white;
+  background-color: black;
+  padding: 0 2px 0 2px;
+}
+
+em {
+  color: darkblue;
+  font-style: inherit;
+}
+
+.download a {
+  color: gray;
+}
+
+.download a.current {
+  color: red;
+}
+
+.footer {
+  text-align: right;
+  font-size: 10pt;
+}
+
+.footer a {
+  color: inherit;
+}
+
+/* 以下、モック用 */
+#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; margin-top: 8px; color: white; background-color: black; font-size: 10pt; font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; text-align: left; }
+#kancolle-info * { font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; }
+#kancolle-info #tab-headers { color: #ccc; background-color: #444; line-height: 1.5; font-weight: bold; }
+#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; padding: 1px 12px 2px 12px; }
+#kancolle-info #base-info { float: right; margin-right: 8px; color: white; font-weight: normal; }
+#kancolle-info #base-info button { height: 21px; position: relative; top: -1px; font-size: 10px; }
+#kancolle-info #updated { font-weight: bold; color: lightgreen; }
+#kancolle-info .tab-header a { color: inherit; text-decoration: none; }
+#kancolle-info .tab-header a:hover { color: yellow; }
+#kancolle-info .tab { padding: 2px 8px 2px 8px; }
+#kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }
+#kancolle-info .tab a { color: skyblue; text-decoration: none; font-weight: bold; }
+#kancolle-info .tab a:hover { color: yellow; }
+#kancolle-info .tab h2 .fleet-name { float: right; color: #ccc; }
+#kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }
+#kancolle-info .tab table tr { padding: 0; margin: 0; }
+#kancolle-info .tab table th, #kancolle-info .tab table td { padding: 0; margin: 0; line-height: 1.2; }
+#kancolle-info .tab .table-outer { position: relative; padding-top: 20px; }
+#kancolle-info .tab .table-inner { height: 256px; overflow: auto; }
+#kancolle-info .tab .table-outer .table-inner table thead { position: absolute; top: 0px; left: 0px; }
+#kancolle-info .tab .table-outer .table-inner table thead th { text-align: left; font-weight: bold; }
+#kancolle-info .tab .ship-no, #kancolle-info .tab .item-no, #kancolle-info .tab .item-num { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }
+#kancolle-info .tab .ship-type { width: 2.7em; }
+#kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }
+#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; }
+#kancolle-info .tab .ship-hp { text-align: right; width: 4em; }
+#kancolle-info .tab .ship-at { text-align: right; width: 7.8em; }
+#kancolle-info .tab .ship-fuel, #kancolle-info .tab .ship-bull { text-align: right; width: 3.8em; }
+#kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }
+#kancolle-info .tab .item-type { width: 8em; }
+#kancolle-info .tab .item-name { font-weight: bold; width: 14em; }
+#kancolle-info .tab a.sort-current { color: yellow; }
+#kancolle-info #tab-main #ndock { width: 482px; float: left; }
+#kancolle-info #tab-main #kdock { width: 302px; float: left; }
+#kancolle-info #tab-main table { position: relative; top: -3px; }
+#kancolle-info #tab-main input.check-timer { padding: 0; margin: 0 0 0 4px; position: relative; top: 2px;}
+#kancolle-info #tab-config td.config-header { text-align: right; width: 12em; padding: 2px 16px 0 0; color: skyblue; text-decoration: none; font-weight: bold; }
+#kancolle-info #tab-config td.config-label { text-align: right; width: 12em; padding-right: 16px; }
+#kancolle-info #tab-config td.config-input { text-align: left; width: 40em; }
+#kancolle-info #tab-config td.config-input input[type=text] { width: 100%; }
+#kancolle-info #tab-config td.config-input input[type=number] { width: 4em; }
+#kancolle-info #tab-config td.config-input input[type=checkbox] { padding: 0; margin: 0 4px 0 0; position: relative; top: 2px; }
+#kancolle-info #tab-config div.config-buttons { text-align: center; }
+#kancolle-info #tab-config button { width: 5em; padding: 0; margin: 0; height: 24px; font-size: 10.5px; }
+#kancolle-info .color-green { color: lightgreen; }
+#kancolle-info .color-yellow { color: yellow; }
+#kancolle-info .color-orange { color: orange; }
+#kancolle-info .color-red { color: red; }
+#kancolle-info .color-gray { color: silver; }
+#kancolle-info .color-default { color: inherit; }
+#kancolle-info .blink { -moz-animation: blink 1.0s ease-in-out infinite alternate; }
+@-moz-keyframes blink { 0% {background-color: rgba(240,208,0,0.5);} 60% {background-color: inherit;} 100% {background-color: inherit;} }
+--></style>
+</head>
+<body>
+<div class="breadcrumbs"><a href="/">トップ</a> > kancolleinfo</div>
+<h1>kancolleinfo <small>for Firefox</small></h1>
+
+<p>
+このページがなんか崩れて見える場合は、ブラウザをFirefoxに変更してください。
+</p>
+
+<h2>なにこれ?</h2>
+<p>
+『艦隊これくしょん～艦これ～』(以下『艦これ』)のプレイ中情報を(たぶん)便利に表示するFirefox拡張機能です。
+</p>
+<p>
+kancolleinfo自体は『艦これ』サーバとは一切通信を行っていません。
+『艦これ』ゲーム画面とサーバとの間の通信を覗き見して、その情報を元に表示内容を構成しています。
+また、kancolleinfo側でいかなる操作を行っても、それによって『艦これ』ゲーム内に影響を及ぼすことはありません。
+</p>
+<p>
+なお、<b>『艦これ』公式とは一切関係がありません</b>のであしからず。
+</p>
+
+<h2>ダウンロード</h2>
+<p>
+<b>先に<a href="#notice">注意事項</a>をよく読んでからダウンロードしてください。</b>
+</p>
+<ul class="download">
+  <li><a href="./kancolleinfo_1.0.0.xpi" class="current">ver 1.0.0 (最新)</a></li>
+</ul>
+
+<h2>スクリーンショット</h2>
+<p>
+というか、動的モックです。
+実物とは微妙に細部が異なるかもしれません。
+</p>
+<div id="kancolle-info">
+  <div id="tab-headers">
+    <div id="tab-header-main" class="tab-header"><a href="#">メイン</a></div>
+    <div id="tab-header-ships" class="tab-header"><a href="#">艦娘</a></div>
+    <div id="tab-header-items" class="tab-header"><a href="#">装備</a></div>
+    <div id="tab-header-config" class="tab-header"><a href="#">設定</a></div>
+    <div id="base-info"><span class="color-default">19</span>/100 ships; <span class="color-default">78</span>/500 items <span id="updated">20:35更新</span> <button id="capture">画面キャプチャ</button></div>
+  </div>
+  <div id="tab-main" class="tab">
+    <div id="fleet1" class="fleet">
+      <h2><a href="#">第1艦隊</a> <span class="color-green">[出撃中<span id="battle-result" style="display: none;"> + 5-4-1 同航戦 <span style="letter-spacing: -2px;"><span class="color-gray">×</span><span class="color-green">◎</span><span class="color-red">△</span><span class="color-orange">○</span><span class="color-gray">×</span><span class="color-yellow">◎</span></span></span>]</span> <span class="color-gray" title="旗艦 Bismarck drei">LV:105/475</span> <span class="color-gray">制空:159</span> <span class="color-gray" title="Bismarck drei, Верный">キラ:2/6</span> <span class="color-gray" title="暁改, Верный">ドラム缶:4/2</span><span class="fleet-name">「第1艦隊」</span></h2>
+      <table>
+        <tr><td class="ship-no color-red" title="応急修理要員">1</td><td class="ship-type">巡戦</td><td class="ship-name" title="38cm連装砲改 38cm連装砲改 61cm四連装(酸素)魚雷 応急修理要員">Bismarck drei</td><td class="ship-level">105</td><td class="ship-hp color-green">99/99</td><td class="ship-cond color-green blink">53</td><td class="ship-fuel color-green" title="93/93">100%</td><td class="ship-bull color-green" title="131/131">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">2</td><td class="ship-type">戦艦</td><td class="ship-name" title="46cm三連装砲 46cm三連装砲 46cm三連装砲 46cm三連装砲">大和改</td><td class="ship-level">61</td><td class="ship-hp color-green">96/96</td><td class="ship-cond color-yellow">30</td><td class="ship-fuel color-orange" title="125/250">50%</td><td class="ship-bull color-orange" title="162/325">49%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">3</td><td class="ship-type">潜水</td><td class="ship-name" title="潜水艦53cm艦首魚雷(8門) 61cm五連装(酸素)魚雷">伊168改</td><td class="ship-level">58</td><td class="ship-hp color-orange blink">7/15</td><td class="ship-cond color-orange">20</td><td class="ship-fuel color-green" title="10/10">100%</td><td class="ship-bull color-green" title="20/20">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">4</td><td class="ship-type">駆逐</td><td class="ship-name" title="10cm連装高角砲 ドラム缶(輸送用) ドラム缶(輸送用)">暁改</td><td class="ship-level">90</td><td class="ship-hp color-yellow">20/30</td><td class="ship-cond color-red">10</td><td class="ship-fuel color-green" title="15/15">100%</td><td class="ship-bull color-green" title="20/20">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">5</td><td class="ship-type">駆逐</td><td class="ship-name" title="10cm連装高角砲 ドラム缶(輸送用) ドラム缶(輸送用)">Верный</td><td class="ship-level">98</td><td class="ship-hp color-red">1/37</td><td class="ship-cond color-green blink">100</td><td class="ship-fuel color-green" title="15/15">100%</td><td class="ship-bull color-green" title="25/25">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">6</td><td class="ship-type">軽空</td><td class="ship-name" title="烈風改 烈風 烈風 烈風">千代田航改二</td><td class="ship-level">63</td><td class="ship-hp blink">56/58</td><td class="ship-cond">49</td><td class="ship-fuel color-yellow" title="36/45">80%</td><td class="ship-bull color-yellow" title="32/40">80%</td><td class="ship-desc"></td></tr>
+      </table>
+    </div>
+    <div id="fleet2" class="fleet">
+      <h2><a href="#">第2艦隊</a> <span class="color-red">[遠征中 <label>20:33帰還<input class="check-timer" type="checkbox"></label>]</span> <span class="color-gray" title="旗艦 北上改二">LV:92/155</span> <span class="color-gray">制空:37</span> <span class="color-gray">キラ:0/4</span><span class="fleet-name">「第2艦隊」</span></h2>
+      <table>
+        <tr><td class="ship-no">1</td><td class="ship-type">雷巡</td><td class="ship-name" title="61cm五連装(酸素)魚雷 61cm五連装(酸素)魚雷 甲標的">北上改二</td><td class="ship-level">92</td><td class="ship-hp color-green">43/43</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="25/25">100%</td><td class="ship-bull color-green" title="75/75">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">2</td><td class="ship-type">航巡</td><td class="ship-name" title="瑞雲 瑞雲(六三四空) 瑞雲 零式水上偵察機">最上改</td><td class="ship-level">27</td><td class="ship-hp color-green">50/50</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="50/50">100%</td><td class="ship-bull color-green" title="55/55">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">3</td><td class="ship-type">重巡</td><td class="ship-name" title="20.3cm連装砲 20.3cm連装砲 61cm四連装魚雷">羽黒</td><td class="ship-level">3</td><td class="ship-hp color-green">44/44</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="40/40">100%</td><td class="ship-bull color-green" title="65/65">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">4</td><td class="ship-type">揚陸</td><td class="ship-name" title="三式指揮連絡機(対潜) カ号観測機 紫電改二">あきつ丸改</td><td class="ship-level">33</td><td class="ship-hp color-green">40/40</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="45/45">100%</td><td class="ship-bull color-green" title="25/25">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">5</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel"></td><td class="ship-bull"></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">6</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel"></td><td class="ship-bull"></td><td class="ship-desc"></td></tr>
+      </table>
+    </div>
+    <div id="fleet3" class="fleet">
+      <h2><a href="#">第3艦隊</a> <span class="color-yellow">[遠征中 <label>20:40帰還<input class="check-timer" type="checkbox"></label>]</span> <span class="color-gray" title="旗艦 吹雪改">LV:55/152</span> <span class="color-gray">制空:0</span> <span class="color-gray">キラ:0/3</span><span class="fleet-name">「第3艦隊」</span></h2>
+      <table>
+        <tr><td class="ship-no">1</td><td class="ship-type">駆逐</td><td class="ship-name" title="12.7cm連装砲 12.7cm連装砲 13号対空電探">吹雪改</td><td class="ship-level">55</td><td class="ship-hp color-green">30/30</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="15/15">100%</td><td class="ship-bull color-green" title="20/20">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">2</td><td class="ship-type">駆逐</td><td class="ship-name" title="12.7cm連装砲 三式水中探信儀 九四式爆雷投射機">天津風改</td><td class="ship-level">24</td><td class="ship-hp color-green">34/34</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="20/20">100%</td><td class="ship-bull color-green" title="20/20">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">3</td><td class="ship-type">駆逐</td><td class="ship-name" title="12.7cm単装砲 2cm 四連装FlaK 38 61cm三連装魚雷">Z1 zwei</td><td class="ship-level">73</td><td class="ship-hp color-green">35/35</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="20/20">100%</td><td class="ship-bull color-green" title="25/25">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">4</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel"></td><td class="ship-bull"></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">5</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel"></td><td class="ship-bull"></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">6</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel"></td><td class="ship-bull"></td><td class="ship-desc"></td></tr>
+      </table>
+    </div>
+    <div id="fleet4" class="fleet">
+      <h2><a href="#">第4艦隊</a> <span class="color-orange blink" title="大鯨">未補給艦あり</span> <span class="color-yellow" title="千歳甲">入渠艦あり</span> <span class="color-gray" title="旗艦 千歳甲">LV:12/63</span> <span class="color-gray">制空:0</span> <span class="color-gray">キラ:0/2</span> <span class="color-gray" title="千歳甲">大発:1</span><span class="fleet-name">「第4艦隊」</span></h2>
+      <table>
+        <tr><td class="ship-no">1</td><td class="ship-type">水母</td><td class="ship-name" title="試製晴嵐 甲標的 大発動艇">千歳甲</td><td class="ship-level">12</td><td class="ship-hp color-default">40/42</td><td class="ship-cond">49</td><td class="ship-fuel color-green" title="35/35">100%</td><td class="ship-bull color-green" title="45/45">100%</td><td class="ship-desc color-yellow">入渠中</td></tr>
+        <tr><td class="ship-no">2</td><td class="ship-type">潜母</td><td class="ship-name" title="15.5cm三連装副砲 15.5cm三連装副砲 新型高温高圧缶">大鯨</td><td class="ship-level color-green" title="改造後 龍鳳">52</td><td class="ship-hp color-default">39/39</td><td class="ship-cond">49</td><td class="ship-fuel color-yellow" title="28/35">80%</td><td class="ship-bull color-yellow" title="8/10">80%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">3</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel"></td><td class="ship-bull"></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">4</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel"></td><td class="ship-bull"></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">5</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel"></td><td class="ship-bull"></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">6</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel"></td><td class="ship-bull"></td><td class="ship-desc"></td></tr>
+      </table>
+    </div>
+    <div id="ndock">
+      <h2><a href="#">入渠</a></h2>
+      <table>
+        <tr><td class="ship-no">1</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-at"></td></tr>
+        <tr><td class="ship-no">2</td><td class="ship-type">水母</td><td class="ship-name" title="試製晴嵐 甲標的 大発動艇">千歳甲</td><td class="ship-level">12</td><td class="ship-hp color-default">40/42</td><td class="ship-cond">49</td><td class="ship-at color-orange"><label>20:36<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">3</td><td class="ship-type">航戦</td><td class="ship-name" title="41cm連装砲 41cm連装砲 瑞雲(六三四空) 瑞雲">伊勢改</td><td class="ship-level">83</td><td class="ship-hp color-red">2/77</td><td class="ship-cond color-yellow blink">30</td><td class="ship-at"><label>10/09 02:34<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">4</td><td class="ship-type">潜空</td><td class="ship-name" title="61cm四連装(酸素)魚雷 61cm四連装(酸素)魚雷">伊58改</td><td class="ship-level">51</td><td class="ship-hp color-orange">8/18</td><td class="ship-cond color-orange blink">20</td><td class="ship-at color-red"><label>20:34<input class="check-timer" type="checkbox"></label></td></tr>
+      </table>
+    </div>
+    <div id="kdock">
+      <h2><a href="#">建造</a></h2>
+      <table>
+        <tr><td class="ship-no">1</td><td class="ship-type"><span class="built-result">???</span><span style="display: none;">駆逐</span></td><td class="ship-name"><span class="built-result">???</span><span style="display: none;">雷</span></td><td class="ship-at color-red"><label>--:--<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">2</td><td class="ship-type"><span class="built-result">???</span><span style="display: none;">軽巡</span></td><td class="ship-name"><span class="built-result">???</span><span style="display: none;">那珂</span></td><td class="ship-at color-orange"><label>20:36<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">3</td><td class="ship-type"><span class="built-result">???</span><span style="display: none;">軽巡</span></td><td class="ship-name"><span class="built-result">???</span><span style="display: none;">多摩</span></td><td class="ship-at color-red"><label>20:34<input class="check-timer" type="checkbox"></label></td></tr>
+        <tr><td class="ship-no">4</td><td class="ship-type"><span class="built-result">???</span><span style="display: none;">戦艦</span></td><td class="ship-name"><span class="built-result">???</span><span style="display: none;">大和</span></td><td class="ship-at"><label>10/09 01:01<input class="check-timer" type="checkbox"></label></td></tr>
+      </table>
+    </div>
+  </div>
+  <div id="tab-ships" class="tab">
+    <div class="table-outer"><div class="table-inner"><table>
+      <thead>
+        <tr><th class="ship-no"><a href="#">#</a></th><th class="ship-type"><a href="#">艦種</a></th><th class="ship-name"><a href="#">艦名</a></th><th class="ship-level"><a href="#" class="sort-current">LV</a></th><th class="ship-hp"><a href="#">耐久</a></th><th class="ship-cond">疲労</th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-desc">所在</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="ship-no">1</td><td class="ship-type">正空</td><td class="ship-name" title="応急修理女神">飛龍改二</td><td class="ship-level">150</td><td class="ship-hp color-green">74/74</td><td class="ship-cond color-green blink">53</td><td class="ship-fuel color-green" title="59/59">100%</td><td class="ship-bull color-green" title="63/63">100%</td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">2</td><td class="ship-type">巡戦</td><td class="ship-name" title="38cm連装砲改 38cm連装砲改 61cm四連装(酸素)魚雷 応急修理要員">Bismarck drei</td><td class="ship-level">105</td><td class="ship-hp color-green">99/99</td><td class="ship-cond color-green blink">53</td><td class="ship-fuel color-green" title="93/93">100%</td><td class="ship-bull color-green" title="131/131">100%</td><td class="ship-desc">第1艦隊<span class="color-gray">「第1艦隊」</span></td></tr>
+        <tr><td class="ship-no">3</td><td class="ship-type">駆逐</td><td class="ship-name" title="10cm連装高角砲 ドラム缶(輸送用) ドラム缶(輸送用)">Верный</td><td class="ship-level">98</td><td class="ship-hp color-red">1/37</td><td class="ship-cond color-green blink">100</td><td class="ship-fuel color-green" title="15/15">100%</td><td class="ship-bull color-green" title="25/25">100%</td><td class="ship-desc">第1艦隊<span class="color-gray">「第1艦隊」</span></td></tr>
+        <tr><td class="ship-no">4</td><td class="ship-type">雷巡</td><td class="ship-name" title="61cm五連装(酸素)魚雷 61cm五連装(酸素)魚雷 甲標的">北上改二</td><td class="ship-level">92</td><td class="ship-hp color-green">43/43</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="25/25">100%</td><td class="ship-bull color-green" title="75/75">100%</td><td class="ship-desc">第2艦隊<span class="color-gray">「第2艦隊」</span></td></tr>
+        <tr><td class="ship-no">5</td><td class="ship-type">駆逐</td><td class="ship-name" title="10cm連装高角砲 ドラム缶(輸送用) ドラム缶(輸送用)">暁改</td><td class="ship-level">90</td><td class="ship-hp color-yellow">20/30</td><td class="ship-cond color-red">10</td><td class="ship-fuel color-green" title="15/15">100%</td><td class="ship-bull color-green" title="20/20">100%</td><td class="ship-desc">第1艦隊<span class="color-gray">「第1艦隊」</span></td></tr>
+        <tr><td class="ship-no">6</td><td class="ship-type">航戦</td><td class="ship-name" title="41cm連装砲 41cm連装砲 瑞雲(六三四空) 瑞雲">伊勢改</td><td class="ship-level">83</td><td class="ship-hp color-red">2/77</td><td class="ship-cond color-yellow blink">30</td><td class="ship-fuel color-green" title="95/95">100%</td><td class="ship-bull color-green" title="105/105">100%</td><td class="ship-desc color-yellow">入渠中</td></tr>
+        <tr><td class="ship-no">7</td><td class="ship-type">駆逐</td><td class="ship-name" title="12.7cm単装砲 2cm 四連装FlaK 38 61cm三連装魚雷">Z1 zwei</td><td class="ship-level">73</td><td class="ship-hp color-green">35/35</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="20/20">100%</td><td class="ship-bull color-green" title="25/25">100%</td><td class="ship-desc">第3艦隊<span class="color-gray">「第3艦隊」</span></td></tr>
+        <tr><td class="ship-no">8</td><td class="ship-type">軽空</td><td class="ship-name" title="烈風改 烈風 烈風 烈風">千代田航改二</td><td class="ship-level">63</td><td class="ship-hp blink">56/58</td><td class="ship-cond">49</td><td class="ship-fuel color-yellow" title="36/45">80%</td><td class="ship-bull color-yellow" title="32/40">80%</td><td class="ship-desc">第1艦隊<span class="color-gray">「第1艦隊」</span></td></tr>
+        <tr><td class="ship-no">9</td><td class="ship-type">戦艦</td><td class="ship-name" title="46cm三連装砲 46cm三連装砲 46cm三連装砲 46cm三連装砲">大和改</td><td class="ship-level">61</td><td class="ship-hp color-green">96/96</td><td class="ship-cond color-yellow">30</td><td class="ship-fuel color-orange" title="125/250">50%</td><td class="ship-bull color-orange" title="162/325">49%</td><td class="ship-desc">第1艦隊<span class="color-gray">「第1艦隊」</span></td></tr>
+        <tr><td class="ship-no">10</td><td class="ship-type">潜水</td><td class="ship-name" title="潜水艦53cm艦首魚雷(8門) 61cm五連装(酸素)魚雷">伊168改</td><td class="ship-level">58</td><td class="ship-hp color-orange blink">7/15</td><td class="ship-cond color-orange">20</td><td class="ship-fuel color-green" title="10/10">100%</td><td class="ship-bull color-green" title="20/20">100%</td><td class="ship-desc">第1艦隊<span class="color-gray">「第1艦隊」</span></td></tr>
+        <tr><td class="ship-no">11</td><td class="ship-type">駆逐</td><td class="ship-name" title="12.7cm連装砲 12.7cm連装砲 13号対空電探">吹雪改</td><td class="ship-level">55</td><td class="ship-hp color-green">30/30</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="15/15">100%</td><td class="ship-bull color-green" title="20/20">100%</td><td class="ship-desc">第3艦隊<span class="color-gray">「第3艦隊」</span></td></tr>
+        <tr><td class="ship-no">12</td><td class="ship-type">潜母</td><td class="ship-name" title="15.5cm三連装副砲 15.5cm三連装副砲 新型高温高圧缶">大鯨</td><td class="ship-level color-green" title="改造後 龍鳳">52</td><td class="ship-hp color-default">39/39</td><td class="ship-cond">49</td><td class="ship-fuel color-yellow" title="28/35">80%</td><td class="ship-bull color-yellow" title="8/10">80%</td><td class="ship-desc">第4艦隊<span class="color-gray">「第4艦隊」</span></td></tr>
+        <tr><td class="ship-no">13</td><td class="ship-type">潜空</td><td class="ship-name" title="61cm四連装(酸素)魚雷 61cm四連装(酸素)魚雷">伊58改</td><td class="ship-level">51</td><td class="ship-hp color-orange">8/18</td><td class="ship-cond color-orange blink">20</td><td class="ship-fuel color-green" title="10/10">100%</td><td class="ship-bull color-green" title="25/25">100%</td><td class="ship-desc color-yellow">入渠中</td></tr>
+        <tr><td class="ship-no">14</td><td class="ship-type">揚陸</td><td class="ship-name" title="三式指揮連絡機(対潜) カ号観測機 紫電改二">あきつ丸改</td><td class="ship-level">33</td><td class="ship-hp color-green">40/40</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="45/45">100%</td><td class="ship-bull color-green" title="25/25">100%</td><td class="ship-desc">第2艦隊<span class="color-gray">「第2艦隊」</span></td></tr>
+        <tr><td class="ship-no">15</td><td class="ship-type">航巡</td><td class="ship-name" title="瑞雲 瑞雲(六三四空) 瑞雲 零式水上偵察機">最上改</td><td class="ship-level">27</td><td class="ship-hp color-green">50/50</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="50/50">100%</td><td class="ship-bull color-green" title="55/55">100%</td><td class="ship-desc">第2艦隊<span class="color-gray">「第2艦隊」</span></td></tr>
+        <tr><td class="ship-no">16</td><td class="ship-type">駆逐</td><td class="ship-name" title="12.7cm連装砲 三式水中探信儀 九四式爆雷投射機">天津風改</td><td class="ship-level">24</td><td class="ship-hp color-green">34/34</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="20/20">100%</td><td class="ship-bull color-green" title="20/20">100%</td><td class="ship-desc">第3艦隊<span class="color-gray">「第3艦隊」</span></td></tr>
+        <tr><td class="ship-no">17</td><td class="ship-type">水母</td><td class="ship-name" title="試製晴嵐 甲標的 大発動艇">千歳甲</td><td class="ship-level">12</td><td class="ship-hp color-default">40/42</td><td class="ship-cond">49</td><td class="ship-fuel color-green" title="35/35">100%</td><td class="ship-bull color-green" title="45/45">100%</td><td class="ship-desc">第4艦隊<span class="color-gray">「第4艦隊」</span></td></tr>
+        <tr><td class="ship-no">18</td><td class="ship-type">重巡</td><td class="ship-name" title="20.3cm連装砲 20.3cm連装砲 61cm四連装魚雷">羽黒</td><td class="ship-level">3</td><td class="ship-hp color-green">44/44</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="40/40">100%</td><td class="ship-bull color-green" title="65/65">100%</td><td class="ship-desc">第2艦隊<span class="color-gray">「第2艦隊」</span></td></tr>
+        <tr><td class="ship-no">19</td><td class="ship-type">駆逐</td><td class="ship-name" title="12.7cm連装砲 61cm三連装魚雷">綾波</td><td class="ship-level">1</td><td class="ship-hp color-green">15/15</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="15/15">100%</td><td class="ship-bull color-green" title="20/20">100%</td><td class="ship-desc"></td></tr>
+      </tbody>
+    </table></div></div>
+  </div>
+  <div id="tab-items" class="tab">
+    <div class="table-outer"><div class="table-inner"><table>
+      <thead>
+        <tr><th class="item-no"><a href="#">#</a></th><th class="item-type"><a href="#" class="sort-current">種別</a></th><th class="item-name"><a href="#">名称</a></th><th class="ship-name"><a href="#">所在</a></th><th class="ship-level"></th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="item-no">1</td><td class="item-type">小口径主砲</td><td class="item-name">12.7cm連装砲</td><td class="ship-name" title="12.7cm連装砲 12.7cm連装砲 13号対空電探">吹雪改</td><td class="ship-level">55</td></tr>
+        <tr><td class="item-no">2</td><td class="item-type">小口径主砲</td><td class="item-name">12.7cm連装砲</td><td class="ship-name" title="12.7cm連装砲 12.7cm連装砲 13号対空電探">吹雪改</td><td class="ship-level">55</td></tr>
+        <tr><td class="item-no">3</td><td class="item-type">小口径主砲</td><td class="item-name">12.7cm連装砲</td><td class="ship-name" title="12.7cm連装砲 三式水中探信儀 九四式爆雷投射機">天津風改</td><td class="ship-level">24</td></tr>
+        <tr><td class="item-no">4</td><td class="item-type">小口径主砲</td><td class="item-name">12.7cm連装砲</td><td class="ship-name" title="12.7cm連装砲 61cm三連装魚雷">綾波</td><td class="ship-level">1</td></tr>
+        <tr><td class="item-no">5</td><td class="item-type">小口径主砲</td><td class="item-name">12.7cm連装砲</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">6</td><td class="item-type">小口径主砲</td><td class="item-name">12.7cm連装砲</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">7</td><td class="item-type">小口径主砲</td><td class="item-name">10cm連装高角砲</td><td class="ship-name" title="10cm連装高角砲 ドラム缶(輸送用) ドラム缶(輸送用)">Верный</td><td class="ship-level">98</td></tr>
+        <tr><td class="item-no">8</td><td class="item-type">小口径主砲</td><td class="item-name">10cm連装高角砲</td><td class="ship-name" title="10cm連装高角砲 ドラム缶(輸送用) ドラム缶(輸送用)">暁改</td><td class="ship-level">90</td></tr>
+        <tr><td class="item-no">9</td><td class="item-type">小口径主砲</td><td class="item-name">12.7cm単装砲</td><td class="ship-name" title="12.7cm単装砲 2cm 四連装FlaK 38 61cm三連装魚雷">Z1 zwei</td><td class="ship-level">73</td></tr>
+        <tr><td class="item-no">10</td><td class="item-type">中口径主砲</td><td class="item-name">20.3cm連装砲</td><td class="ship-name" title="20.3cm連装砲 20.3cm連装砲 61cm四連装魚雷">羽黒</td><td class="ship-level">3</td></tr>
+        <tr><td class="item-no">11</td><td class="item-type">中口径主砲</td><td class="item-name">20.3cm連装砲</td><td class="ship-name" title="20.3cm連装砲 20.3cm連装砲 61cm四連装魚雷">羽黒</td><td class="ship-level">3</td></tr>
+        <tr><td class="item-no">12</td><td class="item-type">中口径主砲</td><td class="item-name">20.3cm連装砲</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">13</td><td class="item-type">中口径主砲</td><td class="item-name">20.3cm連装砲</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">14</td><td class="item-type">中口径主砲</td><td class="item-name">20.3cm連装砲</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">15</td><td class="item-type">中口径主砲</td><td class="item-name">20.3cm連装砲</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">16</td><td class="item-type">大口径主砲</td><td class="item-name">41cm連装砲</td><td class="ship-name" title="41cm連装砲 41cm連装砲 瑞雲(六三四空) 瑞雲">伊勢改</td><td class="ship-level">83</td></tr>
+        <tr><td class="item-no">17</td><td class="item-type">大口径主砲</td><td class="item-name">41cm連装砲</td><td class="ship-name" title="41cm連装砲 41cm連装砲 瑞雲(六三四空) 瑞雲">伊勢改</td><td class="ship-level">83</td></tr>
+        <tr><td class="item-no">18</td><td class="item-type">大口径主砲</td><td class="item-name">46cm三連装砲</td><td class="ship-name" title="46cm三連装砲 46cm三連装砲 46cm三連装砲 46cm三連装砲">大和改</td><td class="ship-level">61</td></tr>
+        <tr><td class="item-no">19</td><td class="item-type">大口径主砲</td><td class="item-name">46cm三連装砲</td><td class="ship-name" title="46cm三連装砲 46cm三連装砲 46cm三連装砲 46cm三連装砲">大和改</td><td class="ship-level">61</td></tr>
+        <tr><td class="item-no">20</td><td class="item-type">大口径主砲</td><td class="item-name">46cm三連装砲</td><td class="ship-name" title="46cm三連装砲 46cm三連装砲 46cm三連装砲 46cm三連装砲">大和改</td><td class="ship-level">61</td></tr>
+        <tr><td class="item-no">21</td><td class="item-type">大口径主砲</td><td class="item-name">46cm三連装砲</td><td class="ship-name" title="46cm三連装砲 46cm三連装砲 46cm三連装砲 46cm三連装砲">大和改</td><td class="ship-level">61</td></tr>
+        <tr><td class="item-no">22</td><td class="item-type">大口径主砲</td><td class="item-name">38cm連装砲改</td><td class="ship-name" title="38cm連装砲改 38cm連装砲改 61cm四連装(酸素)魚雷 応急修理要員">Bismarck drei</td><td class="ship-level">105</td></tr>
+        <tr><td class="item-no">23</td><td class="item-type">大口径主砲</td><td class="item-name">38cm連装砲改</td><td class="ship-name" title="38cm連装砲改 38cm連装砲改 61cm四連装(酸素)魚雷 応急修理要員">Bismarck drei</td><td class="ship-level">105</td></tr>
+        <tr><td class="item-no">24</td><td class="item-type">副砲</td><td class="item-name">15.5cm三連装副砲</td><td class="ship-name" title="15.5cm三連装副砲 15.5cm三連装副砲 新型高温高圧缶">大鯨</td><td class="ship-level color-green" title="改造後 龍鳳">52</td></tr>
+        <tr><td class="item-no">25</td><td class="item-type">副砲</td><td class="item-name">15.5cm三連装副砲</td><td class="ship-name" title="15.5cm三連装副砲 15.5cm三連装副砲 新型高温高圧缶">大鯨</td><td class="ship-level color-green" title="改造後 龍鳳">52</td></tr>
+        <tr><td class="item-no">26</td><td class="item-type">魚雷</td><td class="item-name">61cm三連装魚雷</td><td class="ship-name" title="12.7cm単装砲 2cm 四連装FlaK 38 61cm三連装魚雷">Z1 zwei</td><td class="ship-level">73</td></tr>
+        <tr><td class="item-no">27</td><td class="item-type">魚雷</td><td class="item-name">61cm三連装魚雷</td><td class="ship-name" title="12.7cm連装砲 61cm三連装魚雷">綾波</td><td class="ship-level">1</td></tr>
+        <tr><td class="item-no">28</td><td class="item-type">魚雷</td><td class="item-name">61cm四連装魚雷</td><td class="ship-name" title="20.3cm連装砲 20.3cm連装砲 61cm四連装魚雷">羽黒</td><td class="ship-level">3</td></tr>
+        <tr><td class="item-no">29</td><td class="item-type">魚雷</td><td class="item-name">61cm四連装魚雷</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">30</td><td class="item-type">魚雷</td><td class="item-name">61cm四連装(酸素)魚雷</td><td class="ship-name" title="38cm連装砲改 38cm連装砲改 61cm四連装(酸素)魚雷 応急修理要員">Bismarck drei</td><td class="ship-level">105</td></tr>
+        <tr><td class="item-no">31</td><td class="item-type">魚雷</td><td class="item-name">61cm四連装(酸素)魚雷</td><td class="ship-name" title="61cm四連装(酸素)魚雷 61cm四連装(酸素)魚雷">伊58改</td><td class="ship-level">51</td></tr>
+        <tr><td class="item-no">32</td><td class="item-type">魚雷</td><td class="item-name">61cm四連装(酸素)魚雷</td><td class="ship-name" title="61cm四連装(酸素)魚雷 61cm四連装(酸素)魚雷">伊58改</td><td class="ship-level">51</td></tr>
+        <tr><td class="item-no">33</td><td class="item-type">魚雷</td><td class="item-name">61cm五連装(酸素)魚雷</td><td class="ship-name" title="61cm五連装(酸素)魚雷 61cm五連装(酸素)魚雷 甲標的">北上改二</td><td class="ship-level">92</td></tr>
+        <tr><td class="item-no">34</td><td class="item-type">魚雷</td><td class="item-name">61cm五連装(酸素)魚雷</td><td class="ship-name" title="61cm五連装(酸素)魚雷 61cm五連装(酸素)魚雷 甲標的">北上改二</td><td class="ship-level">92</td></tr>
+        <tr><td class="item-no">35</td><td class="item-type">魚雷</td><td class="item-name">61cm五連装(酸素)魚雷</td><td class="ship-name" title="潜水艦53cm艦首魚雷(8門) 61cm五連装(酸素)魚雷">伊168改</td><td class="ship-level">58</td></tr>
+        <tr><td class="item-no">36</td><td class="item-type">艦上戦闘機</td><td class="item-name">烈風</td><td class="ship-name" title="烈風改 烈風 烈風 烈風">千代田航改二</td><td class="ship-level">63</td></tr>
+        <tr><td class="item-no">37</td><td class="item-type">艦上戦闘機</td><td class="item-name">烈風</td><td class="ship-name" title="烈風改 烈風 烈風 烈風">千代田航改二</td><td class="ship-level">63</td></tr>
+        <tr><td class="item-no">38</td><td class="item-type">艦上戦闘機</td><td class="item-name">烈風</td><td class="ship-name" title="烈風改 烈風 烈風 烈風">千代田航改二</td><td class="ship-level">63</td></tr>
+        <tr><td class="item-no">39</td><td class="item-type">艦上戦闘機</td><td class="item-name">烈風改</td><td class="ship-name" title="烈風改 烈風 烈風 烈風">千代田航改二</td><td class="ship-level">63</td></tr>
+        <tr><td class="item-no">40</td><td class="item-type">艦上戦闘機</td><td class="item-name">紫電改二</td><td class="ship-name" title="三式指揮連絡機(対潜) カ号観測機 紫電改二">あきつ丸改</td><td class="ship-level">33</td></tr>
+        <tr><td class="item-no">41</td><td class="item-type">艦上爆撃機</td><td class="item-name">彗星</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">42</td><td class="item-type">艦上爆撃機</td><td class="item-name">彗星</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">43</td><td class="item-type">艦上攻撃機</td><td class="item-name">流星</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">44</td><td class="item-type">艦上攻撃機</td><td class="item-name">流星改</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">45</td><td class="item-type">艦上偵察機</td><td class="item-name">二式艦上偵察機</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">46</td><td class="item-type">水上偵察機</td><td class="item-name">零式水上偵察機</td><td class="ship-name" title="瑞雲 瑞雲(六三四空) 瑞雲 零式水上偵察機">最上改</td><td class="ship-level">27</td></tr>
+        <tr><td class="item-no">47</td><td class="item-type">水上爆撃機</td><td class="item-name">瑞雲</td><td class="ship-name" title="41cm連装砲 41cm連装砲 瑞雲(六三四空) 瑞雲">伊勢改</td><td class="ship-level">83</td></tr>
+        <tr><td class="item-no">48</td><td class="item-type">水上爆撃機</td><td class="item-name">瑞雲</td><td class="ship-name" title="瑞雲 瑞雲(六三四空) 瑞雲 零式水上偵察機">最上改</td><td class="ship-level">27</td></tr>
+        <tr><td class="item-no">49</td><td class="item-type">水上爆撃機</td><td class="item-name">瑞雲</td><td class="ship-name" title="瑞雲 瑞雲(六三四空) 瑞雲 零式水上偵察機">最上改</td><td class="ship-level">27</td></tr>
+        <tr><td class="item-no">50</td><td class="item-type">水上爆撃機</td><td class="item-name">試製晴嵐</td><td class="ship-name" title="試製晴嵐 甲標的 大発動艇">千歳甲</td><td class="ship-level">12</td></tr>
+        <tr><td class="item-no">51</td><td class="item-type">水上爆撃機</td><td class="item-name">瑞雲(六三四空)</td><td class="ship-name" title="41cm連装砲 41cm連装砲 瑞雲(六三四空) 瑞雲">伊勢改</td><td class="ship-level">83</td></tr>
+        <tr><td class="item-no">52</td><td class="item-type">水上爆撃機</td><td class="item-name">瑞雲(六三四空)</td><td class="ship-name" title="瑞雲 瑞雲(六三四空) 瑞雲 零式水上偵察機">最上改</td><td class="ship-level">27</td></tr>
+        <tr><td class="item-no">53</td><td class="item-type">小型電探</td><td class="item-name">13号対空電探</td><td class="ship-name" title="12.7cm連装砲 12.7cm連装砲 13号対空電探">吹雪改</td><td class="ship-level">55</td></tr>
+        <tr><td class="item-no">54</td><td class="item-type">小型電探</td><td class="item-name">22号対水上電探</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">55</td><td class="item-type">大型電探</td><td class="item-name">21号対空電探</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">56</td><td class="item-type">ソナー</td><td class="item-name">九三式水中探信儀</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">57</td><td class="item-type">ソナー</td><td class="item-name">三式水中探信儀</td><td class="ship-name" title="12.7cm連装砲 三式水中探信儀 九四式爆雷投射機">天津風改</td><td class="ship-level">24</td></tr>
+        <tr><td class="item-no">58</td><td class="item-type">爆雷</td><td class="item-name">九四式爆雷投射機</td><td class="ship-name" title="12.7cm連装砲 三式水中探信儀 九四式爆雷投射機">天津風改</td><td class="ship-level">24</td></tr>
+        <tr><td class="item-no">59</td><td class="item-type">機関部強化</td><td class="item-name">新型高温高圧缶</td><td class="ship-name" title="15.5cm三連装副砲 15.5cm三連装副砲 新型高温高圧缶">大鯨</td><td class="ship-level color-green" title="改造後 龍鳳">52</td></tr>
+        <tr><td class="item-no">60</td><td class="item-type">対空強化弾</td><td class="item-name">三式弾</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">61</td><td class="item-type">対空強化弾</td><td class="item-name">三式弾</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">62</td><td class="item-type">対艦強化弾</td><td class="item-name">九一式徹甲弾</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">63</td><td class="item-type">対空機銃</td><td class="item-name">12cm30連装噴進砲</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">64</td><td class="item-type">対空機銃</td><td class="item-name">2cm 四連装FlaK 38</td><td class="ship-name" title="12.7cm単装砲 2cm 四連装FlaK 38 61cm三連装魚雷">Z1 zwei</td><td class="ship-level">73</td></tr>
+        <tr><td class="item-no">65</td><td class="item-type">特殊潜航艇</td><td class="item-name">甲標的</td><td class="ship-name" title="61cm五連装(酸素)魚雷 61cm五連装(酸素)魚雷 甲標的">北上改二</td><td class="ship-level">92</td></tr>
+        <tr><td class="item-no">66</td><td class="item-type">特殊潜航艇</td><td class="item-name">甲標的</td><td class="ship-name" title="試製晴嵐 甲標的 大発動艇">千歳甲</td><td class="ship-level">12</td></tr>
+        <tr><td class="item-no">67</td><td class="item-type">応急修理要員</td><td class="item-name">応急修理要員</td><td class="ship-name" title="38cm連装砲改 38cm連装砲改 61cm四連装(酸素)魚雷 応急修理要員">Bismarck drei</td><td class="ship-level">105</td></tr>
+        <tr><td class="item-no">68</td><td class="item-type">応急修理要員</td><td class="item-name">応急修理要員</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">69</td><td class="item-type">応急修理要員</td><td class="item-name">応急修理女神</td><td class="ship-name" title="応急修理女神">飛龍改二</td><td class="ship-level">150</td></tr>
+        <tr><td class="item-no">70</td><td class="item-type">上陸用舟艇</td><td class="item-name">大発動艇</td><td class="ship-name" title="試製晴嵐 甲標的 大発動艇">千歳甲</td><td class="ship-level">12</td></tr>
+        <tr><td class="item-no">71</td><td class="item-type">オートジャイロ</td><td class="item-name">カ号観測機</td><td class="ship-name" title="三式指揮連絡機(対潜) カ号観測機 紫電改二">あきつ丸改</td><td class="ship-level">33</td></tr>
+        <tr><td class="item-no">72</td><td class="item-type">対潜哨戒機</td><td class="item-name">三式指揮連絡機(対潜)</td><td class="ship-name" title="三式指揮連絡機(対潜) カ号観測機 紫電改二">あきつ丸改</td><td class="ship-level">33</td></tr>
+        <tr><td class="item-no">73</td><td class="item-type">探照灯</td><td class="item-name">探照灯</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">74</td><td class="item-type">簡易輸送部材</td><td class="item-name">ドラム缶(輸送用)</td><td class="ship-name" title="10cm連装高角砲 ドラム缶(輸送用) ドラム缶(輸送用)">Верный</td><td class="ship-level">98</td></tr>
+        <tr><td class="item-no">75</td><td class="item-type">簡易輸送部材</td><td class="item-name">ドラム缶(輸送用)</td><td class="ship-name" title="10cm連装高角砲 ドラム缶(輸送用) ドラム缶(輸送用)">Верный</td><td class="ship-level">98</td></tr>
+        <tr><td class="item-no">76</td><td class="item-type">簡易輸送部材</td><td class="item-name">ドラム缶(輸送用)</td><td class="ship-name" title="10cm連装高角砲 ドラム缶(輸送用) ドラム缶(輸送用)">暁改</td><td class="ship-level">90</td></tr>
+        <tr><td class="item-no">77</td><td class="item-type">簡易輸送部材</td><td class="item-name">ドラム缶(輸送用)</td><td class="ship-name" title="10cm連装高角砲 ドラム缶(輸送用) ドラム缶(輸送用)">暁改</td><td class="ship-level">90</td></tr>
+        <tr><td class="item-no">78</td><td class="item-type">潜水艦魚雷</td><td class="item-name">潜水艦53cm艦首魚雷(8門)</td><td class="ship-name" title="潜水艦53cm艦首魚雷(8門) 61cm五連装(酸素)魚雷">伊168改</td><td class="ship-level">58</td></tr>
+      </tbody>
+    </table></div></div>
+  </div>
+  <div id="tab-config" class="tab">
+    <table>
+      <tr><td class="config-header">画面キャプチャ</td><td></td></tr>
+      <tr><td class="config-label">保存先</td><td class="config-input"><input id="capture-save-dir" type="text" value="C:\Users\提督\AppData\Local\Temp"></td></tr>
+      <tr><td class="config-label">ベース名</td><td class="config-input"><input id="capture-save-base" type="text" value="kancolle-"></td></tr>
+      <tr><td class="config-header">タイマーサウンド</td><td></td></tr>
+      <tr><td class="config-label">サウンドファイルURL</td><td class="config-input"><input id="beep-url" type="text" value="file://C:/Windows/Media/ringout.wav"></td></tr>
+      <tr><td class="config-label">ボリューム(0～100)</td><td class="config-input"><input id="beep-volume" type="number" max="100" min="0" value="100"> <button>テスト</button></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-expedition" type="checkbox">遠征帰還時のサウンド再生を自動でONにする</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-dock" type="checkbox">入渠終了時のサウンド再生を自動でONにする</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-built" type="checkbox">建造終了時のサウンド再生を自動でONにする</label></td></tr>
+      <tr><td class="config-header">情報表示</td><td></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="show-battle" type="checkbox">戦闘結果を表示する</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="show-built" type="checkbox">建造結果を表示する</label></td></tr>
+    </table>
+    <div class="config-buttons">
+      <button id="config-save">保存</button>
+      <button id="config-reset">クリア</button>
+    </div>
+  </div>
+</div>
+
+<h2>使い方</h2>
+<h3>インストール</h3>
+<p>
+ダウンロードしたxpiファイルをFirefoxにドロップすると、インストールの可否を問われます。
+インストールを許可してFirefoxを再起動した後、『艦これ』を開始すると、ゲーム画面の下にkancolleinfoの画面が表示されます。
+</p>
+
+<h3>使用方法</h3>
+<p>
+上の<a href="#kancolle-info">モック</a>をいじりながら読むとわかりやすいかもしれません。
+</p>
+<p>
+各表示の更新は、『艦これ』ゲーム画面で一定の操作を行ったタイミング、または、10秒ごとに行われます。
+ただし、10秒ごとの更新の際には、ゲーム画面とサーバとの間で通信があるわけではないので、情報自体が更新されるわけではありません。
+後述の、時間経過で色が変化したりサウンド再生が行われるものに関して、その更新処理のみが行われます。
+</p>
+
+<h4 id="desc-header">ヘッダ部</h4>
+<p>
+<samp>メイン</samp>・<samp>艦娘</samp>・<samp>装備</samp>・<samp>設定</samp>の4つのタブがあります。
+それぞれのタブをクリックすると、下の表示部の中身が切り替わります。
+</p>
+<p>
+右のほうには、現在の艦娘数(現在数/最大数)、装備数(現在数/最大数)、更新時刻が表示されます。
+艦娘の現在数が最大数-8隻以上になると、現在数が黄色で表示されます。
+さらに最大数-4隻以上になると、オレンジ色になります。
+最大数に達した場合、つまりこれ以上艦娘を入手できなくなった場合、赤色になります。
+装備の現在数についても、同様に、最大数-35個以上で黄色、最大数-19個以上でオレンジ色、最大数-3個以上で赤色になります。
+</p>
+<p>
+一番右に<samp>画面キャプチャ</samp>ボタンがあります。
+クリックすると現在のゲーム画面をPNG形式でキャプチャし、ローカルストレージに保存します(この<a href="#kancolle-info">モック</a>では、押しても何も起きません)。
+実際の保存場所およびファイル名については、<a href="#desc-config">設定の説明</a>を参照してください。
+</p>
+
+<h4 id="desc-main">メイン</h4>
+<p>
+<samp>メイン</samp>タブ内には、第1～第4の各艦隊、入渠ドック、建造ドックの情報が表示されます。
+</p>
+<p>
+<b>艦隊情報</b>については、最初の1行に全体情報が、その後に各艦の情報が表示されます。
+各艦の情報は現在選択中の艦隊のみ表示されますので、他の艦隊各艦の情報を見たい場合は<samp>第n艦隊</samp>の部分(水色の箇所)をクリックしてください。
+</p>
+<p>
+艦隊の全体情報としては、出撃中・遠征中・修理中(工作艦が旗艦で母港にいる状態)であればその旨が表示されます。
+その後ろに、以下の情報が表示されます。
+</p>
+<dl>
+  <dt><samp>LV:</samp></dt>
+  <dd>旗艦のレベル/各艦のレベルの合計</dd>
+  <dt><samp>制空:</samp></dt>
+  <dd>いわゆる制空値の合計</dd>
+  <dt><samp>キラ:</samp><dt>
+  <dd>いわゆる「キラキラ状態」の艦数/艦隊所属艦数</dd>
+  <dt><samp>ドラム缶:</samp></dt>
+  <dd>ドラム缶装備総数/ドラム缶装備艦数 ※<em>ドラム缶(輸送用)</em>を装備している艦が存在する場合のみ表示</dd>
+  <dt><samp>大発:</samp></dt>
+  <dd>大発動艇装備総数 ※<em>大発動艇</em>を装備している艦が存在する場合のみ表示</dd>
+</dl>
+<p>
+艦隊が母港にいる場合(<a href="#kancolle-info">モック</a>の第4艦隊を参照)、未補給の艦が存在する場合および入渠中の艦が存在する場合はその旨が表示されます。
+</p>
+<p>
+最後に、右端にゲーム内の編成画面で設定した艦隊名が表示されます。
+</p>
+<p>
+出撃中の艦隊(<a href="#kancolle-info">モック</a>の第1艦隊を参照)については、<samp>設定</samp>タブで<q>戦闘結果を表示する</q>にチェックを入れている場合(<a href="#desc-config">後述</a>)、艦隊の現在位置や戦闘結果を合わせて表示します。具体例については、<a href="#kancolle-info">モック</a>を使って<samp>設定</samp>タブで該当設定を変更してから<samp>第1艦隊</samp>の部分を確認してみてください。
+表示の意味は以下のとおりです。
+</p>
+<dl>
+  <dt>現在マス効果</dt>
+  <dd><samp>-</samp>:戦闘なし・<samp>+</samp>:戦闘あり・<samp>*</samp>:ボスマス(ただし、ボスマスの判定はいい加減なので、<samp>*</samp>ではなく<samp>+</samp>で表示される場合もあります)</dd>
+  <dt>現在位置</dt>
+  <dd><samp>5-4-1</samp>など。「現在位置」というのは前回進撃を決定した時点で決まっているので、ゲーム画面内で羅針盤を回す前には既に決定済みであり、それが表示されてしまっています(夢も希望もありませんね!)。</dt>
+</dl>
+<p>
+戦闘を開始している場合は、さらに以下が表示されます。
+</p>
+<dl>
+  <dt>交戦形態</dt>
+  <dd><samp>同航戦</samp>など</dd>
+  <dt>敵艦隊被害状況</dt>
+  <dd><samp style="color: lightgreen;">◎</samp>:無傷あるいは僅かな損害・<samp style="color: yellow;">◎</samp>:小破・<samp style="color: orange;">○</samp>中破</samp>・<samp style="color: red;">△</samp>:大破・<samp style="color: silver;">×</samp>:轟沈。戦闘開始時に既に戦闘結果は決まっているので、ゲーム画面上で戦闘が始まる頃には既にこちらには結果が表示されてしまっています(何の情緒もありませんね!)。</dd>
+</dl>
+<p>
+以上のように、<q>戦闘結果を表示する</q>ようにするとプレイの醍醐味が損なわれるやもしれませんので、この機能を有効にするかどうかはよくよく考えてご判断ください。
+</p>
+<p>
+遠征中の艦隊(<a href="#kancolle-info">モック</a>の第2艦隊・第3艦隊を参照)については、帰還時刻(翌日以降になる場合は日付も)が表示されます。
+帰還5分前になると黄色で、1分前になるとオレンジ色で、帰還時刻以降になると赤色で表示されます。
+末尾のチェックボックスにチェックを入れてある場合、帰還1分前から<a href="#desc-config">設定</a>で指定したサウンドがループ再生されます(この<a href="#kancolle-info">モック</a>では何も起きません)。
+</p>
+<p>
+艦隊内の各艦の情報は、左から順に、以下の通りです。
+</p>
+<dl>
+  <dt>並び順(1～6)</dt>
+  <dd>そのまんま。いわゆるダメコン(<em>応急修理要員</em>または<em>応急修理女神</em>)を搭載している場合、赤色で表示されます。ただし、あまりkancolleinfoを信用しすぎず、自分の判断で進撃or撤退を決断するようにしてください。kancolleinfoにバグがあって、実際にはダメコンを搭載してないのにあると信じて大破進撃して不幸にも轟沈が発生しても、作者は一切責任を取りません(取れません)。</dd>
+  <dt>艦種</dt>
+  <dd>基本的には見ての通り。わかりにくそうなものを一応説明すると、<samp>巡戦</samp>は巡航戦艦(いわゆる高速戦艦。金剛型など)、<samp>軽空</samp>は軽空母(軽母という略記が使用されることが多いようですが)、<samp>正空</samp>は正規空母、<samp>潜空</samp>は潜水空母、<samp>潜母</samp>は潜水母艦、をそれぞれ意味します。特に<samp>潜母</samp>はよく使われている略記と意味が違うのでご注意ください。</dd>
+  <dt>艦名</dt>
+  <dd>そのまんま。</dd>
+  <dt>レベル</dt>
+  <dd>そのまんま。改造可能なレベルに達している場合は緑色で表示されます。</dd>
+  <dt>耐久値</dt>
+  <dd>現在値/最大値。完全回復している場合は緑色で、小破していれば黄色で、中破していればオレンジ色で、大破していれば赤色で、それぞれ表示されます。</dd>
+  <dt>いわゆる疲労度</dt>
+  <dd>コンディション値とも言われます。50以上がいわゆる「キラキラ状態」で、緑色で表示されます。また、40未満で黄色、30未満でオレンジ色、20未満で赤色で表示されます。</dd>
+  <dt>燃料残量</dt>
+  <dd>%で表示されます。</dd>
+  <dt>弾薬残量</dt>
+  <dd>%で表示されます。</dd>
+  <dt>その他</dt>
+  <dd>入渠中であればその旨が表示されます。</dd>
+</dl>
+<p>
+レベル・耐久値・疲労度・燃料残量・弾薬残量については、直前の操作で変更があった場合、背景が点滅します。
+</p>
+<p>
+<b>入渠ドック情報</b>は、各ドックについて、ドック番号(こちらは装備にかかわらず色は変わりません)を先頭に、艦種から疲労度までは艦隊内各艦の情報と同じものが表示されます。
+その後ろに、遠征艦隊と同じような形式で入渠完了時刻が表示されます。チェックボックスの意味も遠征艦隊のものと同様で、チェックを入れておくと1分前からサウンドがループ再生されます。
+</p>
+<p>
+<b>建造ドック情報</b>は、各ドックについて、ドック番号・艦種・艦名・完成時刻(チェックボックスにチェックを入れれば1分前からサウンド再生)が表示されます。
+ただし、艦種と艦名についてはデフォルトでは<samp>???</samp>と表示されます。<samp>設定</samp>タブで<q>建造結果を表示する</q>にチェックを入れれば(<a href="#desc-config">後述</a>)、実際の艦種・艦名が表示されますが、何ができるかわからないあのドキドキ感が損なわれるかもしれませんので、この機能を有効にすべきかどうかは利用者の判断に任せます。
+完成時刻が<samp style="color: red;">--:--</samp>となっている場合がありますが、これは完成後もドックから取り出さないでリロードしたりした場合の表示です。要するに完成済ということです。
+</p>
+
+<h4 id="desc-ships">艦娘</h4>
+<p>
+<samp>艦娘</samp>タブ内には、保有する全艦娘がリスト表示されます。
+表示内容は<a href="#desc-main">メイン</a>の艦隊内各艦の情報と同じですが、最後の<samp>所在</samp>には、所属する艦隊(とその名前)または入渠中の旨が表示されます。建造中の艦は、ゲーム内と同様に、保有艦娘には含まれてません。
+</p>
+<p>
+リストのヘッダ部のうち、水色または黄色のものをクリックすると、その項目を使ってリスト内の並び順を変更することができます。
+現在の並び順に使われた項目が黄色になっています。
+黄色の項目をクリックした場合は並びが逆順になります。
+もちろん、逆順にすればその逆の順番で並ぶことになりますが、艦種順やレベル順などの場合、同一艦種・同一レベル内での並び順は正順・逆順に関わらず常に一定(内部ソート順による)となります。
+なお<a href="#kancolle-info">モック</a>では並び順の変更は実装していません(動作しません)。
+並び順の意味は以下の通りです。
+</p>
+<dl>
+  <dt><samp>#</samp></dt>
+  <dd>表示されている数字は単に先頭からの通番ですが、並び順項目として選択すると、取得の新しい順に表示されます。</dd>
+  <dt><samp>艦種</samp></dt>
+  <dd>艦種順に表示されます。</dd>
+  <dt><samp>艦名</samp></dt>
+  <dd>内部ソート順に表示されます。ゲーム内の艦船選択でレベル順で表示させた場合の同じレベルの艦船間での並び順のことです。</dd>
+  <dt><samp>LV</samp></dt>
+  <dd>レベルの高い順に表示されます。</dd>
+  <dt><samp>耐久</samp></dt>
+  <dd>被害の割合の高い順に表示されます。ゲーム内の入渠時艦船選択のデフォルトと同じで、耐久最大値に対する耐久現在値の割合で並び順が決定されます。</dd>
+</dl>
+
+<h4 id="desc-items">装備</h4>
+<p>
+<samp>装備</samp>タブ内には、保有する全装備がリスト表示されます。
+ゲーム内では現在艦娘に装備されてない装備しか一覧する方法がないわけですが、ここでは艦娘が装備しているものも含めて全てが一覧できます。
+並び順変更などは<a href="#desc-ships">艦娘</a>のところで説明したものと挙動は同じです(同様に<a href="#kancolle-info">モック</a>でも実装してありません)。
+各項目の意味は以下の通りです。
+</p>
+<dl>
+  <dt><samp>#</samp></dt>
+  <dd>表示されている数字は単に先頭からの通番。並び順として使用した場合は入手の新しい順。</dd>
+  <dt><samp>種別</samp></dt>
+  <dd>見ての通り。並び順としての意味もそのまま。</dd>
+  <dt><samp>名称</samp></dt>
+  <dd>表示の意味は見ての通り。並び順としての意味は、内部ソート順(ゲーム内での装備選択と同じ順)。</dd>
+  <dt><samp>所在</samp></dt>
+  <dd>装備中の艦娘名とそのレベル。並び順として使用した場合、<samp>艦娘</samp>タブでの現在の並び順と同じ順で装備している艦娘が並ぶ。
+</dl>
+
+<h4 id="desc-config">設定</h4>
+<p>
+<samp>設定</samp>タブ内では、kancolleinfoの動作に関する設定を変更することができます。
+</p>
+<p>
+<samp>画面キャプチャ</samp>では、<a href="#desc-header">ヘッダ部</a>で説明した、画面キャプチャ結果の画像ファイルに関する設定を行います。
+</p>
+<dl>
+  <dt><samp>保存先</samp></dt>
+  <dd>画像ファイルの保存先ディレクトリです。デフォルトではシステムのテンポラリディレクトリとなっているはずです。</dd>
+  <dt><samp>ベース名</samp></dt>
+  <dd>ここで指定した文字列＋画面キャプチャを行った日時(YYYYMMDDhhmmss)＋<code>.png</code>というファイル名で保存されます。</dd>
+</dl>
+<p>
+<samp>タイマーサウンド</samp>では、<a href="#desc-main">メイン</a>で説明した、遠征・入渠・建造でチェックを入れた場合に再生するサウンドに関する設定を行います。
+</p>
+<dl>
+  <dt><samp>サウンドファイル</samp></dt>
+  <dd>再生するサウンドのURLです。普通はローカルファイルを指定すると思いますが、その場合は先頭に<code>file:///</code>を付けてください。対応するサウンドフォーマットはFirefox任せです。<code>.wav</code>・<code>.ogg</code>あたりは大丈夫だと思いますが、<code>.mp3</code>や<code>.aac</code>などが再生できるかはOSによります。デフォルトではWindows環境向けの適当なローカルファイルが指定してありますが、使用中の環境に合わせて変更してください。</dd>
+  <dt><samp>ボリューム</samp></dt>
+  <dd>0～100の数値です。</dd>
+  <dt><samp>テスト</samp>ボタン</dt>
+  <dd>指定したURLのファイルおよびボリュームで再生テストを行います。再生中にもう一度押すと停止します。これで音が鳴らない場合は設定内容を確認してください。なお、<a href="#kancolle-info">モック</a>ではそもそも音は鳴りませんのであしからず。</dd>
+  <dt><samp>遠征帰還時の～</samp></dt>
+  <dd>そのまんまですが、つまり自動で該当チェックボックスにチェックを入れます。</dd>
+  <dt><samp>入渠終了時の～</samp></dt>
+  <dd>同上。</dd>
+  <dt><samp>建造終了時の～</samp></dt>
+  <dd>同上。</dd>
+</dl>
+<p>
+<samp>情報表示</samp>では、<a href="#desc-main">メイン</a>で説明した、ゲームの興を殺いでしまいそうな機能に関する設定を行います。
+</p>
+<dl>
+  <dt><samp>戦闘結果を～</samp></dt>
+  <dd>先に説明したとおりです。</dd>
+  <dt><samp>建造結果を～</samp></dt>
+  <dd>先に説明したとおりです。</dd>
+</dl>
+<p>
+設定を変更しても、<samp>保存</samp>ボタンを押下しない限り反映はされません(<a href="#kancolle-info">モック</a>では<samp>情報表示</samp>の各項目のチェック状態を変更すると即時に反映されますが、これは実物の挙動とは異なります)。
+また、<samp>リセット</samp>ボタンを押すと、書き換えた各設定項目の値が前回保存した状態に戻ります。
+前回の保存状態から何か変更しない限りは、<samp>保存</samp>ボタンも<samp>リセット</samp>ボタンも押せません(<a href="#kancolle-info">モック</a>ではいつでも押せますが、押しても意味はありません)。
+</p>
+
+<h3>動作上の制限事項など</h3>
+<p>
+なんか表示内容が実際の『艦これ』の中身とずれてるなあ、と思ったら、母港と工廠あたりを行き来してみてください。
+それでもおかしい場合は、ページをリロードすれば直るんじゃないかと思います。
+</p>
+<p>
+戦闘で艦娘がドロップしたり、イベント海域でクリア報酬として装備品や艦娘を入手した場合、表示にうまく反映されない場合があります。
+その場合は母港に戻った時点でたぶん反映されます。
+</p>
+
+<h2 id="notice">注意事項</h2>
+<p>
+<b>kancolleinfoを使用することによって生じたいかなる損害についても、作者は一切の責を負いません。</b>
+これは、kancolleinfoに不具合があり、それに起因する問題が発生した場合も同様です。
+このことを了承できる場合のみ、kancolleinfoをご使用ください。
+</p>
+<p>
+kancolleinfoが『艦これ』の利用規約に違反しているかどうかはわかりませんが、『艦これ』運営チームのツイートから判断する限りはグレーゾーンに該当するものと思われます。
+とはいえ、全ては『艦これ』運営チームの判断次第ですので、その点をご理解の上、<b>ご自身の判断でkancolleinfoをご使用ください(またはご使用をとりやめてください)。</b>
+</p>
+<p>
+kancolleinfoはc.mos氏の「<a href="http://vcraft.jp/soft/kancolle.html">kancolleEx</a>」ver 0.2をベースにしています(もはや原型を留めていませんが)。
+kancolleinfoの公開に関してはc.mos氏から快諾を頂きました。この場を借りてお礼申し上げます。ありがとうございます。
+仮に、kancolleinfoに不具合があった場合、それは全てkancolleinfo作者によるものであり、c.mos氏によるものではありません。
+kancolleinfoに関する問い合わせ等をc.mos氏に対して行うことのないようお願いします。
+</p>
+<p>
+kancolleinfoはゲーム画面の下に割と大きなスペースを取って情報を表示するため、環境によっては使いづらいかもしれませんが、kancolleinfoのベースとなった「<a href="http://vcraft.jp/soft/kancolle.html">kancolleEx</a>」はゲーム画面横にコンパクトに必要な情報をまとめて表示してくれます。
+情報表示はほしいけどkancolleinfoの表示方法は気に入らないという方は、「<a href="http://vcraft.jp/soft/kancolle.html">kancolleEx</a>」を試してみるといいかもしれません。
+</p>
+<p>
+kancolleinfoの中身を改造・流用するのは自由にやっていただいてかまいません(c.mos氏からもご了解を頂いています)。
+</p>
+
+<h2>履歴</h2>
+<dl>
+  <dt>2014-10-08</dt>
+  <dd>ver 1.0.0<br>最初のバージョン</dd>
+</dl>
+
+<p style="text-align: center;">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:inline-block;width:728px;height:90px"
+     data-ad-client="ca-pub-4307333584176038"
+     data-ad-slot="6991095029"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script></p>
+
+<p class="footer">
+by <a href="https://twitter.com/brunei_admiral">ブルネイ泊地のとある提督</a>
+</p>
+<script type="application/javascript"><!--
+var kcif = {
+  info_div: null,
+  current_tab: "tab-main",
+  current_fleet: "fleet1"
+};
+kcif.info_div = document;
+
+function select_tab(evt){
+  evt.preventDefault();
+  var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header");
+  for (var i = 0; i < elems.length; i++) {
+    elems[i].style.color = "inherit";
+    elems[i].style.backgroundColor = "inherit";
+  }
+  elems = kcif.info_div.querySelectorAll("#kancolle-info .tab")
+  for (var i = 0; i < elems.length; i++) {
+    elems[i].style.display = "none";
+  }
+
+  var tab = this.parentNode;
+  tab.style.color = "white";
+  tab.style.backgroundColor = "black";
+  kcif.info_div.querySelector("#kancolle-info #" + tab.id.replace("-header", "")).style.display = "block";
+
+  kcif.current_tab = tab.id;
+}
+
+function select_fleet(evt){
+  evt.preventDefault();
+  var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main .fleet table");
+  for (var i = 0; i < elems.length; i++) {
+    elems[i].style.display = "none";
+  }
+
+  var fleet = this.parentNode.parentNode;
+  kcif.info_div.querySelector("#kancolle-info #" + fleet.id + " table").style.display = "block";
+
+  kcif.current_fleet = fleet.id;
+}
+
+// タブ
+var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header a");
+for (var i = 0; i < elems.length; i++) {
+  elems[i].addEventListener("click", select_tab, false);
+}
+kcif.info_div.querySelector("#kancolle-info #" + kcif.current_tab.replace("-", "-header-") + " a").click();
+
+// メイン:艦隊
+elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main .fleet h2 a");
+for (var i = 0; i < elems.length; i++) {
+  elems[i].addEventListener("click", select_fleet, false);
+}
+kcif.info_div.querySelector("#kancolle-info #" + kcif.current_fleet + " h2 a").click();
+
+// 艦娘
+elems = kcif.info_div.querySelectorAll("#tab-ships th a");
+for (var i = 0; i < elems.length; i++) {
+  elems[i].addEventListener("click", function(evt){ evt.preventDefault(); }, false);
+}
+
+// 装備
+elems = kcif.info_div.querySelectorAll("#tab-items th a");
+for (var i = 0; i < elems.length; i++) {
+  elems[i].addEventListener("click", function(evt){ evt.preventDefault(); }, false);
+}
+
+// 設定
+var elem = kcif.info_div.querySelector("#show-battle");
+elem.addEventListener("click", function(evt){
+  var elem = kcif.info_div.querySelector("#battle-result");
+  if (this.checked && elem.style.display == "none") {
+    elem.style.display = "inline";
+  }
+  else if (!this.checked && elem.style.display != "none") {
+    elem.style.display = "none";
+  }
+}, false);
+elem.checked = false;
+elem = kcif.info_div.querySelector("#show-built");
+elem.addEventListener("click", function(evt){
+  var elems = kcif.info_div.querySelectorAll(".built-result");
+  for (var i = 0; i < elems.length; i++) {
+    var elem = elems[i];
+    if (!this.checked && elem.style.display == "none") {
+      elem.style.display = "inline";
+      elem.nextSibling.style.display = "none";
+    }
+    else if (this.checked && elem.style.display != "none") {
+      elem.style.display = "none";
+      elem.nextSibling.style.display = "inline";
+    }
+  }
+}, false);
+elem.checked = false;
+//--></script>
+</body>
+</html>

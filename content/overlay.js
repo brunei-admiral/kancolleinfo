@@ -1,3 +1,5 @@
+// "kancolleinfo" http://kancollegadgets.web.fc2.com/kancolleinfo/
+//
 // derived from http://vcraft.jp/soft/kancolle.html 0.2 by c.mos
 //
 // original code: https://github.com/kageroh/cond_checker
@@ -502,7 +504,7 @@ function ship_type(ship) {
 
 function ship_name(ship) {
   var s;
-  var items = null;
+  var items = [];
   if (!ship || !ship.ship_id) {
     s = "";
   }
@@ -510,35 +512,32 @@ function ship_name(ship) {
     s = ship.name || "(" + ship.ship_id + ")";
     for (var i = 0; ship.slot && i < 5; i++) {
       if (ship.slot[i] >= 0 && kcif.item_list[ship.slot[i]]) {
-        if (!items) {
-          items = kcif.item_list[ship.slot[i]].name;
-        }
-        else {
-          items += " " + kcif.item_list[ship.slot[i]].name;
-        }
+        items.push(kcif.item_list[ship.slot[i]].name);
       }
     }
   }
-  if (items) {
-    items = ' title="' + items + '"';
+  if (items.length > 0) {
+    items = ' title="' + items.join(", ") + '"';
   }
   else {
-    items = null;
+    items = "";
   }
   return '<td class="ship-name"' + items + '>' + s + '</td>';
 }
 
 function ship_level(ship) {
   var col = "color-default";
+  var title = "";
   if (ship) {
     if (ship.afterlv > 0 && ship.level >= ship.afterlv) {
       col = "color-green";
+      title = ' title="改造後 ' + kcif.ship_master[ship.aftershipid].name + '"';
     }
     if (ship.level != ship.p_level) {
       col += " blink";
     }
   }
-  return '<td class="ship-level ' + col + '">' + (ship ? ship.level : "") + '</td>';
+  return '<td class="ship-level ' + col + '"' + title + '>' + (ship ? ship.level : "") + '</td>';
 }
 
 function ship_hp(ship) {
@@ -916,6 +915,7 @@ function makeShip(data) {
     ship.name = kcif.ship_master[data.api_ship_id].name;
     ship.type = kcif.ship_master[data.api_ship_id].type;
     ship.afterlv = kcif.ship_master[data.api_ship_id].afterlv;
+    ship.aftershipid = kcif.ship_master[data.api_ship_id].aftershipid;
     ship.sort_no = kcif.ship_master[data.api_ship_id].sort_no;
     ship.fuel_max = kcif.ship_master[data.api_ship_id].fuel_max;
     ship.bull_max = kcif.ship_master[data.api_ship_id].bull_max;
@@ -1119,6 +1119,7 @@ function kcifCallback(request, content, query) {
         name: ship.api_name,
         type: ship.api_stype,
         afterlv: ship.api_afterlv,
+        aftershipid: ship.api_aftershipid,
         sort_no: ship.api_sortno,
         fuel_max: ship.api_fuel_max,
         bull_max: ship.api_bull_max,
@@ -1826,14 +1827,14 @@ var kcif = {
         if (deck) {
           var ships = [];
           var level_sum = 0;
-          var sup = false;
+          var sup = [];
           var kira = [];
           var drum = 0;
           var drum_ship = [];
           var dai = 0;
           var dai_ship = [];
           var seiku = 0;
-          var ndock = false;
+          var ndock = [];
           for (var j = 0; j < 6; j++) {
             var id = deck.api_ship[j]
             if (id === -1 || id == null) {
@@ -1869,7 +1870,7 @@ var kcif = {
               lhtml += ship_bull(ship);
               if (kcif.repair.filter(function(e){return e.api_ship_id == ship.api_id}).length != 0) {
                 lhtml += '<td class="ship-desc color-yellow">入渠中</td>';
-                ndock = true;
+                ndock.push(ship.name);
               }
               else {
                 lhtml += '<td class="ship-desc"></td>';
@@ -1879,7 +1880,7 @@ var kcif = {
 
             level_sum += ship.level;
             if (ship.fuel < ship.fuel_max || ship.bull < ship.bull_max) {
-              sup = true;
+              sup.push(ship.name);
             }
             if (ship.cond >= 50) {
               kira.push(ship.name);
@@ -1923,23 +1924,23 @@ var kcif = {
             else {
               s = "";
             }
-            if (sup) {
-              s += ' <span class="color-orange blink">未補給艦あり</span>';
+            if (sup.length > 0) {
+              s += ' <span class="color-orange blink" title="' + sup.join(', ') + '">未補給艦あり</span>';
             }
-            if (ndock) {
-              s += ' <span class="color-yellow">入渠艦あり</span>';
+            if (ndock.length > 0) {
+              s += ' <span class="color-yellow" title="' + ndock.join(', ') + '">入渠艦あり</span>';
             }
           }
 
           if (ships.length > 0) {
             s += ' <span class="color-gray" title="旗艦 ' + ships[0].name + '">LV:' + ships[0].level + '/' + level_sum + '</span>';
             s += ' <span class="color-gray"">制空:' + seiku + '</span>';
-            s += ' <span class="color-gray" title="' + kira.join(' ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
+            s += ' <span class="color-gray" title="' + kira.join(', ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
             if (drum > 0) {
-              s += ' <span class="color-gray" title="' + drum_ship.join(' ') + '">ドラム缶:' + drum + '/' + drum_ship.length + '</span>';
+              s += ' <span class="color-gray" title="' + drum_ship.join(', ') + '">ドラム缶:' + drum + '/' + drum_ship.length + '</span>';
             }
             if (dai > 0) {
-              s += ' <span class="color-gray" title="' + dai_ship.join(' ') + '">大発動艇:' + dai + '</span>';
+              s += ' <span class="color-gray" title="' + dai_ship.join(', ') + '">大発動艇:' + dai + '</span>';
             }
           }
 

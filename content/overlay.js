@@ -1045,6 +1045,19 @@ function kcifCallback(request, content, query) {
       log("nyukyo");
     }
   }
+  else if (url.indexOf("speedchange") != -1) {
+    var dock_id = Number(query["api_ndock_id"]);
+    if (dock_id > 0 && kcif.repair[dock_id - 1]) {
+      var ship = kcif.ship_list[kcif.repair[dock_id - 1].api_ship_id];
+      if (ship) {
+        ship.p_hp = ship.hp;
+        ship.hp = ship.hp_max;
+      }
+      kcif.repair[dock_id - 1].api_ship_id = 0;
+      kcif.repair[dock_id - 1].api_complete_time = 0;
+      log("nyukyo speedchange");
+    }
+  }
   else if (url.indexOf("/powerup") != -1) {
     var id_list = query["api_id_items"].split(",");
     for (var i = 0, id; (id = id_list[i]) && i < id_list.length; i++) {
@@ -1446,7 +1459,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(getship|destroyship|createitem|destroyitem2)|api_req_nyukyo\/start|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(getship|destroyship|createitem|destroyitem2)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);

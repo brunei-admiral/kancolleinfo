@@ -1539,7 +1539,7 @@ var kcif = {
         doc.head.appendChild(style);
         return style.sheet;
       })();
-      sheet.insertRule('#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; margin-top: 8px; color: white; background-color: black; font-size: 10pt; font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; text-align: left; }', sheet.length);
+      sheet.insertRule('#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; text-align: left; }', sheet.length);
       sheet.insertRule('#kancolle-info * { font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-headers { color: #ccc; background-color: #444; line-height: 1.5; font-weight: bold; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; padding: 1px 12px 2px 12px; }', sheet.length);
@@ -1564,7 +1564,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .ship-type { width: 2.7em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 4em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 4.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 7.8em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-fuel, #kancolle-info .tab .ship-bull { text-align: right; width: 3.8em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }', sheet.length);
@@ -1590,6 +1590,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info .color-gray { color: silver; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-default { color: inherit; }', sheet.length);
       sheet.insertRule('#kancolle-info .blink { -moz-animation: blink 1.0s ease-in-out infinite alternate; }', sheet.length);
+      sheet.insertRule('@-moz-keyframes blink { 0% {background-color: rgba(240,208,0,0.5);} 60% {background-color: inherit;} 100% {background-color: inherit;} }', sheet.length);
 
       log("create div");
       kcif.flash = doc.querySelector("#flashWrap");

@@ -1048,7 +1048,7 @@ function kcifCallback(request, content, query) {
       log("nyukyo");
     }
   }
-  else if (url.indexOf("speedchange") != -1) {
+  else if (url.indexOf("/speedchange") != -1) {
     var dock_id = Number(query["api_ndock_id"]);
     if (dock_id > 0 && kcif.repair[dock_id - 1]) {
       var ship = kcif.ship_list[kcif.repair[dock_id - 1].api_ship_id];
@@ -1205,7 +1205,13 @@ function kcifCallback(request, content, query) {
     else {
       var tmp = deck.api_ship[idx];
       if (tmp < 0) {
-        removeFromDeck(deck.api_ship[idx]);
+        removeFromDeck(ship_id);
+        if (idx > 0 && deck.api_ship[idx - 1] < 0) {
+          deck.api_ship[idx - 1] = ship_id;
+        }
+        else {
+          deck.api_ship[idx] = ship_id;
+        }
       }
       else {
         var found = false;
@@ -1221,8 +1227,8 @@ function kcifCallback(request, content, query) {
             }
           }
         }
+        deck.api_ship[idx] = ship_id;
       }
-      deck.api_ship[idx] = ship_id;
     }
     update_all = false;
   }

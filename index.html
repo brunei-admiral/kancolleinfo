@@ -120,8 +120,12 @@ em {
   color: inherit;
 }
 
+#ss + p {
+  margin-bottom: 8px;
+}
+
 /* 以下、モック用 */
-#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; margin-top: 8px; color: white; background-color: black; font-size: 10pt; font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; text-align: left; }
+#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; text-align: left; }
 #kancolle-info * { font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; }
 #kancolle-info #tab-headers { color: #ccc; background-color: #444; line-height: 1.5; font-weight: bold; }
 #kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; padding: 1px 12px 2px 12px; }
@@ -146,7 +150,7 @@ em {
 #kancolle-info .tab .ship-type { width: 2.7em; }
 #kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }
 #kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; }
-#kancolle-info .tab .ship-hp { text-align: right; width: 4em; }
+#kancolle-info .tab .ship-hp { text-align: right; width: 4.5em; }
 #kancolle-info .tab .ship-at { text-align: right; width: 7.8em; }
 #kancolle-info .tab .ship-fuel, #kancolle-info .tab .ship-bull { text-align: right; width: 3.8em; }
 #kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }
@@ -183,7 +187,7 @@ em {
 このページがなんか崩れて見える場合は、ブラウザをFirefoxに変更してください。
 </p>
 
-<h2>なにこれ?</h2>
+<h2 id="whatis">なにこれ?</h2>
 <p>
 『艦隊これくしょん～艦これ～』(以下『艦これ』)のプレイ中情報を(たぶん)便利に表示するFirefox拡張機能です。
 </p>
@@ -196,7 +200,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 なお、<b>『艦これ』公式とは一切関係がありません</b>のであしからず。
 </p>
 
-<h2>ダウンロード</h2>
+<h2 id="download">ダウンロード</h2>
 <p>
 <b>先に<a href="#notice">注意事項</a>をよく読んでからダウンロードしてください。</b>
 </p>
@@ -206,7 +210,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <li><a href="./kancolleinfo_1.0.0.xpi">ver 1.0.0</a> <a href="#v100">(概要)</a></li>
 </ul>
 
-<h2>スクリーンショット</h2>
+<h2 id="ss">スクリーンショット</h2>
 <p>
 というか、動的モックです。
 実物とは微妙に細部が異なるかもしれません。
@@ -637,7 +641,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 前回の保存状態から何か変更しない限りは、<samp>保存</samp>ボタンも<samp>リセット</samp>ボタンも押せません(<a href="#kancolle-info">モック</a>ではいつでも押せますが、押しても意味はありません)。
 </p>
 
-<h3>動作上の制限事項など</h3>
+<h3 id="bugs">動作上の制限事項など</h3>
 <p>
 なんか表示内容が実際の『艦これ』の中身とずれてるなあ、と思ったら、母港と工廠あたりを行き来してみてください。
 それでもおかしい場合は、ページをリロードすれば直るんじゃないかと思います。
@@ -671,7 +675,7 @@ kancolleinfoはゲーム画面の下に割と大きなスペースを取って�
 kancolleinfoの中身を改造・流用するのは自由にやっていただいてかまいません(c.mos氏からもご了解を頂いています)。
 </p>
 
-<h2>履歴</h2>
+<h2 id="histroy">履歴</h2>
 <dl>
   <dt>????-??-??</dt>
   <dd id="v110">ver 1.1.0<br>艦隊情報の「未補給艦あり」の文字色を艦隊内最低燃料/弾薬の文字色に合わせた。<br>艦隊情報の「入渠艦あり」の文字色を(出撃できないわけなので)赤色に変更。</dd>

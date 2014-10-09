@@ -12,5 +12,5 @@ task :pack do
 end
 
 task :style do
-  puts File.read("index.html", encoding: 'utf-8').lines.grep(/^\#kancolle-info/).map{|e| "      sheet.insertRule('#{e.chomp}', sheet.length);"}
+  puts File.read("index.html", encoding: 'utf-8').lines.grep(/^(?:\#kancolle-info|@-moz-)/).map{|e| "      sheet.insertRule('#{e.chomp}', sheet.length);"}
 end

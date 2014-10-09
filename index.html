@@ -132,8 +132,8 @@ em {
 #kancolle-info .tab-header a:hover { color: yellow; }
 #kancolle-info .tab { padding: 2px 8px 2px 8px; }
 #kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }
-#kancolle-info .tab a { color: skyblue; text-decoration: none; font-weight: bold; }
-#kancolle-info .tab a:hover { color: yellow; }
+#kancolle-info .tab .list-header { color: skyblue; text-decoration: none; font-weight: bold; }
+#kancolle-info .tab a.list-header:hover { color: yellow !important; dext-decoration: none !important; font-weight: bold !important; }
 #kancolle-info .tab h2 .fleet-name { float: right; color: #ccc; }
 #kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }
 #kancolle-info .tab table tr { padding: 0; margin: 0; }
@@ -201,7 +201,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 <b>先に<a href="#notice">注意事項</a>をよく読んでからダウンロードしてください。</b>
 </p>
 <ul class="download">
-  <li><a href="./kancolleinfo_1.1.0.xpi" class="current">ver 1.0.1 [最新]</a> <a href="#v110">(概要)</a></li>
+  <li><a href="./kancolleinfo_1.1.0.xpi" class="current">ver 1.1.0 [最新]</a> <a href="#v110">(概要)</a></li>
   <li><a href="./kancolleinfo_1.0.1.xpi">ver 1.0.1</a> <a href="#v101">(概要)</a></li>
   <li><a href="./kancolleinfo_1.0.0.xpi">ver 1.0.0</a> <a href="#v100">(概要)</a></li>
 </ul>
@@ -221,7 +221,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   </div>
   <div id="tab-main" class="tab">
     <div id="fleet1" class="fleet">
-      <h2><a href="#">第1艦隊</a> <span class="color-green">[出撃中<span id="battle-result" style="display: none;"> + 5-4-1 同航戦 <span style="letter-spacing: -2px;"><span class="color-gray">×</span><span class="color-green">◎</span><span class="color-red">△</span><span class="color-orange">○</span><span class="color-gray">×</span><span class="color-yellow">◎</span></span></span>]</span> <span class="color-gray" title="旗艦 Bismarck drei">LV:105/475</span> <span class="color-gray">制空:159</span> <span class="color-gray" title="Bismarck drei, Верный">キラ:2/6</span> <span class="color-gray" title="暁改, Верный">ドラム缶:4/2</span><span class="fleet-name">「第1艦隊」</span></h2>
+      <h2><a class="list-header" href="#">第1艦隊</a> <span class="color-green">[出撃中<span id="battle-result" style="display: none;"> + 5-4-1 同航戦 <span style="letter-spacing: -2px;"><span class="color-gray">×</span><span class="color-green">◎</span><span class="color-red">△</span><span class="color-orange">○</span><span class="color-gray">×</span><span class="color-yellow">◎</span></span></span>]</span> <span class="color-gray" title="旗艦 Bismarck drei">LV:105/475</span> <span class="color-gray">制空:159</span> <span class="color-gray" title="Bismarck drei, Верный">キラ:2/6</span> <span class="color-gray" title="暁改, Верный">ドラム缶:4/2</span><span class="fleet-name">「第1艦隊」</span></h2>
       <table>
         <tr><td class="ship-no color-red" title="応急修理要員">1</td><td class="ship-type">巡戦</td><td class="ship-name" title="38cm連装砲改 38cm連装砲改 61cm四連装(酸素)魚雷 応急修理要員">Bismarck drei</td><td class="ship-level">105</td><td class="ship-hp color-green">99/99</td><td class="ship-cond color-green blink">53</td><td class="ship-fuel color-green" title="93/93">100%</td><td class="ship-bull color-green" title="131/131">100%</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">戦艦</td><td class="ship-name" title="46cm三連装砲 46cm三連装砲 46cm三連装砲 46cm三連装砲">大和改</td><td class="ship-level">61</td><td class="ship-hp color-green">96/96</td><td class="ship-cond color-yellow">30</td><td class="ship-fuel color-orange" title="125/250">50%</td><td class="ship-bull color-orange" title="162/325">49%</td><td class="ship-desc"></td></tr>
@@ -232,7 +232,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       </table>
     </div>
     <div id="fleet2" class="fleet">
-      <h2><a href="#">第2艦隊</a> <span class="color-red">[遠征中 <label>20:33帰還<input class="check-timer" type="checkbox"></label>]</span> <span class="color-gray" title="旗艦 北上改二">LV:92/155</span> <span class="color-gray">制空:37</span> <span class="color-gray">キラ:0/4</span><span class="fleet-name">「第2艦隊」</span></h2>
+      <h2><a class="list-header" href="#">第2艦隊</a> <span class="color-red">[遠征中 <label>20:33帰還<input class="check-timer" type="checkbox"></label>]</span> <span class="color-gray" title="旗艦 北上改二">LV:92/155</span> <span class="color-gray">制空:37</span> <span class="color-gray">キラ:0/4</span><span class="fleet-name">「第2艦隊」</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type">雷巡</td><td class="ship-name" title="61cm五連装(酸素)魚雷 61cm五連装(酸素)魚雷 甲標的">北上改二</td><td class="ship-level">92</td><td class="ship-hp color-green">43/43</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="25/25">100%</td><td class="ship-bull color-green" title="75/75">100%</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">航巡</td><td class="ship-name" title="瑞雲 瑞雲(六三四空) 瑞雲 零式水上偵察機">最上改</td><td class="ship-level">27</td><td class="ship-hp color-green">50/50</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="50/50">100%</td><td class="ship-bull color-green" title="55/55">100%</td><td class="ship-desc"></td></tr>
@@ -243,7 +243,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       </table>
     </div>
     <div id="fleet3" class="fleet">
-      <h2><a href="#">第3艦隊</a> <span class="color-yellow">[遠征中 <label>20:40帰還<input class="check-timer" type="checkbox"></label>]</span> <span class="color-gray" title="旗艦 吹雪改">LV:55/152</span> <span class="color-gray">制空:0</span> <span class="color-gray">キラ:0/3</span><span class="fleet-name">「第3艦隊」</span></h2>
+      <h2><a class="list-header" href="#">第3艦隊</a> <span class="color-yellow">[遠征中 <label>20:40帰還<input class="check-timer" type="checkbox"></label>]</span> <span class="color-gray" title="旗艦 吹雪改">LV:55/152</span> <span class="color-gray">制空:0</span> <span class="color-gray">キラ:0/3</span><span class="fleet-name">「第3艦隊」</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type">駆逐</td><td class="ship-name" title="12.7cm連装砲 12.7cm連装砲 13号対空電探">吹雪改</td><td class="ship-level">55</td><td class="ship-hp color-green">30/30</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="15/15">100%</td><td class="ship-bull color-green" title="20/20">100%</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">駆逐</td><td class="ship-name" title="12.7cm連装砲 三式水中探信儀 九四式爆雷投射機">天津風改</td><td class="ship-level">24</td><td class="ship-hp color-green">34/34</td><td class="ship-cond color-default">49</td><td class="ship-fuel color-green" title="20/20">100%</td><td class="ship-bull color-green" title="20/20">100%</td><td class="ship-desc"></td></tr>
@@ -254,7 +254,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       </table>
     </div>
     <div id="fleet4" class="fleet">
-      <h2><a href="#">第4艦隊</a> <span class="color-yellow blink" title="大鯨">未補給艦あり</span> <span class="color-red" title="千歳甲">入渠艦あり</span> <span class="color-gray" title="旗艦 千歳甲">LV:12/63</span> <span class="color-gray">制空:0</span> <span class="color-gray">キラ:0/2</span> <span class="color-gray" title="千歳甲">大発:1</span><span class="fleet-name">「第4艦隊」</span></h2>
+      <h2><a class="list-header" href="#">第4艦隊</a> <span class="color-yellow blink" title="大鯨">未補給艦あり</span> <span class="color-red" title="千歳甲">入渠艦あり</span> <span class="color-gray" title="旗艦 千歳甲">LV:12/63</span> <span class="color-gray">制空:0</span> <span class="color-gray">キラ:0/2</span> <span class="color-gray" title="千歳甲">大発:1</span><span class="fleet-name">「第4艦隊」</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type">水母</td><td class="ship-name" title="試製晴嵐 甲標的 大発動艇">千歳甲</td><td class="ship-level">12</td><td class="ship-hp color-default">40/42</td><td class="ship-cond">49</td><td class="ship-fuel color-green" title="35/35">100%</td><td class="ship-bull color-green" title="45/45">100%</td><td class="ship-desc color-red">入渠中</td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">潜母</td><td class="ship-name" title="15.5cm三連装副砲 15.5cm三連装副砲 新型高温高圧缶">大鯨</td><td class="ship-level color-green" title="改造後 龍鳳">52</td><td class="ship-hp color-default">39/39</td><td class="ship-cond">49</td><td class="ship-fuel color-yellow" title="28/35">80%</td><td class="ship-bull color-yellow" title="8/10">80%</td><td class="ship-desc"></td></tr>
@@ -265,7 +265,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       </table>
     </div>
     <div id="ndock">
-      <h2><a href="#">入渠</a></h2>
+      <h2><span class="list-header">入渠</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-at"></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">水母</td><td class="ship-name" title="試製晴嵐 甲標的 大発動艇">千歳甲</td><td class="ship-level">12</td><td class="ship-hp color-default">40/42</td><td class="ship-cond">49</td><td class="ship-at color-orange"><label>20:36<input class="check-timer" type="checkbox"></label></td></tr>
@@ -274,7 +274,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       </table>
     </div>
     <div id="kdock">
-      <h2><a href="#">建造</a></h2>
+      <h2><span class="list-header">建造</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type"><span class="built-result">???</span><span style="display: none;">駆逐</span></td><td class="ship-name"><span class="built-result">???</span><span style="display: none;">雷</span></td><td class="ship-at color-red"><label>--:--<input class="check-timer" type="checkbox"></label></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type"><span class="built-result">???</span><span style="display: none;">軽巡</span></td><td class="ship-name"><span class="built-result">???</span><span style="display: none;">那珂</span></td><td class="ship-at color-orange"><label>20:36<input class="check-timer" type="checkbox"></label></td></tr>
@@ -286,7 +286,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <div id="tab-ships" class="tab">
     <div class="table-outer"><div class="table-inner"><table>
       <thead>
-        <tr><th class="ship-no"><a href="#">#</a></th><th class="ship-type"><a href="#">艦種</a></th><th class="ship-name"><a href="#">艦名</a></th><th class="ship-level"><a href="#" class="sort-current">LV</a></th><th class="ship-hp"><a href="#">耐久</a></th><th class="ship-cond">疲労</th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-desc">所在</th></tr>
+        <tr><th class="ship-no"><a class="list-header" href="#">#</a></th><th class="ship-type"><a class="list-header" href="#">艦種</a></th><th class="ship-name"><a class="list-header" href="#">艦名</a></th><th class="ship-level"><a class="list-header" href="#" class="sort-current">LV</a></th><th class="ship-hp"><a class="list-header" href="#">耐久</a></th><th class="ship-cond">疲労</th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-desc">所在</th></tr>
       </thead>
       <tbody>
         <tr><td class="ship-no">1</td><td class="ship-type">正空</td><td class="ship-name" title="応急修理女神">飛龍改二</td><td class="ship-level">150</td><td class="ship-hp color-green">74/74</td><td class="ship-cond color-green blink">53</td><td class="ship-fuel color-green" title="59/59">100%</td><td class="ship-bull color-green" title="63/63">100%</td><td class="ship-desc"></td></tr>
@@ -314,7 +314,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <div id="tab-items" class="tab">
     <div class="table-outer"><div class="table-inner"><table>
       <thead>
-        <tr><th class="item-no"><a href="#">#</a></th><th class="item-type"><a href="#" class="sort-current">種別</a></th><th class="item-name"><a href="#">名称</a></th><th class="ship-name"><a href="#">所在</a></th><th class="ship-level"></th></tr>
+        <tr><th class="item-no"><a class="list-header" href="#">#</a></th><th class="item-type"><a class="list-header" href="#" class="sort-current">種別</a></th><th class="item-name"><a class="list-header" href="#">名称</a></th><th class="ship-name"><a class="list-header" href="#">所在</a></th><th class="ship-level"></th></tr>
       </thead>
       <tbody>
         <tr><td class="item-no">1</td><td class="item-type">小口径主砲</td><td class="item-name">12.7cm連装砲</td><td class="ship-name" title="12.7cm連装砲 12.7cm連装砲 13号対空電探">吹雪改</td><td class="ship-level">55</td></tr>

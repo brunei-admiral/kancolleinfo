@@ -1539,7 +1539,7 @@ var kcif = {
         doc.head.appendChild(style);
         return style.sheet;
       })();
-      sheet.insertRule('#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; text-align: left; }', sheet.length);
+      sheet.insertRule('#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; margin-top: 8px; color: white; background-color: black; font-size: 10pt; font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; text-align: left; }', sheet.length);
       sheet.insertRule('#kancolle-info * { font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-headers { color: #ccc; background-color: #444; line-height: 1.5; font-weight: bold; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; padding: 1px 12px 2px 12px; }', sheet.length);
@@ -1550,8 +1550,8 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab-header a:hover { color: yellow; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab { padding: 2px 8px 2px 8px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab a { color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab a:hover { color: yellow; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .list-header { color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab a.list-header:hover { color: yellow !important; dext-decoration: none !important; font-weight: bold !important; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab h2 .fleet-name { float: right; color: #ccc; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab table tr { padding: 0; margin: 0; }', sheet.length);
@@ -1590,7 +1590,6 @@ var kcif = {
       sheet.insertRule('#kancolle-info .color-gray { color: silver; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-default { color: inherit; }', sheet.length);
       sheet.insertRule('#kancolle-info .blink { -moz-animation: blink 1.0s ease-in-out infinite alternate; }', sheet.length);
-      sheet.insertRule('@-moz-keyframes blink { 0% {background-color: rgba(240,208,0,0.5);} 60% {background-color: inherit;} 100% {background-color: inherit;} }', sheet.length);
 
       log("create div");
       kcif.flash = doc.querySelector("#flashWrap");
@@ -1956,10 +1955,10 @@ var kcif = {
             }
           }
 
-          html += '<h2><a href="#">第' + (i + 1) + '艦隊</a>' + s + '<span class="fleet-name">「' + deck.api_name + '」</span></h2>';
+          html += '<h2><a class="list-header" href="#">第' + (i + 1) + '艦隊</a>' + s + '<span class="fleet-name">「' + deck.api_name + '」</span></h2>';
         }
         else {
-          html += '<h2><a href="#">第' + (i + 1) + '艦隊</a> <span class="color-gray">[未解放]</span></h2>';
+          html += '<h2><span class="list-header" href="#">第' + (i + 1) + '艦隊</span> <span class="color-gray">[未解放]</span></h2>';
         }
 
         html += '<table>' + lhtml + '</table>';
@@ -1967,7 +1966,7 @@ var kcif = {
       }
 
       html += '<div id="ndock">';
-      html += '<h2><a href="#">入渠</a></h2>';
+      html += '<h2><span class="list-header">入渠</span></h2>';
       html += '<table>';
       for (var i = 0; kcif.repair[i]; i++) {
         if (kcif.repair[i].api_complete_time > 0) {
@@ -1989,7 +1988,7 @@ var kcif = {
       html += '</div>';
 
       html += '<div id="kdock">';
-      html += '<h2><a href="#">建造</a></h2>';
+      html += '<h2><span class="list-header">建造</span></h2>';
       html += '<table>';
       for (var i = 0; kcif.build[i]; i++) {
         if (kcif.build[i].api_complete_time > 0 || kcif.build[i].api_state == 3) {
@@ -2051,7 +2050,7 @@ var kcif = {
       var shipstab = kcif.info_div.querySelector("#tab-ships");
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="ship-no"><a href="#"' + (kcif.sort_ships.indexOf("no") == 0 ? ' class="sort-current"' : '') + '>#</a></th><th class="ship-type"><a href="#"' + (kcif.sort_ships.indexOf("type") == 0 ? ' class="sort-current"' : '') + '>艦種</a></th><th class="ship-name"><a href="#"' + (kcif.sort_ships.indexOf("name") == 0 ? ' class="sort-current"' : '') + '>艦名</a></th><th class="ship-level"><a href="#"' + (kcif.sort_ships.indexOf("level") == 0 ? ' class="sort-current"' : '') + '>LV</a></th><th class="ship-hp"' + (kcif.sort_ships.indexOf("hp") == 0 ? ' class="sort-current"' : '') + '><a href="#">耐久</a></th><th class="ship-cond">疲労</th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-desc">所在</th></tr></thead>';
+      html += '<thead><tr><th class="ship-no"><a class="list-header" href="#"' + (kcif.sort_ships.indexOf("no") == 0 ? ' class="sort-current"' : '') + '>#</a></th><th class="ship-type"><a class="list-header" href="#"' + (kcif.sort_ships.indexOf("type") == 0 ? ' class="sort-current"' : '') + '>艦種</a></th><th class="ship-name"><a class="list-header" href="#"' + (kcif.sort_ships.indexOf("name") == 0 ? ' class="sort-current"' : '') + '>艦名</a></th><th class="ship-level"><a class="list-header" href="#"' + (kcif.sort_ships.indexOf("level") == 0 ? ' class="sort-current"' : '') + '>LV</a></th><th class="ship-hp"' + (kcif.sort_ships.indexOf("hp") == 0 ? ' class="sort-current"' : '') + '><a class="list-header" href="#">耐久</a></th><th class="ship-cond">疲労</th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-desc">所在</th></tr></thead>';
       html += '<tbody>';
 
       var ships = [];
@@ -2115,7 +2114,7 @@ var kcif = {
       var itemstab = kcif.info_div.querySelector("#tab-items");
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="item-no"><a href="#"' + (kcif.sort_items.indexOf("no") == 0 ? ' class="sort-current"' : '') + '>#</a></th><th class="item-type"><a href="#"' + (kcif.sort_items.indexOf("type") == 0 ? ' class="sort-current"' : '') + '>種別</a></th><th class="item-name"><a href="#"' + (kcif.sort_items.indexOf("name") == 0 ? ' class="sort-current"' : '') + '>名称</a></th><th class="ship-name"><a href="#"' + (kcif.sort_items.indexOf("holder") == 0 ? ' class="sort-current"' : '') + '>所在</a></th><th class="ship-level"></th></tr></thead>';
+      html += '<thead><tr><th class="item-no"><a class="list-header" href="#"' + (kcif.sort_items.indexOf("no") == 0 ? ' class="sort-current"' : '') + '>#</a></th><th class="item-type"><a class="list-header" href="#"' + (kcif.sort_items.indexOf("type") == 0 ? ' class="sort-current"' : '') + '>種別</a></th><th class="item-name"><a class="list-header" href="#"' + (kcif.sort_items.indexOf("name") == 0 ? ' class="sort-current"' : '') + '>名称</a></th><th class="ship-name"><a class="list-header" href="#"' + (kcif.sort_items.indexOf("holder") == 0 ? ' class="sort-current"' : '') + '>所在</a></th><th class="ship-level"></th></tr></thead>';
       html += '<tbody>';
 
       var items = [];

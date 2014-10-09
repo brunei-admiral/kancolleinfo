@@ -10,3 +10,7 @@ task :pack do
 
   sh "zip -r -9 #{file} #{DEPENDS.join(' ')}"
 end
+
+task :style do
+  puts File.read("index.html", encoding: 'utf-8').lines.grep(/^\#kancolle-info/).map{|e| "      sheet.insertRule('#{e.chomp}', sheet.length);"}
+end

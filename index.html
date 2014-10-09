@@ -253,7 +253,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       </table>
     </div>
     <div id="fleet4" class="fleet">
-      <h2><a href="#">第4艦隊</a> <span class="color-orange blink" title="大鯨">未補給艦あり</span> <span class="color-yellow" title="千歳甲">入渠艦あり</span> <span class="color-gray" title="旗艦 千歳甲">LV:12/63</span> <span class="color-gray">制空:0</span> <span class="color-gray">キラ:0/2</span> <span class="color-gray" title="千歳甲">大発:1</span><span class="fleet-name">「第4艦隊」</span></h2>
+      <h2><a href="#">第4艦隊</a> <span class="color-yellow blink" title="大鯨">未補給艦あり</span> <span class="color-red" title="千歳甲">入渠艦あり</span> <span class="color-gray" title="旗艦 千歳甲">LV:12/63</span> <span class="color-gray">制空:0</span> <span class="color-gray">キラ:0/2</span> <span class="color-gray" title="千歳甲">大発:1</span><span class="fleet-name">「第4艦隊」</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type">水母</td><td class="ship-name" title="試製晴嵐 甲標的 大発動艇">千歳甲</td><td class="ship-level">12</td><td class="ship-hp color-default">40/42</td><td class="ship-cond">49</td><td class="ship-fuel color-green" title="35/35">100%</td><td class="ship-bull color-green" title="45/45">100%</td><td class="ship-desc color-yellow">入渠中</td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">潜母</td><td class="ship-name" title="15.5cm三連装副砲 15.5cm三連装副砲 新型高温高圧缶">大鯨</td><td class="ship-level color-green" title="改造後 龍鳳">52</td><td class="ship-hp color-default">39/39</td><td class="ship-cond">49</td><td class="ship-fuel color-yellow" title="28/35">80%</td><td class="ship-bull color-yellow" title="8/10">80%</td><td class="ship-desc"></td></tr>
@@ -672,6 +672,8 @@ kancolleinfoの中身を改造・流用するのは自由にやっていただ�
 
 <h2>履歴</h2>
 <dl>
+  <dt>????-??-??</dt>
+  <dd id="v110">ver 1.1.0<br>艦隊情報の「未補給艦あり」の文字色を艦隊内最低燃料/弾薬の文字色に合わせた。<br>艦隊情報の「入渠艦あり」の文字色を(出撃できないわけなので)赤色に変更。</dd>
   <dt>2014-10-09</dt>
   <dd id="v101">ver 1.0.1<br>編成変更の際、艦の並びが正しく反映されないことのあった不具合を修正。</dd>
   <dt>2014-10-08</dt>
@@ -699,28 +701,25 @@ var kcif = {
 };
 kcif.info_div = document;
 
-function select_tab(evt){
+function selectTab(evt){
   evt.preventDefault();
-  var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header");
-  for (var i = 0; i < elems.length; i++) {
-    elems[i].style.color = "inherit";
-    elems[i].style.backgroundColor = "inherit";
-  }
-  elems = kcif.info_div.querySelectorAll("#kancolle-info .tab")
-  for (var i = 0; i < elems.length; i++) {
-    elems[i].style.display = "none";
-  }
 
-  var tab = this.parentNode;
-  tab.style.color = "white";
-  tab.style.backgroundColor = "black";
-  kcif.info_div.querySelector("#kancolle-info #" + tab.id.replace("-header", "")).style.display = "block";
+  kcif.current_tab = this.parentNode.id.replace("-header", "");
 
-  kcif.current_tab = tab.id;
+  var elems = kcif.info_div.querySelectorAll(".tab-header");
+  for (var i = 0; i < elems.length; i++) {
+    elems[i].style.color = elems[i] == this.parentNode ? "white" : "inherit";
+    elems[i].style.backgroundColor = elems[i] == this.parentNode ? "black" : "inherit";
+  }
+  elems = kcif.info_div.querySelectorAll(".tab")
+  for (var i = 0; i < elems.length; i++) {
+    elems[i].style.display = elems[i].id == kcif.current_tab ? "block" : "none";
+  }
 }
 
-function select_fleet(evt){
+function selectFleet(evt){
   evt.preventDefault();
+
   var elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main .fleet table");
   for (var i = 0; i < elems.length; i++) {
     elems[i].style.display = "none";
@@ -735,14 +734,14 @@ function select_fleet(evt){
 // タブ
 var elems = kcif.info_div.querySelectorAll("#kancolle-info .tab-header a");
 for (var i = 0; i < elems.length; i++) {
-  elems[i].addEventListener("click", select_tab, false);
+  elems[i].addEventListener("click", selectTab, false);
 }
 kcif.info_div.querySelector("#kancolle-info #" + kcif.current_tab.replace("-", "-header-") + " a").click();
 
 // メイン:艦隊
 elems = kcif.info_div.querySelectorAll("#kancolle-info #tab-main .fleet h2 a");
 for (var i = 0; i < elems.length; i++) {
-  elems[i].addEventListener("click", select_fleet, false);
+  elems[i].addEventListener("click", selectFleet, false);
 }
 kcif.info_div.querySelector("#kancolle-info #" + kcif.current_fleet + " h2 a").click();
 

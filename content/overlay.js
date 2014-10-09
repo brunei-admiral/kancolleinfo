@@ -576,20 +576,23 @@ function shipCond(ship) {
   return '<td class="ship-cond ' + col + '">' + ship.cond + '</td>';
 }
 
-function shipFuel(ship) {
-  var col = "color-default";
-  if (ship.fuel == 0) {
-    col = "color-red";
+function fuelBullColor(cur, max) {
+  if (cur == 0) {
+    return "color-red";
   }
-  else if (ship.fuel < ship.fuel_max / 2.0) {
-    col = "color-orange";
+  else if (cur < max / 2.0) {
+    return "color-orange";
   }
-  else if (ship.fuel < ship.fuel_max) {
-    col = "color-yellow";
+  else if (cur < max) {
+    return "color-yellow";
   }
   else {
-    col = "color-green";
+    return "color-green";
   }
+}
+
+function shipFuel(ship) {
+  var col = fuelBullColor(ship.fuel, ship.fuel_max);
   if (ship.fuel != ship.p_fuel) {
     col += " blink";
   }
@@ -597,19 +600,7 @@ function shipFuel(ship) {
 }
 
 function shipBull(ship) {
-  var col = "color-default";
-  if (ship.bull == 0) {
-    col = "color-red";
-  }
-  else if (ship.bull < ship.bull_max / 2.0) {
-    col = "color-orange";
-  }
-  else if (ship.bull < ship.bull_max) {
-    col = "color-yellow";
-  }
-  else {
-    col = "color-green";
-  }
+  var col = fuelBullColor(ship.bull, ship.bull_max);
   if (ship.bull != ship.p_bull) {
     col += " blink";
   }
@@ -1824,6 +1815,7 @@ var kcif = {
           var ships = [];
           var level_sum = 0;
           var sup = [];
+          var sup_col = "";
           var kira = [];
           var drum = 0;
           var drum_ship = [];
@@ -1865,7 +1857,7 @@ var kcif = {
               lhtml += shipFuel(ship);
               lhtml += shipBull(ship);
               if (kcif.repair.filter(function(e){return e.api_ship_id == ship.api_id}).length != 0) {
-                lhtml += '<td class="ship-desc color-yellow">入渠中</td>';
+                lhtml += '<td class="ship-desc color-red">入渠中</td>';
                 ndock.push(ship.name);
               }
               else {
@@ -1877,6 +1869,30 @@ var kcif = {
             level_sum += ship.level;
             if (ship.fuel < ship.fuel_max || ship.bull < ship.bull_max) {
               sup.push(ship.name);
+              var col1 = fuelBullColor(ship.fuel, ship.fuel_max);
+              var col2 = fuelBullColor(ship.bull, ship.bull_max);
+              if (/red/.test(col1)) {
+                sup_col = col1;
+              }
+              else if (/red/.test(col2)) {
+                sup_col = col2;
+              }
+              else if (!/red/.test(sup_col)) {
+                if (/orange/.test(col1)) {
+                  sup_col = col1;
+                }
+                else if (/orange/.test(col2)) {
+                  sup_col = col2;
+                }
+                else if (!/orange/.test(sup_col)) {
+                  if (/yellow/.test(col1)) {
+                    sup_col = col1;
+                  }
+                  else if (/yellow/.test(col2)) {
+                    sup_col = col2;
+                  }
+                }
+              }
             }
             if (ship.cond >= 50) {
               kira.push(ship.name);
@@ -1921,10 +1937,10 @@ var kcif = {
               s = "";
             }
             if (sup.length > 0) {
-              s += ' <span class="color-orange blink" title="' + sup.join(', ') + '">未補給艦あり</span>';
+              s += ' <span class="' + sup_col + ' blink" title="' + sup.join(', ') + '">未補給艦あり</span>';
             }
             if (ndock.length > 0) {
-              s += ' <span class="color-yellow" title="' + ndock.join(', ') + '">入渠艦あり</span>';
+              s += ' <span class="color-red" title="' + ndock.join(', ') + '">入渠艦あり</span>';
             }
           }
 
@@ -2066,7 +2082,7 @@ var kcif = {
           html += '<td class="ship-desc">第' + fleet + '艦隊<span class="color-gray">「' + kcif.deck_list[fleet - 1].api_name + '」</span></td>';
         }
         else if (kcif.repair.filter(function(e){ return e.api_ship_id == ship.api_id; }).length != 0) {
-          html += '<td class="ship-desc color-yellow">入渠中</td>';
+          html += '<td class="ship-desc color-red">入渠中</td>';
         }
         else {
           html += '<td class="ship-desc"></td>';

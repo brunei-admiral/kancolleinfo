@@ -1224,12 +1224,14 @@ function kcifCallback(request, content, query) {
     update_all = false;
   }
   else if (url.indexOf("battle") != -1) {
-    log("battle: " + url);
-    var deck_id = Number(json.api_data.api_dock_id || json.api_data.api_deck_id);
-    if (url.indexOf("practice") != -1 && (!kcif.mission[deck_id - 1] || kcif.mission[deck_id - 1].indexOf("演習") == -1)) {
-      kcif.mission[deck_id - 1] = "演習";
+    if (getShowBattle()) {
+      log("battle: " + url);
+      var deck_id = Number(json.api_data.api_dock_id || json.api_data.api_deck_id);
+      if (url.indexOf("practice") != -1 && (!kcif.mission[deck_id - 1] || kcif.mission[deck_id - 1].indexOf("演習") == -1)) {
+        kcif.mission[deck_id - 1] = "演習";
+      }
+      battle(url, json);
     }
-    battle(url, json);
   }
   else if (url.indexOf("_map/start") != -1) {
     var deck_id = Number(query["api_deck_id"]);
@@ -1869,7 +1871,7 @@ var kcif = {
                 lhtml += '<td class="ship-desc"></td>';
               }
               lhtml += '</tr>';
-              if (t && isNaN(Number(t)) && getShowBattle() && ship.hp <= ship.hp_max / 4) {
+              if (t && isNaN(Number(t)) && ship.hp <= ship.hp_max / 4) {
                 col = "color-red";
               }
             }

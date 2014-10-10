@@ -537,22 +537,27 @@ function shipLevel(ship) {
 
 function shipHp(ship) {
   var col = "color-default";
-  if (ship.hp <= ship.hp_max / 4) {
+  var hp = ship.hp;
+  if (hp <= 0) {
+    col = "color-gray";
+    hp = 0;
+  }
+  else if (hp <= ship.hp_max / 4) {
     col = "color-red";
   }
-  else if (ship.hp <= ship.hp_max / 2) {
+  else if (hp <= ship.hp_max / 2) {
     col = "color-orange";
   }
-  else if (ship.hp <= ship.hp_max * 3 / 4) {
+  else if (hp <= ship.hp_max * 3 / 4) {
     col = "color-yellow";
   }
-  else if (ship.hp >= ship.hp_max) {
+  else if (hp >= ship.hp_max) {
     col = "color-green";
   }
-  if (ship.p_hp != ship.hp) {
+  if (ship.p_hp != hp) {
     col += " blink";
   }
-  return '<td class="ship-hp ' + col + '">' + ship.hp + '/' + ship.hp_max + '</td>';
+  return '<td class="ship-hp ' + col + '">' + hp + '/' + ship.hp_max + '</td>';
 }
 
 function shipCond(ship) {
@@ -1864,6 +1869,9 @@ var kcif = {
                 lhtml += '<td class="ship-desc"></td>';
               }
               lhtml += '</tr>';
+              if (t && isNaN(Number(t)) && getShowBattle() && ship.hp <= ship.hp_max / 4) {
+                col = "color-red";
+              }
             }
 
             level_sum += ship.level;

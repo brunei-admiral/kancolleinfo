@@ -1,0 +1,66 @@
+// JUST - JavaScript UnitTest Suite (Temporary)
+var JUST = {
+  tests: 0,
+  assertions: 0,
+  passes: 0,
+  failures: 0,
+  errors: 0,
+
+  testCase: function(obj){
+    for (var prop in obj) {
+      if (prop.indexOf("test") == 0) {
+        try {
+          if (obj.setup) {
+            obj.setup();
+          }
+          obj[prop]();
+        }
+        catch (ex) {
+          var stack = ex.stack;
+          if (ex instanceof JUST.FailedAssertion) {
+            JUST.failures++;
+            console.log("[" + (JUST.failures + JUST.errors) + "] Failure: " + prop);
+            console.log(ex.message);
+            stack = stack.replace(/^.*?\n/, "");
+            var re = /^\s+at assert.*?\n/;
+            while (re.test(stack)) {
+              stack = stack.replace(re, "");
+            }
+          }
+          else {
+            JUST.errors++;
+            console.log("[" + (JUST.failures + JUST.errors) + "] Error: " + prop);
+          }
+          console.log(stack);
+          console.log("");
+        }
+        finally {
+          if (obj.teardown) {
+            obj.teardown();
+          }
+        }
+        JUST.tests++;
+      }
+    }
+    console.log(String(JUST.tests) + " tests, " + JUST.assertions + " assertions, " + JUST.passes + " passes, " + JUST.failures + " failures, " + JUST.errors + " errors.");
+    phantom.exit(JUST.failures + JUST.errors);
+  },
+
+  FailedAssertion: function(message){
+    this.message = message;
+  }
+};
+
+function assert(result, message) {
+  JUST.assertions++;
+  if (result) {
+    JUST.passes++;
+  }
+  else {
+    throw new JUST.FailedAssertion(message || "no message given");
+  }
+}
+
+function assertMatch(reg, str, message) {
+  assert(reg.test(str), message || reg + "\ndid not match with\n" + str);
+}

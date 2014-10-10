@@ -67,7 +67,9 @@ JUST.testCase({
     ship.hp = 2;
     assertMatch(/^<td class="ship-hp color-red blink">2\/10<\/td>$/, shipHp(ship));
     ship.hp = 0;
-    assertMatch(/^<td class="ship-hp\b.*?<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-gray blink">0\/10<\/td>$/, shipHp(ship));
+    ship.hp = -1;
+    assertMatch(/^<td class="ship-hp color-gray blink">0\/10<\/td>$/, shipHp(ship));
   },
 
   testShipCond: function(){

@@ -225,7 +225,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   </div>
   <div id="tab-main" class="tab">
     <div id="fleet1" class="fleet">
-      <h2><a class="list-header" href="#">第1艦隊</a> <span class="color-green">[出撃中<span id="battle-result" style="display: none;"> + 5-4-1 同航戦 <span style="letter-spacing: -2px;"><span class="color-gray">×</span><span class="color-green">◎</span><span class="color-red">△</span><span class="color-orange">○</span><span class="color-gray">×</span><span class="color-yellow">◎</span></span></span>]</span> <span class="color-gray" title="旗艦 Bismarck drei">LV:105/475</span> <span class="color-gray">制空:159</span> <span class="color-gray" title="Bismarck drei, Верный">キラ:2/6</span> <span class="color-gray" title="暁改, Верный">ドラム缶:4/2</span><span class="fleet-name">「第1艦隊」</span></h2>
+      <h2><a class="list-header" href="#">第1艦隊</a> <span class="color-red">[出撃中<span id="battle-result" style="display: none;"> + 5-4-1 同航戦 <span style="letter-spacing: -2px;"><span class="color-gray">×</span><span class="color-green">◎</span><span class="color-red">△</span><span class="color-orange">○</span><span class="color-gray">×</span><span class="color-yellow">◎</span></span></span>]</span> <span class="color-gray" title="旗艦 Bismarck drei">LV:105/475</span> <span class="color-gray">制空:159</span> <span class="color-gray" title="Bismarck drei, Верный">キラ:2/6</span> <span class="color-gray" title="暁改, Верный">ドラム缶:4/2</span><span class="fleet-name">「第1艦隊」</span></h2>
       <table>
         <tr><td class="ship-no color-red" title="応急修理要員">1</td><td class="ship-type">巡戦</td><td class="ship-name" title="38cm連装砲改 38cm連装砲改 61cm四連装(酸素)魚雷 応急修理要員">Bismarck drei</td><td class="ship-level">105</td><td class="ship-hp color-green">99/99</td><td class="ship-cond color-green blink">53</td><td class="ship-fuel color-green" title="93/93">100%</td><td class="ship-bull color-green" title="131/131">100%</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">戦艦</td><td class="ship-name" title="46cm三連装砲 46cm三連装砲 46cm三連装砲 46cm三連装砲">大和改</td><td class="ship-level">61</td><td class="ship-hp color-green">96/96</td><td class="ship-cond color-yellow">30</td><td class="ship-fuel color-orange" title="125/250">50%</td><td class="ship-bull color-orange" title="162/325">49%</td><td class="ship-desc"></td></tr>
@@ -455,7 +455,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 </p>
 <p>
 一番右に<samp>画面キャプチャ</samp>ボタンがあります。
-クリックすると現在のゲーム画面をPNG形式でキャプチャし、ローカルストレージに保存します(この<a href="#kancolle-info">モック</a>では、押しても何も起きません)。
+クリックすると現在のゲーム画面をPNG形式でキャプチャし、ローカルストレージ(HDDとか)に保存します(この<a href="#kancolle-info">モック</a>では、押しても何も起きません)。
 実際の保存場所およびファイル名については、<a href="#desc-config">設定の説明</a>を参照してください。
 </p>
 
@@ -490,7 +490,8 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 最後に、右端にゲーム内の編成画面で設定した艦隊名が表示されます。
 </p>
 <p>
-出撃中の艦隊(<a href="#kancolle-info">モック</a>の第1艦隊を参照)については、<samp>設定</samp>タブで<q>戦闘結果を表示する</q>にチェックを入れている場合(<a href="#desc-config">後述</a>)、艦隊の現在位置や戦闘結果を合わせて表示します。具体例については、<a href="#kancolle-info">モック</a>を使って<samp>設定</samp>タブで該当設定を変更してから<samp>第1艦隊</samp>の部分を確認してみてください。
+出撃中の艦隊(<a href="#kancolle-info">モック</a>の第1艦隊を参照)についてはその旨が表示されます。通常は緑色で、大破艦が存在する場合は赤色になります。
+<samp>設定</samp>タブで<q>戦闘結果を表示する</q>にチェックを入れている場合(<a href="#desc-config">後述</a>)、艦隊の現在位置や戦闘結果を合わせて表示します。具体例については、<a href="#kancolle-info">モック</a>を使って<samp>設定</samp>タブで該当設定を変更してから<samp>第1艦隊</samp>の部分を確認してみてください。
 表示の意味は以下のとおりです。
 </p>
 <dl>
@@ -541,6 +542,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 </dl>
 <p>
 レベル・耐久値・疲労度・燃料残量・弾薬残量については、直前の操作で変更があった場合、背景が点滅します。
+<q>戦闘情報を表示する</q>場合、耐久値は戦闘開始時に戦闘結果のものが反映されます。ただし、戦闘中に<q>戦闘情報を表示する</q>かどうかを変更しても表示内容は変化しません。
 </p>
 <p>
 <b>入渠ドック情報</b>は、各ドックについて、ドック番号(こちらは装備にかかわらず色は変わりません)を先頭に、艦種から疲労度までは艦隊内各艦の情報と同じものが表示されます。
@@ -650,6 +652,9 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 戦闘で艦娘がドロップしたり、イベント海域でクリア報酬として装備品や艦娘を入手した場合、表示にうまく反映されない場合があります。
 その場合は母港に戻った時点でたぶん反映されます。
 </p>
+<p>
+燃料・弾薬の消費は一連の戦闘が終了した後で表示に反映されます。つまり、昼戦と夜戦が連続した場合、夜戦開始時には本来は既に昼戦分の燃料・弾薬が消費されているはずですが、それは表示には反映されません。
+</p>
 
 <h2 id="notice">注意事項</h2>
 <p>
@@ -678,7 +683,7 @@ kancolleinfoの中身を改造・流用するのは自由にやっていただ�
 <h2 id="histroy">履歴</h2>
 <dl>
   <dt>????-??-??</dt>
-  <dd id="v110">ver 1.1.0<br>艦隊情報の「未補給艦あり」の文字色を艦隊内最低燃料/弾薬の文字色に合わせた。<br>艦隊情報の「入渠艦あり」の文字色を(出撃できないわけなので)赤色に変更。<br>戦闘情報を表示している場合、大破艦があれば艦隊情報の「出撃中」の文字色を赤色に。<br>戦闘情報を表示している場合の、自艦隊轟沈艦の表示を修正。</dd>
+  <dd id="v110">ver 1.1.0<br>戦闘情報を表示しない場合にも自艦隊の損害が表示されていた不具合を修正。<br>戦闘情報を表示している場合の、自艦隊轟沈艦の表示を修正。<br>艦隊情報の「未補給艦あり」の文字色を艦隊内最低燃料/弾薬の文字色に合わせた。<br>艦隊情報の「入渠艦あり」の文字色を(出撃できないわけなので)赤色に変更。<br>大破艦があれば艦隊情報の「出撃中」の文字色を赤色に。</dd>
   <dt>2014-10-09</dt>
   <dd id="v101">ver 1.0.1<br>編成変更の際、艦の並びが正しく反映されないことのあった不具合を修正。</dd>
   <dt>2014-10-08</dt>

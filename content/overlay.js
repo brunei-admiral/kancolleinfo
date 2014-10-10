@@ -389,13 +389,6 @@ function captureAndSave(evt) {
 }
 
 function time2str(dt) {
-  var s;
-  if (dt.getDate() != new Date().getDate()) {
-    s = dt.toLocaleFormat("%H:%M");
-  }
-  else {
-    s = dt.toLocaleFormat("%H:%M");
-  }
   return dt.toLocaleFormat(dt.getDate() != new Date().getDate() ? "%m/%d %H:%M" : "%H:%M");
 }
 
@@ -423,6 +416,17 @@ function hash2str(obj) {
     s += prop + "=" + obj[prop];
   }
   return s;
+}
+
+function map2str(map) {
+  var cell = "-";
+  if (map.api_no == map.api_bosscell_no) {
+    cell = "*";
+  }
+  else if (map.api_enemy) {
+    cell = "+";
+  }
+  return cell + " " + map.api_maparea_id + "-" + map.api_mapinfo_no + "-" + map.api_no;
 }
 
 function shipType(ship) {
@@ -610,17 +614,6 @@ function shipBull(ship) {
     col += " blink";
   }
   return '<td class="ship-bull ' + col + '" title="' + ship.bull + '/' + ship.bull_max + '">' + Math.floor(ship.bull * 100 / ship.bull_max) + '%</td>';
-}
-
-function map2str(map) {
-  var cell = "-";
-  if (map.api_no == map.api_bosscell_no) {
-    cell = "*";
-  }
-  else if (map.api_enemy) {
-    cell = "+";
-  }
-  return cell + " " + map.api_maparea_id + "-" + map.api_mapinfo_no + "-" + map.api_no;
 }
 
 function damageKouku(deck, enemies, kouku) {

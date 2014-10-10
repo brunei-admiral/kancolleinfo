@@ -8,6 +8,41 @@ JUST.testCase({
     kcif.ship_master = {100: {"name": "テスト100"}};
   },
 
+  testTime2str: function(){
+    var dt = new Date();
+    assertEqual(dt.toLocaleFormat("%H:%M"), time2str(dt));
+    dt.setDate(dt.getDate() + 1 > 29 ? 1 : dt.getDate() + 1);
+    assertEqual(dt.toLocaleFormat("%m/%d %H:%M"), time2str(dt));
+  },
+
+  testGetTimeColor: function(){
+    var dt = new Date(new Date().getTime() - 500);
+    assertEqual("color-red", getTimeColor(dt));
+    dt = new Date();
+    assertEqual("color-red", getTimeColor(dt));
+    dt = new Date(new Date().getTime() + 500);
+    assertEqual("color-orange", getTimeColor(dt));
+    dt = new Date(new Date().getTime() + 59500);
+    assertEqual("color-orange", getTimeColor(dt));
+    dt = new Date(new Date().getTime() + 60500);
+    assertEqual("color-yellow", getTimeColor(dt));
+    dt = new Date(new Date().getTime() + 5 * 60000 - 500);
+    assertEqual("color-yellow", getTimeColor(dt));
+    dt = new Date(new Date().getTime() + 5 * 60000 + 500);
+    assertEqual("color-default", getTimeColor(dt));
+    dt = new Date(0);
+    assertEqual("color-red", getTimeColor(dt));
+  },
+
+  testHash2str: function(){
+    var hash = {};
+    assertEqual("", hash2str(hash));
+    hash["a"] = 123;
+    assertEqual("a=123", hash2str(hash));
+    hash["b"] = "abc";
+    assertMatch(/^(?:a=123&b=abc|b=abc&a=123)$/, hash2str(hash));
+  },
+
   testShipType: function(){
     var ship = {
       type: 0

@@ -61,6 +61,10 @@ function assert(result, message) {
   }
 }
 
+function assertEqual(expected, result, message) {
+  assert(expected == result, message || String(expected) + " is expected, but was " + String(result));
+}
+
 function assertMatch(reg, str, message) {
   assert(reg.test(str), message || reg + "\ndid not match with\n" + str);
 }

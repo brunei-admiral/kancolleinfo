@@ -188,4 +188,61 @@ JUST.testCase({
     ship.bull_max = 99;
     assertMatch(/^<td class="ship-bull color-orange" title="49\/99">49%<\/td>$/, shipBull(ship));
   },
+
+  testCompareShip: function(){
+    var a = {
+      api_id: 1,
+      type: 3,
+      sort_no: 1,
+      level: 2,
+      hp: 10,
+      hp_max: 10,
+      cond: 49,
+    };
+    var b = {
+      api_id: 2,
+      type: 2,
+      sort_no: 2,
+      level: 1,
+      hp: 9,
+      hp_max: 10,
+      cond: 50,
+    };
+
+    kcif.sort_ships = "no+";
+    assert(compareShip(a, b) < 0);
+
+    kcif.sort_ships = "no-";
+    assert(compareShip(a, b) > 0);
+
+    kcif.sort_ships = "type+";
+    assert(compareShip(a, b) > 0);
+
+    kcif.sort_ships = "type-";
+    assert(compareShip(a, b) < 0);
+
+    kcif.sort_ships = "name+";
+    assert(compareShip(a, b) < 0);
+
+    kcif.sort_ships = "name-";
+    assert(compareShip(a, b) > 0);
+
+    kcif.sort_ships = "level+";
+    assert(compareShip(a, b) > 0);
+
+    kcif.sort_ships = "level-";
+    assert(compareShip(a, b) < 0);
+
+    kcif.sort_ships = "hp+";
+    assert(compareShip(a, b) > 0);
+
+    kcif.sort_ships = "hp-";
+    assert(compareShip(a, b) < 0);
+
+    kcif.sort_ships = "cond+";
+    assert(compareShip(a, b) < 0);
+
+    kcif.sort_ships = "cond-";
+    assert(compareShip(a, b) > 0);
+  },
 });

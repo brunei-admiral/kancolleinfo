@@ -930,6 +930,9 @@ function compareShip(a, b) {
   else if (kcif.sort_ships.startsWith("hp")) {
     result = (a.hp / a.hp_max) - (b.hp / b.hp_max);
   }
+  else if (kcif.sort_ships.startsWith("cond")) {
+    result = a.cond - b.cond;
+  }
 
   if (kcif.sort_ships.endsWith("-")) {
     result = -result;
@@ -2054,7 +2057,7 @@ var kcif = {
       var shipstab = kcif.info_div.querySelector("#tab-ships");
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="ship-no"><a class="list-header" href="#"' + (kcif.sort_ships.indexOf("no") == 0 ? ' class="sort-current"' : '') + '>#</a></th><th class="ship-type"><a class="list-header" href="#"' + (kcif.sort_ships.indexOf("type") == 0 ? ' class="sort-current"' : '') + '>艦種</a></th><th class="ship-name"><a class="list-header" href="#"' + (kcif.sort_ships.indexOf("name") == 0 ? ' class="sort-current"' : '') + '>艦名</a></th><th class="ship-level"><a class="list-header" href="#"' + (kcif.sort_ships.indexOf("level") == 0 ? ' class="sort-current"' : '') + '>LV</a></th><th class="ship-hp"' + (kcif.sort_ships.indexOf("hp") == 0 ? ' class="sort-current"' : '') + '><a class="list-header" href="#">耐久</a></th><th class="ship-cond">疲労</th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-desc">所在</th></tr></thead>';
+      html += '<thead><tr><th class="ship-no"><a class="list-header' + (kcif.sort_ships.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="ship-type"><a class="list-header' + (kcif.sort_ships.startsWith("type") ? ' sort-current' : '') + '" href="#">艦種</a></th><th class="ship-name' + (kcif.sort_ships.startsWith("name") ? ' sort-current' : '') + '"><a class="list-header" href="#">艦名</a></th><th class="ship-level"><a class="list-header' + (kcif.sort_ships.startsWith("level") ? ' sort-current' : '') + '" href="#">LV</a></th><th class="ship-hp"><a class="list-header' + (kcif.sort_ships.startsWith("hp") ? ' sort-current' : '') + '" href="#">耐久</a></th><th class="ship-cond"><a class="list-header' + (kcif.sort_ships.startsWith("cond") ? ' sort-current' : '') + '" href="#">疲労</a></th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-desc">所在</th></tr></thead>';
       html += '<tbody>';
 
       var ships = [];
@@ -2118,7 +2121,7 @@ var kcif = {
       var itemstab = kcif.info_div.querySelector("#tab-items");
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="item-no"><a class="list-header" href="#"' + (kcif.sort_items.indexOf("no") == 0 ? ' class="sort-current"' : '') + '>#</a></th><th class="item-type"><a class="list-header" href="#"' + (kcif.sort_items.indexOf("type") == 0 ? ' class="sort-current"' : '') + '>種別</a></th><th class="item-name"><a class="list-header" href="#"' + (kcif.sort_items.indexOf("name") == 0 ? ' class="sort-current"' : '') + '>名称</a></th><th class="ship-name"><a class="list-header" href="#"' + (kcif.sort_items.indexOf("holder") == 0 ? ' class="sort-current"' : '') + '>所在</a></th><th class="ship-level"></th></tr></thead>';
+      html += '<thead><tr><th class="item-no"><a class="list-header' + (kcif.sort_items.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="item-type"><a class="list-header' + (kcif.sort_items.startsWith("type") ? ' sort-current' : '') + '" href="#">種別</a></th><th class="item-name"><a class="list-header' + (kcif.sort_items.startsWith("name") ? ' sort-current' : '') + '" href="#">名称</a></th><th class="ship-name"><a class="list-header' + (kcif.sort_items.startsWith("holder") ? ' sort-current' : '') + '" href="#">所在</a></th><th class="ship-level"></th></tr></thead>';
       html += '<tbody>';
 
       var items = [];

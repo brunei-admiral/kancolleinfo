@@ -290,7 +290,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <div id="tab-ships" class="tab">
     <div class="table-outer"><div class="table-inner"><table>
       <thead>
-        <tr><th class="ship-no"><a class="list-header" href="#">#</a></th><th class="ship-type"><a class="list-header" href="#">艦種</a></th><th class="ship-name"><a class="list-header" href="#">艦名</a></th><th class="ship-level"><a class="list-header" href="#" class="sort-current">LV</a></th><th class="ship-hp"><a class="list-header" href="#">耐久</a></th><th class="ship-cond">疲労</th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-desc">所在</th></tr>
+        <tr><th class="ship-no"><a class="list-header" href="#">#</a></th><th class="ship-type"><a class="list-header" href="#">艦種</a></th><th class="ship-name"><a class="list-header" href="#">艦名</a></th><th class="ship-level"><a class="list-header sort-current" href="#">LV</a></th><th class="ship-hp"><a class="list-header" href="#">耐久</a></th><th class="ship-cond"><a class="list-header" href="#">疲労</a></th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-desc">所在</th></tr>
       </thead>
       <tbody>
         <tr><td class="ship-no">1</td><td class="ship-type">正空</td><td class="ship-name" title="応急修理女神">飛龍改二</td><td class="ship-level">150</td><td class="ship-hp color-green">74/74</td><td class="ship-cond color-green blink">53</td><td class="ship-fuel color-green" title="59/59">100%</td><td class="ship-bull color-green" title="63/63">100%</td><td class="ship-desc"></td></tr>
@@ -318,7 +318,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <div id="tab-items" class="tab">
     <div class="table-outer"><div class="table-inner"><table>
       <thead>
-        <tr><th class="item-no"><a class="list-header" href="#">#</a></th><th class="item-type"><a class="list-header" href="#" class="sort-current">種別</a></th><th class="item-name"><a class="list-header" href="#">名称</a></th><th class="ship-name"><a class="list-header" href="#">所在</a></th><th class="ship-level"></th></tr>
+        <tr><th class="item-no"><a class="list-header" href="#">#</a></th><th class="item-type"><a class="list-header sort-current" href="#">種別</a></th><th class="item-name"><a class="list-header" href="#">名称</a></th><th class="ship-name"><a class="list-header" href="#">所在</a></th><th class="ship-level"></th></tr>
       </thead>
       <tbody>
         <tr><td class="item-no">1</td><td class="item-type">小口径主砲</td><td class="item-name">12.7cm連装砲</td><td class="ship-name" title="12.7cm連装砲 12.7cm連装砲 13号対空電探">吹雪改</td><td class="ship-level">55</td></tr>
@@ -578,6 +578,8 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <dd>レベルの高い順に表示されます。</dd>
   <dt><samp>耐久</samp></dt>
   <dd>被害の割合の高い順に表示されます。ゲーム内の入渠時艦船選択のデフォルトと同じで、耐久最大値に対する耐久現在値の割合で並び順が決定されます。</dd>
+  <dt><samp>疲労</samp></dt>
+  <dd>値の小さい順、つまり、疲労の大きい順に表示されます。</dd>
 </dl>
 
 <h4 id="desc-items">装備</h4>
@@ -682,8 +684,8 @@ kancolleinfoの中身を改造・流用するのは自由にやっていただ�
 
 <h2 id="histroy">履歴</h2>
 <dl>
-  <dt>????-??-??</dt>
-  <dd id="v110">ver 1.1.0<br>戦闘情報を表示しない場合にも自艦隊の損害が表示されていた不具合を修正。<br>戦闘情報を表示している場合の、自艦隊轟沈艦の表示を修正。<br>艦隊情報の「未補給艦あり」の文字色を艦隊内最低燃料/弾薬の文字色に合わせた。<br>艦隊情報の「入渠艦あり」の文字色を(出撃できないわけなので)赤色に変更。<br>大破艦があれば艦隊情報の「出撃中」の文字色を赤色に。</dd>
+  <dt>2014-10-15</dt>
+  <dd id="v110">ver 1.1.0<br>戦闘情報を表示しない場合にも自艦隊の損害が表示されていた不具合を修正。<br>戦闘情報を表示している場合の、自艦隊轟沈艦の表示の不具合を修正。<br>艦娘を疲労度でソートできるように。<br>艦隊情報の「未補給艦あり」の文字色を艦隊内最低燃料/弾薬の文字色に合わせた。<br>艦隊情報の「入渠艦あり」の文字色を(出撃できないわけなので)赤色に変更。<br>大破艦があれば艦隊情報の「出撃中」の文字色を赤色に。</dd>
   <dt>2014-10-09</dt>
   <dd id="v101">ver 1.0.1<br>編成変更の際、艦の並びが正しく反映されないことのあった不具合を修正。</dd>
   <dt>2014-10-08</dt>

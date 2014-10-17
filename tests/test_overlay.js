@@ -270,5 +270,13 @@ JUST.testCase({
     reflectDamage(ship, 3);
     assertEqual(20, ship.hp);
     assertEqual([1, 2, -1, -1, -1], ship.slot);
+
+    // enemy
+    var ship = {
+      hp: 10,
+      hp_max: 20,
+    };
+    reflectDamage(ship, 5);
+    assertEqual(5, ship.hp);
   },
 });

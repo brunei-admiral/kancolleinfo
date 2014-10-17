@@ -429,74 +429,80 @@ function map2str(map) {
   return cell + " " + map.api_maparea_id + "-" + map.api_mapinfo_no + "-" + map.api_no;
 }
 
+function type2str(type) {
+  var s = "";
+  switch (type) {
+    case 1:
+      s = "海防";
+      break;
+    case 2:
+      s = "駆逐";
+      break;
+    case 3:
+      s = "軽巡";
+      break;
+    case 4:
+      s = "雷巡";
+      break;
+    case 5:
+      s = "重巡";
+      break;
+    case 6:
+      s = "航巡";
+      break;
+    case 7:
+      s = "軽空";
+      break;
+    case 8:
+      s = "巡戦";
+      break;
+    case 9:
+      s = "戦艦";
+      break;
+    case 10:
+      s = "航戦";
+      break;
+    case 11:
+      s = "正空";
+      break;
+    case 12:
+      s = "超戦";
+      break;
+    case 13:
+      s = "潜水";
+      break;
+    case 14:
+      s = "潜空";
+      break;
+    case 15:
+      s = "輸送";
+      break;
+    case 16:
+      s = "水母";
+      break;
+    case 17:
+      s = "揚陸";
+      break;
+    case 18:
+      s = "装空";
+      break;
+    case 19:
+      s = "工作";
+      break;
+    case 20:
+      s = "潜母";
+      break;
+    default:
+      s = "(" + ship.type + ")";
+      break;
+  }
+  return s;
+}
+
 function shipType(ship) {
   var s = "";
   if (ship && ship.type) {
-    switch (ship.type) {
-      case 1:
-        s = "海防";
-        break;
-      case 2:
-        s = "駆逐";
-        break;
-      case 3:
-        s = "軽巡";
-        break;
-      case 4:
-        s = "雷巡";
-        break;
-      case 5:
-        s = "重巡";
-        break;
-      case 6:
-        s = "航巡";
-        break;
-      case 7:
-        s = "軽空";
-        break;
-      case 8:
-        s = "巡戦";
-        break;
-      case 9:
-        s = "戦艦";
-        break;
-      case 10:
-        s = "航戦";
-        break;
-      case 11:
-        s = "正空";
-        break;
-      case 12:
-        s = "超戦";
-        break;
-      case 13:
-        s = "潜水";
-        break;
-      case 14:
-        s = "潜空";
-        break;
-      case 15:
-        s = "輸送";
-        break;
-      case 16:
-        s = "水母";
-        break;
-      case 17:
-        s = "揚陸";
-        break;
-      case 18:
-        s = "装空";
-        break;
-      case 19:
-        s = "工作";
-        break;
-      case 20:
-        s = "潜母";
-        break;
-      default:
-        s = "(" + ship.type + ")";
-        break;
-    }
+    s = type2str(ship.type);
   }
   return '<td class="ship-type">' + s + '</td>';
 }
@@ -620,22 +626,24 @@ function reflectDamage(ship, damage) {
   ship.hp -= damage;
   if (ship.hp <= 0) {
     var found = false;
-    for (var i = 0; i < ship.slot.length && ship.slot[i] >= 0 && !found; i++) {
-      var item = kcif.item_list[ship.slot[i]];
-      if (item) {
-        if (item.item_id == 42) {      // 応急修理要員
-          ship.hp = Math.ceil(ship.hp_max / 5);
-          found = true;
-        }
-        else if (item.item_id == 43) { // 応急修理女神
-          ship.hp = ship.hp_max;
-          found = true;
-        }
-        if (found) {
-          for (var j = i + 1; j < ship.slot.length - 1; j++) {
-            ship.slot[j - 1] = ship.slot[j];
+    if (ship.slot) {
+      for (var i = 0; i < ship.slot.length && ship.slot[i] >= 0 && !found; i++) {
+        var item = kcif.item_list[ship.slot[i]];
+        if (item) {
+          if (item.item_id == 42) {      // 応急修理要員
+            ship.hp = Math.ceil(ship.hp_max / 5);
+            found = true;
           }
-          ship.slot[ship.slot.length - 1] = -1;
+          else if (item.item_id == 43) { // 応急修理女神
+            ship.hp = ship.hp_max;
+            found = true;
+          }
+          if (found) {
+            for (var j = i + 1; j < ship.slot.length - 1; j++) {
+              ship.slot[j - 1] = ship.slot[j];
+            }
+            ship.slot[ship.slot.length - 1] = -1;
+          }
         }
       }
     }
@@ -663,7 +671,7 @@ function damageKouku(deck, enemies, kouku) {
       if (enemies[i]) {
         if (damage_list[i + 1] >= 0 && (kouku.api_erai_flag[i + 1] > 0 || kouku.api_ebak_flag[i + 1] > 0)) {
           var damage = Math.floor(damage_list[i + 1]);
-          enemies[i].hp -= damage;
+          reflectDamage(enemies[i], damage);
         }
       }
     }
@@ -687,7 +695,7 @@ function damageRaigeki(deck, enemies, raigeki) {
     if (enemies[i]) {
       if (damage_list[i + 1] >= 0 && raigeki.api_frai.indexOf(i + 1) != -1) {
         var damage = Math.floor(damage_list[i + 1]);
-        enemies[i].hp -= damage;
+        reflectDamage(enemies[i], damage);
       }
     }
   }
@@ -705,7 +713,7 @@ function damageHougeki(deck, enemies, hougeki) {
       }
       else if (target >= 7 && target <= 12) {
         if (enemies[target - 7]) {
-          enemies[target - 7].hp -= damage;
+          reflectDamage(enemies[target - 7], damage);
         }
       }
     }
@@ -743,9 +751,17 @@ function battle(url, json) {
     if (json.api_data.api_nowhps && json.api_data.api_maxhps) {
       for (var i = 0; i < 6; i++) {
         enemies[i] = {
+          ship_id: json.api_data.api_ship_ke[i + 1],
           hp: json.api_data.api_nowhps[i + 7],
           hp_max: json.api_data.api_maxhps[i + 7]
         };
+        var mst = kcif.ship_master[enemies[i].ship_id];
+        if (mst) {
+          enemies[i].name = mst.name;
+          if (mst.sort_no == 0 && mst.yomi != "-") {
+            enemies[i].name += mst.yomi;
+          }
+        }
       }
     }
 
@@ -776,7 +792,7 @@ function battle(url, json) {
             var damage = support.api_support_airatack.api_damage;
             for (var i = 0; i < 6; i++) {
               if (damage[i + 1] > 0 && enemies[i]) {
-                enemies[i].hp -= Math.floor(damage[i + 1]);
+                reflectDamage(enemies[i], Math.floor(damage[i + 1]));
               }
             }
           }
@@ -785,7 +801,7 @@ function battle(url, json) {
             var damage = support.api_support_hourai.api_damage;
             for (var i = 0; i < 6; i++) {
               if (damage[i + 1] > 0 && enemies[i]) {
-                enemies[i].hp -= Math.floor(damage[i + 1]);
+                reflectDamage(enemies[i], Math.floor(damage[i + 1]));
               }
             }
           }
@@ -839,20 +855,25 @@ function battle(url, json) {
     var s = "";
     for (var i = 0; i < 6; i++) {
       if (enemies[i] && enemies[i].hp_max > 0) {
+        var t = "";
+        if (enemies[i].name) {
+          t += enemies[i].name + " ";
+        }
+        t += String(enemies[i].hp) + "/" + String(enemies[i].hp_max);
         if (enemies[i].hp > enemies[i].hp_max * 3 / 4) {
-          s += "<span class='color-green'>◎</span>";
+          s += "<span class='color-green' title='" + t + "'>◎</span>";
         }
         else if (enemies[i].hp > enemies[i].hp_max / 2) {
-          s += "<span class='color-yellow'>◎</span>";
+          s += "<span class='color-yellow' title='" + t + "'>◎</span>";
         }
         else if (enemies[i].hp > enemies[i].hp_max / 4) {
-          s += "<span class='color-orange'>○</span>";
+          s += "<span class='color-orange' title='" + t + "'>○</span>";
         }
         else if (enemies[i].hp > 0) {
-          s += "<span class='color-red'>△</span>";
+          s += "<span class='color-red' title='" + t + "'>△</span>";
         }
         else if (enemies[i].hp <= 0) {
-          s += "<span class='color-gray'>×</span>";
+          s += "<span class='color-gray' title='" + t + "'>×</span>";
         }
       }
     }
@@ -1133,6 +1154,7 @@ function kcifCallback(request, content, query) {
       master[ship.api_id] = {
         ship_id: ship.api_id,
         name: ship.api_name,
+        yomi: ship.api_yomi,
         type: ship.api_stype,
         afterlv: ship.api_afterlv,
         aftershipid: ship.api_aftershipid,

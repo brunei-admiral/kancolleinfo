@@ -616,6 +616,35 @@ function shipBull(ship) {
   return '<td class="ship-bull ' + col + '" title="' + ship.bull + '/' + ship.bull_max + '">' + Math.floor(ship.bull * 100 / ship.bull_max) + '%</td>';
 }
 
+function reflectDamage(ship, damage) {
+  ship.hp -= damage;
+  if (ship.hp <= 0) {
+    var found = false;
+    for (var i = 0; i < ship.slot.length && ship.slot[i] >= 0 && !found; i++) {
+      var item = kcif.item_list[ship.slot[i]];
+      if (item) {
+        if (item.item_id == 42) {      // 応急修理要員
+          ship.hp = Math.ceil(ship.hp_max / 5);
+          found = true;
+        }
+        else if (item.item_id == 43) { // 応急修理女神
+          ship.hp = ship.hp_max;
+          found = true;
+        }
+        if (found) {
+          for (var j = i + 1; j < ship.slot.length - 1; j++) {
+            ship.slot[j - 1] = ship.slot[j];
+          }
+          ship.slot[ship.slot.length - 1] = -1;
+        }
+      }
+    }
+    if (!found) {
+      ship.hp = 0;
+    }
+  }
+}
+
 function damageKouku(deck, enemies, kouku) {
   if (kouku) {
     var damage_list = kouku.api_fdam;
@@ -625,7 +654,7 @@ function damageKouku(deck, enemies, kouku) {
         var damage = Math.floor(damage_list[i + 1]);
         log("    ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
         var ship = kcif.ship_list[id];
-        ship.hp -= damage;
+        reflectDamage(ship, damage);
       }
     }
 
@@ -649,7 +678,7 @@ function damageRaigeki(deck, enemies, raigeki) {
       var damage = Math.floor(damage_list[i + 1]);
       log("    ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
       var ship = kcif.ship_list[id];
-      ship.hp -= damage;
+      reflectDamage(ship, damage);
     }
   }
 
@@ -672,7 +701,7 @@ function damageHougeki(deck, enemies, hougeki) {
         var id = deck.api_ship[target - 1];
         log("    ship " + target + "(" + String(id) + ") damaged " + damage);
         var ship = kcif.ship_list[id];
-        ship.hp -= damage;
+        reflectDamage(ship, damage);
       }
       else if (target >= 7 && target <= 12) {
         if (enemies[target - 7]) {
@@ -1578,10 +1607,12 @@ var kcif = {
       sheet.insertRule('#kancolle-info #tab-main #kdock { width: 302px; float: left; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-main table { position: relative; top: -3px; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-main input.check-timer { padding: 0; margin: 0 0 0 4px; position: relative; top: 2px;}', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config table { width: 100%; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-config td.config-header { text-align: right; width: 12em; padding: 2px 16px 0 0; color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-config td.config-label { text-align: right; width: 12em; padding-right: 16px; }', sheet.length);
-      sheet.insertRule('#kancolle-info #tab-config td.config-input { text-align: left; width: 40em; }', sheet.length);
-      sheet.insertRule('#kancolle-info #tab-config td.config-input input[type=text] { width: 100%; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config td.version { text-align: right; color: silver; font-weight: bold; padding-right: 16px; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config td.config-input { text-align: left; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config td.config-input input[type=text] { width: 40em; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-config td.config-input input[type=number] { width: 4em; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-config td.config-input input[type=checkbox] { padding: 0; margin: 0 4px 0 0; position: relative; top: 2px; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-config div.config-buttons { text-align: center; }', sheet.length);
@@ -1955,10 +1986,10 @@ var kcif = {
             s += ' <span class="color-gray"">制空:' + seiku + '</span>';
             s += ' <span class="color-gray" title="' + kira.join(', ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
             if (drum > 0) {
-              s += ' <span class="color-gray" title="' + drum_ship.join(', ') + '">ドラム缶:' + drum + '/' + drum_ship.length + '</span>';
+              s += ' <span class="color-gray" title="' + drum_ship.join(', ') + '">ドラム:' + drum + '/' + drum_ship.length + '</span>';
             }
             if (dai > 0) {
-              s += ' <span class="color-gray" title="' + dai_ship.join(', ') + '">大発動艇:' + dai + '</span>';
+              s += ' <span class="color-gray" title="' + dai_ship.join(', ') + '">大発:' + dai + '</span>';
             }
           }
 

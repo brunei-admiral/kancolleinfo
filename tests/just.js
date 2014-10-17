@@ -62,7 +62,25 @@ function assert(result, message) {
 }
 
 function assertEqual(expected, result, message) {
-  assert(expected == result, message || String(expected) + " is expected, but was " + String(result));
+  var cond;
+  if (expected instanceof Array && result instanceof Array) {
+    if (expected.length != result.length) {
+      cond = false;
+    }
+    else {
+      cond = true;
+      for (var i = 0; i < expected.length; i++) {
+        if (expected[i] != result[i]) {
+          cond = false;
+          break;
+        }
+      }
+    }
+  }
+  else {
+    cond = expected == result;
+  }
+  assert(cond, message || String(expected) + " is expected, but was " + String(result));
 }
 
 function assertMatch(reg, str, message) {

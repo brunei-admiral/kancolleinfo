@@ -4,7 +4,7 @@ phantom.injectJs("../content/overlay.js");
 
 JUST.testCase({
   setup: function(){
-    kcif.item_list = {1: {"name": "アイテム1"}, 2: {"name": "アイテム2"}};
+    kcif.item_list = {1: {"name": "アイテム1"}, 2: {"name": "アイテム2"}, 3: {"name": "応急修理要員", item_id: 42}, 4: {"name": "応急修理女神", item_id: 43}};
     kcif.ship_master = {100: {"name": "テスト100"}};
   },
 
@@ -244,5 +244,31 @@ JUST.testCase({
 
     kcif.sort_ships = "cond-";
     assert(compareShip(a, b) > 0);
+  },
+
+  testReflectDamage: function(){
+    var ship = {
+      hp: 10,
+      hp_max: 20,
+      slot: [-1, -1, -1, -1, -1],
+    };
+    reflectDamage(ship, 5);
+    assertEqual(5, ship.hp);
+    reflectDamage(ship, 3);
+    assertEqual(2, ship.hp);
+    reflectDamage(ship, 3);
+    assertEqual(0, ship.hp);
+
+    ship.hp = 2;
+    ship.slot = [1, 3, 2, -1, -1]
+    reflectDamage(ship, 3);
+    assertEqual(4, ship.hp);
+    assertEqual([1, 2, -1, -1, -1], ship.slot);
+
+    ship.hp = 2;
+    ship.slot = [1, 4, 2, -1, -1]
+    reflectDamage(ship, 3);
+    assertEqual(20, ship.hp);
+    assertEqual([1, 2, -1, -1, -1], ship.slot);
   },
 });

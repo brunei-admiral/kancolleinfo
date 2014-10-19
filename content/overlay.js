@@ -2135,6 +2135,8 @@ var kcif = {
 
       // 艦娘
       var shipstab = kcif.info_div.querySelector("#tab-ships");
+      var table = shipstab.querySelector("div.table-inner");
+      var pos = table ? table.scrollTop : 0;
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
       html += '<thead><tr><th class="ship-no"><a class="list-header' + (kcif.sort_ships.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="ship-type"><a class="list-header' + (kcif.sort_ships.startsWith("type") ? ' sort-current' : '') + '" href="#">艦種</a></th><th class="ship-name' + (kcif.sort_ships.startsWith("name") ? ' sort-current' : '') + '"><a class="list-header" href="#">艦名</a></th><th class="ship-level"><a class="list-header' + (kcif.sort_ships.startsWith("level") ? ' sort-current' : '') + '" href="#">LV</a></th><th class="ship-hp"><a class="list-header' + (kcif.sort_ships.startsWith("hp") ? ' sort-current' : '') + '" href="#">耐久</a></th><th class="ship-cond"><a class="list-header' + (kcif.sort_ships.startsWith("cond") ? ' sort-current' : '') + '" href="#">疲労</a></th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-desc">所在</th></tr></thead>';
@@ -2179,6 +2181,7 @@ var kcif = {
       html += '</tbody>';
       html += '</table></div></div>';
       shipstab.innerHTML = html;
+      shipstab.querySelector("div.table-inner").scrollTop = pos;
 
       // 艦娘:ヘッダ行リンク
       var elems = shipstab.querySelectorAll("th a");
@@ -2199,6 +2202,8 @@ var kcif = {
 
       // アイテム
       var itemstab = kcif.info_div.querySelector("#tab-items");
+      table = itemstab.querySelector("div.table-inner");
+      pos = table ? table.scrollTop : 0;
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
       html += '<thead><tr><th class="item-no"><a class="list-header' + (kcif.sort_items.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="item-type"><a class="list-header' + (kcif.sort_items.startsWith("type") ? ' sort-current' : '') + '" href="#">種別</a></th><th class="item-name"><a class="list-header' + (kcif.sort_items.startsWith("name") ? ' sort-current' : '') + '" href="#">名称</a></th><th class="ship-name"><a class="list-header' + (kcif.sort_items.startsWith("holder") ? ' sort-current' : '') + '" href="#">所在</a></th><th class="ship-level"></th></tr></thead>';
@@ -2266,6 +2271,7 @@ var kcif = {
       html += '</tbody>';
       html += '</table></div></div>';
       itemstab.innerHTML = html;
+      itemstab.querySelector("div.table-inner").scrollTop = pos;
 
       // アイテム:ヘッダ行リンク
       var elems = itemstab.querySelectorAll("th a");

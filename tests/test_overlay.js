@@ -5,6 +5,7 @@ phantom.injectJs("../content/overlay.js");
 JUST.testCase({
   setup: function(){
     kcif.item_list = {1: {"name": "アイテム1"}, 2: {"name": "アイテム2"}, 3: {"name": "応急修理要員", item_id: 42}, 4: {"name": "応急修理女神", item_id: 43}};
+    kcif.ship_list = {100: {"name": "明石", type: 19}};
     kcif.ship_master = {100: {"name": "テスト100"}};
   },
 
@@ -278,5 +279,21 @@ JUST.testCase({
     };
     reflectDamage(ship, 5);
     assertEqual(5, ship.hp);
+  },
+
+  testUpdateRepairStart: function(){
+    kcif.repair_start = [null, null, null, null];
+    kcif.deck_list[0] = {
+      api_ship: [100, -1, -1, -1, -1, -1, -1],
+    };
+    refute(kcif.repair_start[0]);
+    updateRepairStart(0);
+    assert(true, !!kcif.repair_start[0]);
+    kcif.deck_list[0].api_ship[0] = 101;
+    updateRepairStart(0);
+    refute(kcif.repair_start[0]);
+    kcif.deck_list[0].api_ship[1] = 100;
+    updateRepairStart(0);
+    refute(kcif.repair_start[0]);
   },
 });

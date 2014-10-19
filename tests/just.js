@@ -22,7 +22,7 @@ var JUST = {
             console.log("[" + (JUST.failures + JUST.errors) + "] Failure: " + prop);
             console.log(ex.message);
             stack = stack.replace(/^.*?\n/, "");
-            var re = /^\s+at assert.*?\n/;
+            var re = /^\s+at (?:assert|refute).*?\n/;
             while (re.test(stack)) {
               stack = stack.replace(re, "");
             }
@@ -59,6 +59,10 @@ function assert(result, message) {
   else {
     throw new JUST.FailedAssertion(message || "no message given");
   }
+}
+
+function refute(result, message) {
+  return assert(!result, message);
 }
 
 function assertEqual(expected, result, message) {

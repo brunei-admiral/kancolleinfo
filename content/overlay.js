@@ -888,6 +888,19 @@ function battle(url, json) {
   }
 }
 
+function updateRepairStart(idx) {
+  var deck = kcif.deck_list[idx];
+  if (deck && deck.api_ship[0] >= 0) {
+    var ship = kcif.ship_list[deck.api_ship[0]];
+    if (ship && ship.type == 19) { // 工作艦
+      kcif.repair_start[idx] = new Date().getTime();
+    }
+    else {
+      kcif.repair_start[idx] = null;
+    }
+  }
+}
+
 function removeFromDeck(ship_id) {
   var found = false;
   for (var i = 0, deck; (deck = kcif.deck_list[i]) && !found; i++) {
@@ -903,6 +916,7 @@ function removeFromDeck(ship_id) {
           deck.api_ship[k - 1] = deck.api_ship[k];
         }
         deck.api_ship[5] = -1;
+        updateRepairStart(i);
         found = true;
         break;
       }
@@ -1236,6 +1250,7 @@ function kcifCallback(request, content, query) {
       for (var i = 1; i < 6; i++) {
         deck.api_ship[i] = -1;
       }
+      updateRepairStart(deck_id - 1);
     }
     else if (ship_id < 0) {
       removeFromDeck(deck.api_ship[idx]);
@@ -1264,9 +1279,11 @@ function kcifCallback(request, content, query) {
               break;
             }
           }
+          updateRepairStart(i);
         }
         deck.api_ship[idx] = ship_id;
       }
+      updateRepairStart(deck_id - 1);
     }
     update_all = false;
   }
@@ -1477,6 +1494,7 @@ var kcif = {
   beep: null,
   sort_ships: "level-",
   sort_items: "type+",
+  repair_start: [null, null, null, null],
   storage: null,
   ship_master: {},
   item_master: {},
@@ -1938,7 +1956,16 @@ var kcif = {
           }
           else {
             if (ships.length > 0 && ships[0].type == 19) { // 工作艦
-              s = ' <span class="color-yellow">[修理中]</span>';
+              var t = "";
+              if (kcif.repair_start[i]) {
+                var rt = kcif.repair_start[i];
+                var now = new Date().getTime();
+                while (rt < now) {
+                  rt += 20 * 60 * 1000;
+                }
+                t += " 予想更新時刻" + time2str(new Date(rt));
+              }
+              s = ' <span class="color-yellow">[修理中' + t + ']</span>';
             }
             else {
               s = "";

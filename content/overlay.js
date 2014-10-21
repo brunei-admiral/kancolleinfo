@@ -1096,6 +1096,10 @@ function kcifCallback(request, content, query) {
     if (ship && Number(query["api_highspeed"])) {
       ship.p_hp = ship.hp;
       ship.hp = ship.hp_max;
+      if (ship.cond < 40) {
+        ship.p_cond = ship.cond;
+        ship.cond = 40;
+      }
       log("nyukyo");
     }
   }
@@ -1106,6 +1110,10 @@ function kcifCallback(request, content, query) {
       if (ship) {
         ship.p_hp = ship.hp;
         ship.hp = ship.hp_max;
+        if (ship.cond < 40) {
+          ship.p_cond = ship.cond;
+          ship.cond = 40;
+        }
       }
       kcif.repair[dock_id - 1].api_ship_id = 0;
       kcif.repair[dock_id - 1].api_complete_time = 0;

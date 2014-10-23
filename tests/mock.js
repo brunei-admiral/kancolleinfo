@@ -3,6 +3,23 @@ var XPCOMUtils = {
   }
 };
 
+var Services = {
+  console: console,
+}
+
+console.logStringMessage = console.log;
+
+Array.join = function(ary, sep){
+  var s = "";
+  for (var i = 0; i < ary.length; i++) {
+    if (i > 0) {
+      s += sep;
+    }
+    s += ary[i];
+  }
+  return s;
+};
+
 Date.prototype.toLocaleFormat = function(format){
   return format;
 };

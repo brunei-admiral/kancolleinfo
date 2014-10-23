@@ -957,7 +957,8 @@ function makeShip(data) {
     p_bull: prev ? prev.bull : data.api_bull,
     bull: data.api_bull,
     slot: data.api_slot,
-    equip: data.api_onslot
+    equip: data.api_onslot,
+    ndock_item: data.api_ndock_item
   };
   if (kcif.ship_master[data.api_ship_id]) {
     ship.name = kcif.ship_master[data.api_ship_id].name;
@@ -1060,6 +1061,24 @@ function kcifCallback(request, content, query) {
     }
     update_all = false;
   }
+  else if (url.indexOf("/createship_speedchange") != -1) {
+    dock = kcif.build[Number(query["api_kdock_id" - 1])];
+    if (dock) {
+      kcif.material[4] -= dock.api_state == 3 ? 20 : 1;
+    }
+    update_all = false;
+  }
+  else if (url.indexOf("/createship") != -1) {
+    for (var i = 0; i < kcif.material.length; i++) {
+      if (query["api_item" + (i + 1)]) {
+        kcif.material[i] -= Number(query["api_item" + (i + 1)]);
+      }
+    }
+    if (Number(query["api_highspeed"]) > 0) {
+      kcif.material[4] -= Number(query["api_large_flag"]) > 0 ? 20 : 1;
+    }
+    update_all = false;
+  }
   else if (url.indexOf("/destroyship") != -1) {
     var id = query.api_ship_id;
     var ship = kcif.ship_list[id];
@@ -1073,12 +1092,18 @@ function kcifCallback(request, content, query) {
       delete kcif.ship_list[id];
     }
     kcif.ship_num--;
+    for (var i = 0; i < json.api_data.api_material.length; i++) {
+      kcif.material[i] = json.api_data.api_material[i];
+    }
     log("destroyship: " + String(kcif.ship_num) + " ships, " + String(kcif.item_num) + " items");
   }
   else if (url.indexOf("/createitem") != -1) {
     if (json.api_data.api_create_flag > 0) {
       makeItem(json.api_data.api_slot_item, null);
       kcif.item_num++;
+    }
+    for (var i = 0; i < json.api_data.api_material.length; i++) {
+      kcif.material[i] = json.api_data.api_material[i];
     }
     log("createitem: " + String(kcif.item_num) + " items");
   }
@@ -1089,6 +1114,9 @@ function kcifCallback(request, content, query) {
       delete kcif.item_list[id];
     }
     kcif.item_num -= ids.length;
+    for (var i = 0; i < json.api_data.api_get_material.length; i++) {
+      kcif.material[i] += json.api_data.api_get_material[i];
+    }
     log("destroyitem2: " + String(kcif.item_num) + " items");
   }
   else if (url.indexOf("nyukyo/start") != -1) {
@@ -1100,6 +1128,11 @@ function kcifCallback(request, content, query) {
         ship.p_cond = ship.cond;
         ship.cond = 40;
       }
+      if (ship.ndock_item) {
+        kcif.material[0] -= ship.ndock_item[0];
+        kcif.material[2] -= ship.ndock_item[1];
+      }
+      kcif.material[5]--;
       log("nyukyo");
     }
   }
@@ -1115,6 +1148,7 @@ function kcifCallback(request, content, query) {
           ship.cond = 40;
         }
       }
+      kcif.material[5]--;
       kcif.repair[dock_id - 1].api_ship_id = 0;
       kcif.repair[dock_id - 1].api_complete_time = 0;
       log("nyukyo speedchange");
@@ -1246,6 +1280,9 @@ function kcifCallback(request, content, query) {
         ship.bull = data.api_bull;
       }
     }
+    for (var i = 0; i < json.api_data.api_material.length; i++) {
+      kcif.material[i] = json.api_data.api_material[i];
+    }
     log("charged");
   }
   else if (url.indexOf("/change") != -1) {
@@ -1321,6 +1358,12 @@ function kcifCallback(request, content, query) {
     }
     update_all = false;
   }
+  else if (url.indexOf("/mission/result") != -1) {
+    for (var i = 0; i < json.api_data.api_get_material.length; i++) {
+      kcif.material[i] += json.api_data.api_get_material[i];
+    }
+    update_all = false;
+  }
   else if (url.indexOf("/ship") != -1 || url.indexOf("/port") != -1) {
     var port = url.indexOf("/port") != -1;
     var ship2 = url.indexOf("/ship2") != -1;
@@ -1351,6 +1394,11 @@ function kcifCallback(request, content, query) {
     }
     if (port || ship2) {
       kcif.ship_num = i;
+    }
+    if (port) {
+      for (var i = 0, data; data = json.api_data.api_material[i]; i++) {
+        kcif.material[data.api_id - 1] = data.api_value;
+      }
     }
 
     log("etc: " + String(kcif.ship_num) + " ships (" + (port ? "port" : ship2 ? "ship2" : "ship3") + ")");
@@ -1482,7 +1530,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(getship|destroyship|createitem|destroyitem2)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next)|api_req_mission\/result)$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);
@@ -1516,6 +1564,7 @@ var kcif = {
   ship_max: 0,
   item_num: 0,
   item_max: 0,
+  material: [0, 0, 0, 0, 0, 0, 0, 0],
   timer: null,
 
   init: function(event) {
@@ -1580,7 +1629,6 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .list-header { color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab a.list-header:hover { color: yellow !important; dext-decoration: none !important; font-weight: bold !important; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab h2 .fleet-name { float: right; color: #ccc; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab table tr { padding: 0; margin: 0; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab table th, #kancolle-info .tab table td { padding: 0; margin: 0; line-height: 1.2; }', sheet.length);
@@ -1598,7 +1646,10 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-type { width: 8em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-name { font-weight: bold; width: 14em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .res-name { font-weight: bold; width: 6em; padding-left: 1.5em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .res-value { text-align: right; width: 4.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab a.sort-current { color: yellow; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-main #resource { width: 174px; float: right; padding-left: 8px; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-main #ndock { width: 482px; float: left; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-main #kdock { width: 302px; float: left; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-main table { position: relative; top: -3px; }', sheet.length);
@@ -1820,6 +1871,21 @@ var kcif = {
       var maintab = kcif.info_div.querySelector("#tab-main");
       var checks = saveCheckboxes();
       html = "";
+
+      html += '<div id="resource">';
+      html += '<h2><span class="list-header">資源等</span></h2>';
+      html += '<table>';
+      html += '<tr><th class="res-name">燃料</th><td class="res-value">' + kcif.material[0] + '</td></tr>';
+      html += '<tr><th class="res-name">弾薬</th><td class="res-value">' + kcif.material[1] + '</td></tr>';
+      html += '<tr><th class="res-name">鋼材</th><td class="res-value">' + kcif.material[2] + '</td></tr>';
+      html += '<tr><th class="res-name">ボーキサイト</th><td class="res-value">' + kcif.material[3] + '</td></tr>';
+      html += '<tr><th class="res-name">&nbsp;</th><td class="res-value">&nbsp;</td></tr>';
+      html += '<tr><th class="res-name">高速修復材</th><td class="res-value">' + kcif.material[5] + '</td></tr>';
+      html += '<tr><th class="res-name">開発資材</th><td class="res-value">' + kcif.material[6] + '</td></tr>';
+      html += '<tr><th class="res-name">高速建造材</th><td class="res-value">' + kcif.material[4] + '</td></tr>';
+      html += '</table>';
+      html += '</div>';
+
       for (var i = 0; i < 4; i++) {
         var deck = kcif.deck_list[i];
         var lhtml = "";
@@ -1998,7 +2064,7 @@ var kcif = {
             }
           }
 
-          html += '<h2><a class="list-header" href="#">第' + (i + 1) + '艦隊</a>' + s + '<span class="fleet-name">「' + deck.api_name + '」</span></h2>';
+          html += '<h2><a class="list-header" href="#" title="' + deck.api_name + '">第' + (i + 1) + '艦隊</a>' + s + '</h2>';
         }
         else {
           html += '<h2><span class="list-header" href="#">第' + (i + 1) + '艦隊</span> <span class="color-gray">[未解放]</span></h2>';

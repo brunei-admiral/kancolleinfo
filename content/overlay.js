@@ -929,6 +929,7 @@ function makeItem(data, ship_id) {
   var item = {
     api_id: data.api_id,
     item_id: data.api_slotitem_id,
+    level: data.api_level,
     name: kcif.item_master[data.api_slotitem_id].name,
     type: kcif.item_master[data.api_slotitem_id].type,
     sort_no: kcif.item_master[data.api_slotitem_id].sort_no,
@@ -1062,9 +1063,11 @@ function kcifCallback(request, content, query) {
     update_all = false;
   }
   else if (url.indexOf("/createship_speedchange") != -1) {
-    dock = kcif.build[Number(query["api_kdock_id" - 1])];
+    dock = kcif.build[Number(query["api_kdock_id"]) - 1];
     if (dock) {
-      kcif.material[4] -= dock.api_state == 3 ? 20 : 1;
+      dock.api_state = 3;
+      dock.api_complete_time = 0;
+      kcif.material[4] -= 1;
     }
     update_all = false;
   }
@@ -1119,6 +1122,28 @@ function kcifCallback(request, content, query) {
     }
     log("destroyitem2: " + String(kcif.item_num) + " items");
   }
+  else if (url.indexOf("/remodel_slot") != -1) {
+    if (json.api_data.api_after_material) {
+      for (var i = 0; i < json.api_data.api_after_material.length; i++) {
+        kcif.material[i] = json.api_data.api_after_material[i];
+      }
+    }
+    if (json.api_data.api_after_slot) {
+      var item = kcif.item_list[json.api_data.api_after_slot.api_id];
+      if (item) {
+        item.item_id = json.api_data.api_after_slot.api_slotitem_id;
+        item.level = json.api_data.api_after_slot.api_level;
+        if (kcif.item_master[item.item_id]) {
+          item.name = kcif.item_master[item.item_id].name;
+          item.type = kcif.item_master[item.item_id].type;
+          item.sort_no = kcif.item_master[item.item_id].sort_no;
+          item.taiku = kcif.item_master[item.item_id].taiku;
+          item.type_name = kcif.item_master[item.item_id].type_name;
+        }
+      }
+    }
+    log("remodel_slot");
+  }
   else if (url.indexOf("nyukyo/start") != -1) {
     var ship = kcif.ship_list[Number(query["api_ship_id"])];
     if (ship && Number(query["api_highspeed"])) {
@@ -1128,13 +1153,13 @@ function kcifCallback(request, content, query) {
         ship.p_cond = ship.cond;
         ship.cond = 40;
       }
-      if (ship.ndock_item) {
-        kcif.material[0] -= ship.ndock_item[0];
-        kcif.material[2] -= ship.ndock_item[1];
-      }
       kcif.material[5]--;
-      log("nyukyo");
     }
+    if (ship.ndock_item) {
+      kcif.material[0] -= ship.ndock_item[0];
+      kcif.material[2] -= ship.ndock_item[1];
+    }
+    log("nyukyo");
   }
   else if (url.indexOf("/speedchange") != -1) {
     var dock_id = Number(query["api_ndock_id"]);
@@ -1358,11 +1383,10 @@ function kcifCallback(request, content, query) {
     }
     update_all = false;
   }
-  else if (url.indexOf("/mission/result") != -1) {
-    for (var i = 0; i < json.api_data.api_get_material.length; i++) {
-      kcif.material[i] += json.api_data.api_get_material[i];
+  else if (url.indexOf("/material") != -1) {
+    for (var i = 0, data; data = json.api_data[i]; i++) {
+      kcif.material[data.api_id - 1] = data.api_value;
     }
-    update_all = false;
   }
   else if (url.indexOf("/ship") != -1 || url.indexOf("/port") != -1) {
     var port = url.indexOf("/port") != -1;
@@ -1582,7 +1606,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next)|api_req_mission\/result)$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item|material)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);
@@ -1698,6 +1722,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-type { width: 8em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-name { font-weight: bold; width: 14em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .item-level { text-align: right; width: 2.2em; padding-right: 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .res-name { font-weight: bold; width: 6em; padding-left: 1.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .res-value { text-align: right; width: 4.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab a.sort-current { color: yellow; }', sheet.length);
@@ -1935,6 +1960,7 @@ var kcif = {
       html += '<tr><th class="res-name">高速修復材</th><td class="res-value">' + kcif.material[5] + '</td></tr>';
       html += '<tr><th class="res-name">開発資材</th><td class="res-value">' + kcif.material[6] + '</td></tr>';
       html += '<tr><th class="res-name">高速建造材</th><td class="res-value">' + kcif.material[4] + '</td></tr>';
+      html += '<tr><th class="res-name">改修資材</th><td class="res-value">' + kcif.material[7] + '</td></tr>';
       html += '</table>';
       html += '</div>';
 
@@ -2280,7 +2306,7 @@ var kcif = {
       pos = table ? table.scrollTop : 0;
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="item-no"><a class="list-header' + (kcif.sort_items.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="item-type"><a class="list-header' + (kcif.sort_items.startsWith("type") ? ' sort-current' : '') + '" href="#">種別</a></th><th class="item-name"><a class="list-header' + (kcif.sort_items.startsWith("name") ? ' sort-current' : '') + '" href="#">名称</a></th><th class="ship-name"><a class="list-header' + (kcif.sort_items.startsWith("holder") ? ' sort-current' : '') + '" href="#">所在</a></th><th class="ship-level"></th></tr></thead>';
+      html += '<thead><tr><th class="item-no"><a class="list-header' + (kcif.sort_items.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="item-type"><a class="list-header' + (kcif.sort_items.startsWith("type") ? ' sort-current' : '') + '" href="#">種別</a></th><th class="item-name"><a class="list-header' + (kcif.sort_items.startsWith("name") ? ' sort-current' : '') + '" href="#">名称</a></th><th class="item-level"><a class="list-header' + (kcif.sort_items.startsWith("level") ? ' sort-current' : '') + '" href="#">改修</a></th><th class="ship-name"><a class="list-header' + (kcif.sort_items.startsWith("holder") ? ' sort-current' : '') + '" href="#">所在</a></th><th class="ship-level"></th></tr></thead>';
       html += '<tbody>';
 
       var items = [];
@@ -2299,6 +2325,9 @@ var kcif = {
         }
         else if (kcif.sort_items.startsWith("name")) {
           result = a.sort_no - b.sort_no;
+        }
+        else if (kcif.sort_items.startsWith("level")) {
+          result = a.level - b.level;
         }
         else if (kcif.sort_items.startsWith("holder")) {
           if (a.ship_id == null || a.ship_id < 0) {
@@ -2337,6 +2366,7 @@ var kcif = {
         html += '<tr><td class="item-no">' + (i + 1) + '</td>';
         html += '<td class="item-type">' + item.type_name + '</td>';
         html += '<td class="item-name">' + item.name + '</td>';
+        html += '<td class="item-level">' + item.level + '</td>';
         var ship = item.ship_id != null ? kcif.ship_list[item.ship_id] : null;
         html += shipName(ship);
         html += shipLevel(ship);
@@ -2362,7 +2392,7 @@ var kcif = {
             kcif.sort_items = sort + (kcif.sort_items.endsWith("+") ? "-" : "+");
           }
           else {
-            kcif.sort_items = sort + (sort == "no" ? "-" : "+");
+            kcif.sort_items = sort + (sort == "no" || sort == "level" ? "-" : "+");
           }
           kcif.renderInfo(true);
         }, false);

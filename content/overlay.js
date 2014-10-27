@@ -1078,7 +1078,7 @@ function kcifCallback(request, content, query) {
       }
     }
     if (Number(query["api_highspeed"]) > 0) {
-      kcif.material[4] -= Number(query["api_large_flag"]) > 0 ? 20 : 1;
+      kcif.material[4] -= Number(query["api_large_flag"]) > 0 ? 10 : 1;
     }
     update_all = false;
   }

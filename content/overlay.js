@@ -722,7 +722,7 @@ function damageHougeki(deck, enemies, hougeki) {
 
 function battle(url, json) {
   try {
-    var deck_id = json.api_data.api_dock_id || json.api_data.api_deck_id;
+    var deck_id = json.api_data.api_dock_id || json.api_data.api_deck_id || 1;
     if (url.indexOf("combined") != -1 && url.indexOf("midnight") != -1) {
       // if it's combined fleet and midnight battle, it must be 2nd fleet.
       deck_id = 2;
@@ -773,7 +773,7 @@ function battle(url, json) {
           if (url.indexOf("combined") != -1 && json.api_data.api_kouku.api_stage3_combined) {
             // must be 2nd fleet
             log("  kouku (2nd)");
-            damageKouku(kcif.deck_list[1], json.api_data.api_kouku.api_stage3_combined);
+            damageKouku(kcif.deck_list[1], enemies, json.api_data.api_kouku.api_stage3_combined);
           }
         }
         if (json.api_data.api_kouku2) { // combined air battle
@@ -822,7 +822,7 @@ function battle(url, json) {
         }
         if (json.api_data.api_hougeki1) {
           log("  hougeki1");
-          if (url.indexOf("combined") != -1) {
+          if (url.indexOf("combined") != -1 && url.indexOf("water") == -1) {
             // must be 2nd fleet
             damageHougeki(kcif.deck_list[1], enemies, json.api_data.api_hougeki1);
           }
@@ -834,19 +834,24 @@ function battle(url, json) {
           log("  hougeki2");
           damageHougeki(deck, enemies, json.api_data.api_hougeki2);
         }
-        if (json.api_data.api_raigeki) {
+        if (json.api_data.api_raigeki && url.indexOf("combined") == -1) {
           log("  raigeki");
-          if (url.indexOf("combined") != -1) {
-            // must be 2nd fleet
-            damageRaigeki(kcif.deck_list[1], enemies, json.api_data.api_raigeki);
-          }
-          else {
-            damageRaigeki(deck, enemies, json.api_data.api_raigeki);
-          }
+          damageRaigeki(deck, enemies, json.api_data.api_raigeki);
         }
         if (json.api_data.api_hougeki3) { // combined battle
           log("  hougeki3");
-          damageHougeki(deck, enemies, json.api_data.api_hougeki3);
+          if (url.indexOf("water") != -1) {
+            // must be 2nd fleet
+            damageHougeki(kcif.deck_list[1], enemies, json.api_data.api_hougeki3);
+          }
+          else {
+            damageHougeki(deck, enemies, json.api_data.api_hougeki3);
+          }
+        }
+        if (json.api_data.api_raigeki && url.indexOf("combined") != -1) {
+          log("  raigeki");
+          // must be 2nd fleet
+          damageRaigeki(kcif.deck_list[1], enemies, json.api_data.api_raigeki);
         }
         break;
       }
@@ -877,6 +882,13 @@ function battle(url, json) {
         }
       }
     }
+
+    if (url.indexOf("combined") != -1) {
+      if (url.indexOf("midnight") != -1) {
+        deck_id = 1;
+      }
+      kcif.mission[1] = "(連合艦隊)";
+    }
     var n = kcif.mission[deck_id - 1].indexOf(" <span style=");
     if (n != -1) {
       kcif.mission[deck_id - 1] = kcif.mission[deck_id - 1].substring(0, n);
@@ -884,7 +896,7 @@ function battle(url, json) {
     kcif.mission[deck_id - 1] += " <span style='letter-spacing: -2px;'>" + s + "</span>";
   }
   catch (exc) {
-    log("  failed: " + String(exc));
+    log("  failed: " + String(deck_id) + ": " + String(exc));
   }
 }
 
@@ -1554,7 +1566,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item|material)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item|material)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle(_water)?|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);
@@ -1925,7 +1937,7 @@ var kcif = {
           col = getTimeColor(dt);
         }
         else if (t) {
-          if (getShowBattle()) {
+          if (getShowBattle() || t == "(連合艦隊)") {
             s = "[出撃中 " + t + "]";
           }
           else {

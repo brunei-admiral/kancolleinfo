@@ -655,23 +655,26 @@ function reflectDamage(ship, damage) {
 
 function damageKouku(deck, enemies, kouku) {
   if (kouku) {
-    var damage_list = kouku.api_fdam;
-    var id_list = deck.api_ship;
-    for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
-      if (damage_list[i + 1] >= 0 && (kouku.api_frai_flag[i + 1] > 0 || kouku.api_fbak_flag[i + 1] > 0)) {
-        var damage = Math.floor(damage_list[i + 1]);
-        log("    ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
-        var ship = kcif.ship_list[id];
-        reflectDamage(ship, damage);
+    if (kouku.api_edam) {
+      var damage_list = kouku.api_fdam;
+      var id_list = deck.api_ship;
+      for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
+        if (damage_list[i + 1] >= 0 && (kouku.api_frai_flag[i + 1] > 0 || kouku.api_fbak_flag[i + 1] > 0)) {
+          var damage = Math.floor(damage_list[i + 1]);
+          log("    fleet " + deck.api_id + " ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
+          var ship = kcif.ship_list[id];
+          reflectDamage(ship, damage);
+        }
       }
     }
 
     if (kouku.api_edam) {
-      damage_list = kouku.api_edam;
+      var damage_list = kouku.api_edam;
       for (var i = 0; i < 6; i++) {
         if (enemies[i]) {
           if (damage_list[i + 1] >= 0 && (kouku.api_erai_flag[i + 1] > 0 || kouku.api_ebak_flag[i + 1] > 0)) {
             var damage = Math.floor(damage_list[i + 1]);
+            log("    enemy " + (i + 1) + " damaged " + damage);
             reflectDamage(enemies[i], damage);
           }
         }
@@ -686,7 +689,7 @@ function damageRaigeki(deck, enemies, raigeki) {
   for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
     if (damage_list[i + 1] >= 0 && raigeki.api_erai.indexOf(i + 1) != -1) {
       var damage = Math.floor(damage_list[i + 1]);
-      log("    ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
+      log("    fleet " + deck.api_id + " ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
       var ship = kcif.ship_list[id];
       reflectDamage(ship, damage);
     }
@@ -697,6 +700,7 @@ function damageRaigeki(deck, enemies, raigeki) {
     if (enemies[i]) {
       if (damage_list[i + 1] >= 0 && raigeki.api_frai.indexOf(i + 1) != -1) {
         var damage = Math.floor(damage_list[i + 1]);
+        log("    enemy " + (i + 1) + " damaged " + damage);
         reflectDamage(enemies[i], damage);
       }
     }
@@ -709,12 +713,13 @@ function damageHougeki(deck, enemies, hougeki) {
       var damage = Math.floor(hougeki.api_damage[i][j]);
       if (target >= 1 && target <= 6) {
         var id = deck.api_ship[target - 1];
-        log("    ship " + target + "(" + String(id) + ") damaged " + damage);
+        log("    fleet " + deck.api_id + " ship " + target + "(" + String(id) + ") damaged " + damage);
         var ship = kcif.ship_list[id];
         reflectDamage(ship, damage);
       }
       else if (target >= 7 && target <= 12) {
         if (enemies[target - 7]) {
+          log("    enemy " + (target - 6) + " damaged " + damage);
           reflectDamage(enemies[target - 7], damage);
         }
       }
@@ -835,13 +840,14 @@ function battle(url, json) {
             damageHougeki(deck, enemies, json.api_data.api_hougeki1);
           }
         }
+        if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && url.indexOf("water") == -1) {
+          log("  raigeki");
+          // must be 2nd fleet
+          damageRaigeki(kcif.deck_list[1], enemies, json.api_data.api_raigeki);
+        }
         if (json.api_data.api_hougeki2) {
           log("  hougeki2");
           damageHougeki(deck, enemies, json.api_data.api_hougeki2);
-        }
-        if (json.api_data.api_raigeki && url.indexOf("combined") == -1) {
-          log("  raigeki");
-          damageRaigeki(deck, enemies, json.api_data.api_raigeki);
         }
         if (json.api_data.api_hougeki3) { // combined battle
           log("  hougeki3");
@@ -853,10 +859,15 @@ function battle(url, json) {
             damageHougeki(deck, enemies, json.api_data.api_hougeki3);
           }
         }
-        if (json.api_data.api_raigeki && url.indexOf("combined") != -1) {
+        if (json.api_data.api_raigeki && (url.indexOf("combined") == -1 || url.indexOf("water") != -1)) {
           log("  raigeki");
-          // must be 2nd fleet
-          damageRaigeki(kcif.deck_list[1], enemies, json.api_data.api_raigeki);
+          if (url.indexOf("combined") == -1) {
+            damageRaigeki(deck, enemies, json.api_data.api_raigeki);
+          }
+          else {
+            // must be 2nd fleet
+            damageRaigeki(kcif.deck_list[1], enemies, json.api_data.api_raigeki);
+          }
         }
         break;
       }

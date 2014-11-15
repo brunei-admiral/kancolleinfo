@@ -666,12 +666,14 @@ function damageKouku(deck, enemies, kouku) {
       }
     }
 
-    damage_list = kouku.api_edam;
-    for (var i = 0; i < 6; i++) {
-      if (enemies[i]) {
-        if (damage_list[i + 1] >= 0 && (kouku.api_erai_flag[i + 1] > 0 || kouku.api_ebak_flag[i + 1] > 0)) {
-          var damage = Math.floor(damage_list[i + 1]);
-          reflectDamage(enemies[i], damage);
+    if (kouku.api_edam) {
+      damage_list = kouku.api_edam;
+      for (var i = 0; i < 6; i++) {
+        if (enemies[i]) {
+          if (damage_list[i + 1] >= 0 && (kouku.api_erai_flag[i + 1] > 0 || kouku.api_ebak_flag[i + 1] > 0)) {
+            var damage = Math.floor(damage_list[i + 1]);
+            reflectDamage(enemies[i], damage);
+          }
         }
       }
     }
@@ -723,9 +725,12 @@ function damageHougeki(deck, enemies, hougeki) {
 function battle(url, json) {
   try {
     var deck_id = json.api_data.api_dock_id || json.api_data.api_deck_id || 1;
-    if (url.indexOf("combined") != -1 && url.indexOf("midnight") != -1) {
-      // if it's combined fleet and midnight battle, it must be 2nd fleet.
-      deck_id = 2;
+    if (url.indexOf("combined") != -1) {
+      kcif.mission[1] = "(連合艦隊)";
+      if (url.indexOf("midnight") != -1) {
+        // if it's combined fleet and midnight battle, it must be 2nd fleet.
+        deck_id = 2;
+      }
     }
     if (json.api_data.api_formation) {
       var s = "";
@@ -883,11 +888,8 @@ function battle(url, json) {
       }
     }
 
-    if (url.indexOf("combined") != -1) {
-      if (url.indexOf("midnight") != -1) {
-        deck_id = 1;
-      }
-      kcif.mission[1] = "(連合艦隊)";
+    if (url.indexOf("combined") != -1 && url.indexOf("midnight") != -1) {
+      deck_id = 1;
     }
     var n = kcif.mission[deck_id - 1].indexOf(" <span style=");
     if (n != -1) {

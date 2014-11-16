@@ -655,7 +655,7 @@ function reflectDamage(ship, damage) {
 
 function damageKouku(deck, enemies, kouku) {
   if (kouku) {
-    if (kouku.api_edam) {
+    if (kouku.api_fdam) {
       var damage_list = kouku.api_fdam;
       var id_list = deck.api_ship;
       for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {

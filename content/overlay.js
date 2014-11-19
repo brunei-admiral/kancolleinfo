@@ -622,6 +622,12 @@ function shipBull(ship) {
   return '<td class="ship-bull ' + col + '" title="' + ship.bull + '/' + ship.bull_max + '">' + Math.floor(ship.bull * 100 / ship.bull_max) + '%</td>';
 }
 
+function shipExp(ship) {
+  var total = (ship.level == 99 || ship.level == 150) ? '' : ship.exp[0] + '/' + (ship.exp[0] + ship.exp[1]);
+  var need = (ship.level == 99 || ship.level == 150) ? '' : ship.exp[1];
+  return '<td class="ship-exp" title="' + total + '">' + need + '</td>';
+}
+
 function reflectDamage(ship, damage) {
   ship.hp -= damage;
   if (ship.hp <= 0) {
@@ -984,7 +990,8 @@ function makeShip(data) {
     bull: data.api_bull,
     slot: data.api_slot,
     equip: data.api_onslot,
-    ndock_item: data.api_ndock_item
+    ndock_item: data.api_ndock_item,
+    exp: data.api_exp
   };
   if (kcif.ship_master[data.api_ship_id]) {
     ship.name = kcif.ship_master[data.api_ship_id].name;
@@ -1692,6 +1699,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 4.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 7.8em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-fuel, #kancolle-info .tab .ship-bull { text-align: right; width: 3.8em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-exp { text-align: right; width: 5.0em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-type { width: 8em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-name { font-weight: bold; width: 14em; }', sheet.length);
@@ -1973,7 +1981,7 @@ var kcif = {
           for (var j = 0; j < 6; j++) {
             var id = deck.api_ship[j]
             if (id === -1 || id == null) {
-              lhtml += '<tr><td class="ship-no">' + (j + 1) + '</td><td colspan="8"></td></tr>';
+              lhtml += '<tr><td class="ship-no">' + (j + 1) + '</td><td colspan="9"></td></tr>';
               continue;
             }
             var ship = kcif.ship_list[id];
@@ -2003,6 +2011,7 @@ var kcif = {
               lhtml += shipCond(ship);
               lhtml += shipFuel(ship);
               lhtml += shipBull(ship);
+              lhtml += shipExp(ship);
               if (kcif.repair.filter(function(e){return e.api_ship_id == ship.api_id}).length != 0) {
                 lhtml += '<td class="ship-desc color-red">入渠中</td>';
                 ndock.push(ship.name);
@@ -2118,7 +2127,7 @@ var kcif = {
           html += '<h2><a class="list-header" href="#" title="' + deck.api_name + '">第' + (i + 1) + '艦隊</a>' + s + '</h2>';
         }
         else {
-          html += '<h2><span class="list-header" href="#">第' + (i + 1) + '艦隊</span> <span class="color-gray">[未解放]</span></h2>';
+          html += '<h2><span class="list-header" href="#">第' + (i + 1) + '艦隊</span> <span class="color-gray">[未開放]</span></h2>';
         }
 
         html += '<table>' + lhtml + '</table>';
@@ -2212,7 +2221,7 @@ var kcif = {
       var pos = table ? table.scrollTop : 0;
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="ship-no"><a class="list-header' + (kcif.sort_ships.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="ship-type"><a class="list-header' + (kcif.sort_ships.startsWith("type") ? ' sort-current' : '') + '" href="#">艦種</a></th><th class="ship-name' + (kcif.sort_ships.startsWith("name") ? ' sort-current' : '') + '"><a class="list-header" href="#">艦名</a></th><th class="ship-level"><a class="list-header' + (kcif.sort_ships.startsWith("level") ? ' sort-current' : '') + '" href="#">LV</a></th><th class="ship-hp"><a class="list-header' + (kcif.sort_ships.startsWith("hp") ? ' sort-current' : '') + '" href="#">耐久</a></th><th class="ship-cond"><a class="list-header' + (kcif.sort_ships.startsWith("cond") ? ' sort-current' : '') + '" href="#">疲労</a></th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-desc">所在</th></tr></thead>';
+      html += '<thead><tr><th class="ship-no"><a class="list-header' + (kcif.sort_ships.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="ship-type"><a class="list-header' + (kcif.sort_ships.startsWith("type") ? ' sort-current' : '') + '" href="#">艦種</a></th><th class="ship-name' + (kcif.sort_ships.startsWith("name") ? ' sort-current' : '') + '"><a class="list-header" href="#">艦名</a></th><th class="ship-level"><a class="list-header' + (kcif.sort_ships.startsWith("level") ? ' sort-current' : '') + '" href="#">LV</a></th><th class="ship-hp"><a class="list-header' + (kcif.sort_ships.startsWith("hp") ? ' sort-current' : '') + '" href="#">耐久</a></th><th class="ship-cond"><a class="list-header' + (kcif.sort_ships.startsWith("cond") ? ' sort-current' : '') + '" href="#">疲労</a></th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-exp">経験値</th><th class="ship-desc">所在</th></tr></thead>';
       html += '<tbody>';
 
       var ships = [];
@@ -2232,6 +2241,7 @@ var kcif = {
         html += shipCond(ship);
         html += shipFuel(ship);
         html += shipBull(ship);
+        html += shipExp(ship);
         var fleet = null;
         for (var j = 0, deck; deck = kcif.deck_list[j]; j++) {
           if (deck.api_ship.filter(function(e){ return e == ship.api_id; }).length != 0) {

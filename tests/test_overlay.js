@@ -190,6 +190,25 @@ JUST.testCase({
     assertMatch(/^<td class="ship-bull color-orange" title="49\/99">49%<\/td>$/, shipBull(ship));
   },
 
+  testShipExp: function(){
+    var ship = {
+      p_bull: 100,
+      exp: [200, 100, 50],
+      level: 2,
+    };
+    assertMatch(/^<td class="ship-exp" title="200\/300">100<\/td>$/, shipExp(ship));
+    ship.level = 98;
+    assertMatch(/^<td class="ship-exp" title="200\/300">100<\/td>$/, shipExp(ship));
+    ship.level = 99;
+    assertMatch(/^<td class="ship-exp" title=""><\/td>$/, shipExp(ship));
+    ship.level = 100;
+    assertMatch(/^<td class="ship-exp" title="200\/300">100<\/td>$/, shipExp(ship));
+    ship.level = 149;
+    assertMatch(/^<td class="ship-exp" title="200\/300">100<\/td>$/, shipExp(ship));
+    ship.level = 150;
+    assertMatch(/^<td class="ship-exp" title=""><\/td>$/, shipExp(ship));
+  },
+
   testCompareShip: function(){
     var a = {
       api_id: 1,

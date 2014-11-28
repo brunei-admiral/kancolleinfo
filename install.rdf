@@ -4,7 +4,7 @@
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>kancolleinfo@example.jp</em:id>
 		<em:name>kancolleinfo</em:name>
-		<em:version>1.4.0</em:version>
+		<em:version>1.4.1</em:version>
 		<em:description>KanColle Information Viewer</em:description>
 		<em:creator>Burunei no toaru teitoku</em:creator>
 		<em:homepageURL>http://kancollegadgets.web.fc2.com/</em:homepageURL>

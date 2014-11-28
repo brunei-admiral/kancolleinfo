@@ -1735,6 +1735,8 @@ var kcif = {
       kcif.flash = doc.querySelector("#flashWrap");
 
       kcif.renderFrame();
+
+      doc.body.setAttribute("onload", "if (typeof ConstGadgetInfo != 'undefined') ConstGadgetInfo.height = 920;");
     }
     else if (url.match(/\/app_id=854854\//)) {
       log("DOMloaded:", url);
@@ -1744,11 +1746,10 @@ var kcif = {
       }
       var game_frame = doc.querySelector("#game_frame");
       if (game_frame) {
-        game_frame.style.height = '920px';
         kcif.game_frame = game_frame;
       }
 
-      doc.body.setAttribute("onload", "if (DMM && DMM.netgame) DMM.netgame.reloadDialog = function(){};");
+      doc.body.setAttribute("onload", "if (typeof DMM != 'undefined' && DMM.netgame) DMM.netgame.reloadDialog = function(){};");
     }
   },
 
@@ -1891,7 +1892,6 @@ var kcif = {
 
   renderInfo: function(all) {
     if (kcif.info_div) {
-      kcif.game_frame.style.height = '920px'; // なぜかここでないとダメ
       var html = "";
 
       // ベース

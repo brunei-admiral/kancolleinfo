@@ -960,7 +960,7 @@ function makeItem(data, ship_id) {
   var item = {
     api_id: data.api_id,
     item_id: data.api_slotitem_id,
-    level: data.api_level,
+    level: typeof data.api_level != "undefined" ? data.api_level : 0,
     name: kcif.item_master[data.api_slotitem_id].name,
     type: kcif.item_master[data.api_slotitem_id].type,
     sort_no: kcif.item_master[data.api_slotitem_id].sort_no,

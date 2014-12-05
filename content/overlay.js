@@ -1455,6 +1455,25 @@ function kcifCallback(request, content, query) {
       for (var i = 0, data; data = json.api_data.api_material[i]; i++) {
         kcif.material[data.api_id - 1] = data.api_value;
       }
+
+      var now = new Date().getTime();
+      for (var i = 0, deck; i < 4; i++) {
+        var deck = kcif.deck_list[i];
+        var leader = kcif.ship_list[deck.api_ship[0]];
+        if (kcif.mission[i] || !leader || leader.type != 19) {
+          continue;
+        }
+        var changed = false;
+        for (j = 0, ship; ship = kcif.ship_list[deck.api_ship[j]]; j++) {
+          if (ship.hp != ship.p_hp) {
+            changed = true;
+            break;
+          }
+        }
+        if (changed && ((kcif.repair_start[i] && kcif.repair_start[i] < now) || !kcif.repair_start[i])) {
+          kcif.repair_start[i] = now;
+        }
+      }
     }
 
     log("etc: " + String(kcif.ship_num) + " ships (" + (port ? "port" : ship2 ? "ship2" : "ship3") + ")");
@@ -2091,15 +2110,19 @@ var kcif = {
           else {
             if (ships.length > 0 && ships[0].type == 19) { // 工作艦
               var t = "";
+              var rcol = "color-yellow";
               if (kcif.repair_start[i]) {
-                var rt = kcif.repair_start[i];
                 var now = new Date().getTime();
-                while (rt < now) {
-                  rt += 20 * 60 * 1000;
+                var rt = kcif.repair_start[i] + 20 * 60 * 1000;
+                if (rt < now) {
+                  rcol = "color-red";
+                }
+                else if (rt < now + 60 * 1000) {
+                  rcol = "color-orange";
                 }
                 t += " 予想更新時刻" + time2str(new Date(rt));
               }
-              s = ' <span class="color-yellow">[修理中' + t + ']</span>';
+              s = ' <span class="' + rcol + '">[修理中' + t + ']</span>';
             }
             else {
               s = "";

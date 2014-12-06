@@ -1457,8 +1457,7 @@ function kcifCallback(request, content, query) {
       }
 
       var now = new Date().getTime();
-      for (var i = 0, deck; i < 4; i++) {
-        var deck = kcif.deck_list[i];
+      for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
         var leader = kcif.ship_list[deck.api_ship[0]];
         if (kcif.mission[i] || !leader || leader.type != 19) {
           continue;

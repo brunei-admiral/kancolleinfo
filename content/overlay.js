@@ -1983,7 +1983,7 @@ var kcif = {
           }
           col = "color-green";
         }
-        if (deck) {
+        if (deck || i == 0) {
           var ships = [];
           var level_sum = 0;
           var sup = [];
@@ -1996,7 +1996,7 @@ var kcif = {
           var seiku = 0;
           var ndock = [];
           for (var j = 0; j < 6; j++) {
-            var id = deck.api_ship[j]
+            var id = deck ? deck.api_ship[j] : -1
             if (id === -1 || id == null) {
               lhtml += '<tr><td class="ship-no">' + (j + 1) + '</td><td colspan="9"></td></tr>';
               continue;
@@ -2145,7 +2145,7 @@ var kcif = {
             }
           }
 
-          html += '<h2><a class="list-header" href="#" title="' + deck.api_name + '">第' + (i + 1) + '艦隊</a>' + s + '</h2>';
+          html += '<h2><a class="list-header" href="#" title="' + (deck ? deck.api_name : "") + '">第' + (i + 1) + '艦隊</a>' + s + '</h2>';
         }
         else {
           html += '<h2><span class="list-header" href="#">第' + (i + 1) + '艦隊</span> <span class="color-gray">[未開放]</span></h2>';

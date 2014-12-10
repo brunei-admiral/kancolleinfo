@@ -1615,6 +1615,7 @@ var kcifHttpObserver = {
 };
 
 var kcif = {
+  area_game: null,
   game_frame: null,
   flash: null,
   info_div: null,
@@ -1760,6 +1761,7 @@ var kcif = {
       var area_game = doc.querySelector("#area-game");
       if (area_game) {
         area_game.style.height = '920px';
+        kcif.area_game = area_game;
       }
       var game_frame = doc.querySelector("#game_frame");
       if (game_frame) {
@@ -1771,6 +1773,9 @@ var kcif = {
   },
 
   renderFrame: function() {
+    if (kcif.area_game && parseInt(kcif.area_game.style.height) < 920) {
+        kcif.area_game.style.height = '920px';
+    }
     if (kcif.info_div) {
       var html = "";
       html += '<div id="kancolle-info">';

@@ -1758,7 +1758,7 @@ var kcif = {
 
       kcif.renderFrame();
 
-      doc.body.setAttribute("onload", "if (typeof ConstGadgetInfo != 'undefined') ConstGadgetInfo.height = 920;");
+      doc.body.setAttribute("onload", "function setHeight(){if (typeof ConstGadgetInfo != 'undefined') ConstGadgetInfo.height = 920; else window.setTimer(setHeight, 100);} setHeight();");
     }
     else if (url.match(/\/app_id=854854\//)) {
       log("DOMloaded:", url);

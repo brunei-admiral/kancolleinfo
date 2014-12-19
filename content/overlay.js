@@ -333,23 +333,8 @@ function beepOnOff() {
   }
 }
 
-function capture(elem, parent, scale) {
-  log("capture start");
-  var rect = elem.getBoundingClientRect();
-  var rect2 = parent.getBoundingClientRect();
-  var canvas = document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
-  scale = scale || 1.0;
-  canvas.mozOpaque = true;
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-  var context = canvas.getContext("2d");
-  context.scale(scale, scale);
-  context.drawWindow(window.content, rect.left + rect2.left + window.content.scrollX + 1, rect.top + rect2.top + window.content.scrollY, rect.width, rect.height, "white");
-  return canvas.mozGetAsFile("imagedata", "image/png");
-}
-
-function saveFile(dataFile, path) {
-  log("saveFile start: data=" + dataFile + ", path=" + path);
+function saveFile(blob, path) {
+  log("saveFile start: data=" + blob + ", path=" + path);
   var reader = new FileReader();
   reader.onloadend = function() {
     var file = CCIN("@mozilla.org/file/local;1", "nsILocalFile");
@@ -367,7 +352,7 @@ function saveFile(dataFile, path) {
       stream.close();
     }
   }
-  reader.readAsBinaryString(dataFile);
+  reader.readAsBinaryString(blob);
 }
 
 function getPathSeparator() {
@@ -380,12 +365,24 @@ function getPathSeparator() {
 function captureAndSave(evt) {
   evt.preventDefault();
 
-  var png = capture(kcif.flash, kcif.game_frame, 1.0);
-  var dir = getCaptureSaveDir();
-  var base = getCaptureSaveBase();
-  var s = new Date().toLocaleFormat("%Y%m%d%H%M%S");
-  var filename = dir + getPathSeparator() + base + s + ".png";
-  saveFile(png, filename);
+  var rect = kcif.flash.getBoundingClientRect();
+  var rect2 = kcif.game_frame.getBoundingClientRect();
+  var canvas = document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+  scale = 1.0;
+  canvas.mozOpaque = true;
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  var context = canvas.getContext("2d");
+  context.scale(scale, scale);
+  context.drawWindow(window.content, rect.left + rect2.left + window.content.scrollX + 1, rect.top + rect2.top + window.content.scrollY, rect.width, rect.height, "white");
+
+  canvas.toBlob(function(blob){
+    var dir = getCaptureSaveDir();
+    var base = getCaptureSaveBase();
+    var s = new Date().toLocaleFormat("%Y%m%d%H%M%S");
+    var filename = dir + getPathSeparator() + base + s + ".png";
+    saveFile(blob, filename);
+  }, "image/png");
 }
 
 function time2str(dt) {

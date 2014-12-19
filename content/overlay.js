@@ -2006,6 +2006,7 @@ var kcif = {
           var dai_ship = [];
           var seiku = 0;
           var ndock = [];
+          var damage = false;
           for (var j = 0; j < 6; j++) {
             var id = deck ? deck.api_ship[j] : -1
             if (id === -1 || id == null) {
@@ -2050,6 +2051,9 @@ var kcif = {
               lhtml += '</tr>';
               if (t && isNaN(Number(t)) && ship.hp <= ship.hp_max / 4) {
                 col = "color-red";
+              }
+              if (ship.hp < ship.hp_max) {
+                damage = true;
               }
             }
 
@@ -2117,7 +2121,7 @@ var kcif = {
             s = ' <span class="' + col + '">' + s + '</span>';
           }
           else {
-            if (ships.length > 0 && ships[0].type == 19) { // 工作艦
+            if (damage && ships.length > 0 && ships[0].type == 19) { // 工作艦
               var t = "";
               var rcol = "color-yellow";
               if (kcif.repair_start[i]) {

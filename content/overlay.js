@@ -1671,7 +1671,7 @@ var kcif = {
   onLoad: function(event) {
     var doc = event.originalTarget;
     var url = doc.location.href;
-    if (url.match(/osapi\.dmm\.com\//)) {
+    if (url.match(/osapi\.dmm\.com\//) && url.match(/aid=854854/)) {
       log("DOMloaded:", url);
 
       var div = doc.createElement("div");

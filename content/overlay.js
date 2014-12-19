@@ -493,7 +493,7 @@ function type2str(type) {
       s = "潜母";
       break;
     default:
-      s = "(" + ship.type + ")";
+      s = "不明";
       break;
   }
   return s;
@@ -534,9 +534,14 @@ function shipLevel(ship) {
   var col = "color-default";
   var title = "";
   if (ship) {
-    if (ship.afterlv > 0 && ship.level >= ship.afterlv) {
-      col = "color-green";
-      title = ' title="改造後 ' + kcif.ship_master[ship.aftershipid].name + '"';
+    if (ship.afterlv > 0) {
+      if (ship.level >= ship.afterlv) {
+        col = "color-green";
+        title = ' title="改造後 ' + kcif.ship_master[ship.aftershipid].name + '(' + type2str(kcif.ship_master[ship.aftershipid].type) + ')"';
+      }
+      else {
+        title = ' title="LV' + ship.afterlv + ' ' + kcif.ship_master[ship.aftershipid].name + '(' + type2str(kcif.ship_master[ship.aftershipid].type) + ')"';
+      }
     }
     if (ship.level != ship.p_level) {
       col += " blink";

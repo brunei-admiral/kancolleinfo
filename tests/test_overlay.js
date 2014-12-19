@@ -6,7 +6,7 @@ JUST.testCase({
   setup: function(){
     kcif.item_list = {1: {"name": "アイテム1"}, 2: {"name": "アイテム2"}, 3: {"name": "応急修理要員", item_id: 42}, 4: {"name": "応急修理女神", item_id: 43}};
     kcif.ship_list = {100: {"name": "明石", type: 19}};
-    kcif.ship_master = {100: {"name": "テスト100"}};
+    kcif.ship_master = {100: {"name": "テスト100", type: 2}};
   },
 
   testTime2str: function(){
@@ -71,12 +71,12 @@ JUST.testCase({
       afterlv: 3,
       aftershipid: 100,
     };
-    assertMatch(/^<td class="ship-level(?: color-default)?">1<\/td>$/, shipLevel(ship));
+    assertMatch(/^<td class="ship-level(?: color-default)?" title="LV3 .*?">1<\/td>$/, shipLevel(ship));
     ship.level = 2;
-    assertMatch(/^<td class="ship-level(?: color-default)? blink">2<\/td>$/, shipLevel(ship));
+    assertMatch(/^<td class="ship-level(?: color-default)? blink" title="LV3 .*?">2<\/td>$/, shipLevel(ship));
     ship.p_level = 3;
     ship.level = 3;
-    assertMatch(/^<td class="ship-level color-green" title="改造後 テスト100">3<\/td>$/, shipLevel(ship));
+    assertMatch(/^<td class="ship-level color-green" title="改造後 テスト100\(駆逐\)">3<\/td>$/, shipLevel(ship));
   },
 
   testShipHp: function(){

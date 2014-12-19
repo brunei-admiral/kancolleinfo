@@ -187,6 +187,7 @@ span.bugfix:after {
 #kancolle-info .tab .table-inner { height: 256px; overflow: auto; }
 #kancolle-info .tab .table-outer .table-inner table thead { position: absolute; top: 0px; left: 0px; }
 #kancolle-info .tab .table-outer .table-inner table thead th { text-align: left; font-weight: bold; }
+#kancolle-info .tab .table-outer .table-inner table thead th.th-right { text-align: right; }
 #kancolle-info .tab .ship-no, #kancolle-info .tab .item-no, #kancolle-info .tab .item-num { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }
 #kancolle-info .tab .ship-type { width: 2.7em; }
 #kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }
@@ -357,7 +358,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <div id="tab-ships" class="tab">
     <div class="table-outer"><div class="table-inner"><table>
       <thead>
-        <tr><th class="ship-no"><a class="list-header" href="#">#</a></th><th class="ship-type"><a class="list-header" href="#">艦種</a></th><th class="ship-name"><a class="list-header" href="#">艦名</a></th><th class="ship-level"><a class="list-header sort-current" href="#">LV</a></th><th class="ship-hp"><a class="list-header" href="#">耐久</a></th><th class="ship-cond"><a class="list-header" href="#">疲労</a></th><th class="ship-fuel">燃料</th><th class="ship-bull">弾薬</th><th class="ship-exp">経験値</th><th class="ship-desc">所在</th></tr>
+        <tr><th class="ship-no th-right"><a class="list-header" href="#">#</a></th><th class="ship-type"><a class="list-header" href="#">艦種</a></th><th class="ship-name"><a class="list-header" href="#">艦名</a></th><th class="ship-level th-right"><a class="list-header sort-current" href="#">LV</a></th><th class="ship-hp th-right"><a class="list-header" href="#">耐久</a></th><th class="ship-cond th-right"><a class="list-header" href="#">疲労</a></th><th class="ship-fuel th-right">燃料</th><th class="ship-bull th-right">弾薬</th><th class="ship-exp th-right">経験値</th><th class="ship-desc">所在</th></tr>
       </thead>
       <tbody>
         <tr><td class="ship-no">1</td><td class="ship-type">正空</td><td class="ship-name" title="応急修理女神">飛龍改二</td><td class="ship-level">150</td><td class="ship-hp color-green">74/74</td><td class="ship-cond color-green blink">53</td><td class="ship-fuel color-green" title="59/59">100%</td><td class="ship-bull color-green" title="63/63">100%</td><td class="ship-exp" title="0/100">100</td><td class="ship-desc"></td></tr>
@@ -385,7 +386,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <div id="tab-items" class="tab">
     <div class="table-outer"><div class="table-inner"><table>
       <thead>
-        <tr><th class="item-no"><a class="list-header" href="#">#</a></th><th class="item-type"><a class="list-header sort-current" href="#">種別</a></th><th class="item-name"><a class="list-header" href="#">名称</a></th><th class="item-level"><a class="list-header" href="#">改修</a></th><th class="ship-name"><a class="list-header" href="#">所在</a></th><th class="ship-level"></th></tr>
+        <tr><th class="item-no th-right"><a class="list-header" href="#">#</a></th><th class="item-type"><a class="list-header sort-current" href="#">種別</a></th><th class="item-name"><a class="list-header" href="#">名称</a></th><th class="item-level th-right"><a class="list-header" href="#">改修</a></th><th class="ship-name"><a class="list-header" href="#">所在</a></th><th class="ship-level"></th></tr>
       </thead>
       <tbody>
         <tr><td class="item-no">1</td><td class="item-type">小口径主砲</td><td class="item-name">12.7cm連装砲</td><td class="item-level">0</td><td class="ship-name" title="12.7cm連装砲 12.7cm連装砲 13号対空電探">吹雪改</td><td class="ship-level">55</td></tr>

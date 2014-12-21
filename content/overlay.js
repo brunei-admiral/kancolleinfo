@@ -389,13 +389,13 @@ function time2str(dt) {
   return dt.toLocaleFormat(dt.getDate() != new Date().getDate() ? "%m/%d %H:%M" : "%H:%M");
 }
 
-function getTimeColor(dt) {
+function getTimeColor(dt, strict) {
   var now = new Date().getTime();
   var col = "color-default";
   if (dt.getTime() <= now) {
     col = "color-red";
   }
-  else if (dt.getTime() - 60000 <= now) {
+  else if (!strict && dt.getTime() - 60000 <= now) {
     col = "color-orange";
   }
   else if (dt.getTime() - 5 * 60000 <= now) {
@@ -2210,7 +2210,7 @@ var kcif = {
           if (kcif.build[i].api_complete_time > 0) {
             var dt = new Date(kcif.build[i].api_complete_time);
             s = time2str(dt);
-            col = getTimeColor(dt);
+            col = getTimeColor(dt, true);
           }
           else {
             s = "--:--";

@@ -315,4 +315,27 @@ JUST.testCase({
     updateRepairStart(0);
     refute(kcif.repair_start[0]);
   },
+
+  testGetTimeColor: function(){
+    var now = new Date();
+    assertEqual("color-red", getTimeColor(now));
+    assertEqual("color-red", getTimeColor(now, false));
+    assertEqual("color-red", getTimeColor(now, true));
+
+    assertEqual("color-orange", getTimeColor(new Date(now.getTime() + 59 * 1000)));
+    assertEqual("color-orange", getTimeColor(new Date(now.getTime() + 59 * 1000), false));
+    assertEqual("color-yellow", getTimeColor(new Date(now.getTime() + 59 * 1000), true));
+
+    assertEqual("color-yellow", getTimeColor(new Date(now.getTime() + 61 * 1000)));
+    assertEqual("color-yellow", getTimeColor(new Date(now.getTime() + 61 * 1000), false));
+    assertEqual("color-yellow", getTimeColor(new Date(now.getTime() + 61 * 1000), true));
+
+    assertEqual("color-yellow", getTimeColor(new Date(now.getTime() + 299 * 1000)));
+    assertEqual("color-yellow", getTimeColor(new Date(now.getTime() + 299 * 1000), false));
+    assertEqual("color-yellow", getTimeColor(new Date(now.getTime() + 299 * 1000), true));
+
+    assertEqual("color-default", getTimeColor(new Date(now.getTime() + 301 * 1000)));
+    assertEqual("color-default", getTimeColor(new Date(now.getTime() + 301 * 1000), false));
+    assertEqual("color-default", getTimeColor(new Date(now.getTime() + 301 * 1000), true));
+  },
 });

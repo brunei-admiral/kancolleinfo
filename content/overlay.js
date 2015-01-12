@@ -1101,7 +1101,12 @@ function kcifCallback(request, content, query) {
     if (dock) {
       dock.api_state = 3;
       dock.api_complete_time = 0;
-      kcif.material[4] -= 1;
+      if (dock.api_item1 >= 1000) {
+        kcif.material[4] -= 10;
+      }
+      else {
+        kcif.material[4] -= 1;
+      }
     }
     update_all = false;
   }

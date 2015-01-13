@@ -569,7 +569,7 @@ function shipHp(ship) {
   if (ship.p_hp != hp) {
     col += " blink";
   }
-  return '<td class="ship-hp ' + col + '">' + hp + '/' + ship.hp_max + '</td>';
+  return '<td class="ship-hp ' + col + '"' + (ship.p_hp != hp ? ' title="直前:' + ship.p_hp + '"': '') + '>' + hp + '/' + ship.hp_max + '</td>';
 }
 
 function shipCond(ship) {

@@ -87,25 +87,32 @@ JUST.testCase({
     };
     assertMatch(/^<td class="ship-hp color-green">10\/10<\/td>$/, shipHp(ship));
     ship.hp = 9;
-    assertMatch(/^<td class="ship-hp(?: color-default)? blink">9\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:10">9\/10<\/td>$/, shipHp(ship));
     ship.p_hp = ship.hp;
     assertMatch(/^<td class="ship-hp(?: color-default)?">9\/10<\/td>$/, shipHp(ship));
     ship.hp = 8;
-    assertMatch(/^<td class="ship-hp(?: color-default)? blink">8\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:9">8\/10<\/td>$/, shipHp(ship));
+    ship.p_hp = ship.hp;
     ship.hp = 7;
-    assertMatch(/^<td class="ship-hp color-yellow blink">7\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:8">7\/10<\/td>$/, shipHp(ship));
+    ship.p_hp = ship.hp;
     ship.hp = 6;
-    assertMatch(/^<td class="ship-hp color-yellow blink">6\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:7">6\/10<\/td>$/, shipHp(ship));
+    ship.p_hp = ship.hp;
     ship.hp = 5;
-    assertMatch(/^<td class="ship-hp color-orange blink">5\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:6">5\/10<\/td>$/, shipHp(ship));
+    ship.p_hp = ship.hp;
     ship.hp = 3;
-    assertMatch(/^<td class="ship-hp color-orange blink">3\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:5">3\/10<\/td>$/, shipHp(ship));
+    ship.p_hp = ship.hp;
     ship.hp = 2;
-    assertMatch(/^<td class="ship-hp color-red blink">2\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-red blink" title="直前:3">2\/10<\/td>$/, shipHp(ship));
+    ship.p_hp = ship.hp;
     ship.hp = 0;
-    assertMatch(/^<td class="ship-hp color-gray blink">0\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-gray blink" title="直前:2">0\/10<\/td>$/, shipHp(ship));
+    ship.p_hp = ship.hp;
     ship.hp = -1;
-    assertMatch(/^<td class="ship-hp color-gray blink">0\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-gray">0\/10<\/td>$/, shipHp(ship));
   },
 
   testShipCond: function(){

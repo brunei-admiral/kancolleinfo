@@ -639,7 +639,7 @@ function reflectDamage(ship, damage) {
         var item = kcif.item_list[ship.slot[i]];
         if (item) {
           if (item.item_id == 42) {      // 応急修理要員
-            ship.hp = Math.ceil(ship.hp_max / 5);
+            ship.hp = Math.floor(ship.hp_max / 5);
             found = true;
           }
           else if (item.item_id == 43) { // 応急修理女神
@@ -967,6 +967,7 @@ function makeItem(data, ship_id) {
     type: kcif.item_master[data.api_slotitem_id].type,
     sort_no: kcif.item_master[data.api_slotitem_id].sort_no,
     taiku: kcif.item_master[data.api_slotitem_id].taiku,
+    sakuteki: kcif.item_master[data.api_slotitem_id].sakuteki,
     type_name: kcif.item_master[data.api_slotitem_id].type_name,
     ship_id: ship_id
   };
@@ -993,6 +994,7 @@ function makeShip(data) {
     slot: data.api_slot,
     equip: data.api_onslot,
     ndock_item: data.api_ndock_item,
+    sakuteki: data.api_sakuteki[0],
     exp: data.api_exp
   };
   if (kcif.ship_master[data.api_ship_id]) {
@@ -1011,6 +1013,78 @@ function makeShip(data) {
 
 function hasSeiku(type) {
   return (type >= 6 && type <= 8) || type == 11;
+}
+
+function calcSakuteki(item, type) {
+  var co = 0;
+  if (type == 1) { // 旧2-5式
+    switch (item.type[2]) {
+      case 8: // 艦攻
+      case 9: // 艦偵
+      case 10:// 水偵
+      case 11:// 水爆
+        co = 2.0;
+        break;
+      default:// その他
+        co = 1.0;
+        break;
+    }
+  }
+  else if (type == 2) { // 2-5秋式
+    switch (item.type[2]) {
+      case 7: // 艦爆
+        co = 1.04;
+        break;
+      case 8: // 艦攻
+        co = 1.37;
+        break;
+      case 9: // 艦偵
+        co = 1.66;
+        break;
+      case 10:// 水偵
+        co = 2.00;
+        break;
+      case 11:// 水爆
+        co = 1.78;
+        break;
+      case 12:// 小型電探
+        co = 1.00;
+        break;
+      case 13:// 大型電探
+        co = 0.99;
+        break;
+      default:// その他
+        co = 0.91;
+        break;
+    }
+  }
+  else { // 2-5秋簡易式
+    switch (item.type[2]) {
+      case 7: // 艦爆
+        co = 0.6;
+        break;
+      case 8: // 艦攻
+        co = 0.8;
+        break;
+      case 9: // 艦偵
+        co = 1.0;
+        break;
+      case 10:// 水偵
+        co = 1.2;
+        break;
+      case 11:// 水爆
+        co = 1.0;
+        break;
+      case 12:// 小型電探
+      case 13:// 大型電探
+        co = 0.6;
+        break;
+      default:// その他
+        co = 0.5;
+        break;
+    }
+  }
+  return co * item.sakuteki;
 }
 
 function compareShip(a, b) {
@@ -1177,6 +1251,7 @@ function kcifCallback(request, content, query) {
           item.type = kcif.item_master[item.item_id].type;
           item.sort_no = kcif.item_master[item.item_id].sort_no;
           item.taiku = kcif.item_master[item.item_id].taiku;
+          item.sakuteki = kcif.item_master[item.item_id].sakuteki;
           item.type_name = kcif.item_master[item.item_id].type_name;
         }
       }
@@ -1303,6 +1378,7 @@ function kcifCallback(request, content, query) {
         type: item.api_type,
         sort_no: item.api_sortno,
         taiku: item.api_tyku,
+        sakuteki: item.api_saku,
         type_name: item_type[item.api_type[2]].name
       };
     }
@@ -1442,6 +1518,7 @@ function kcifCallback(request, content, query) {
         kcif.repair[i] = dock;
       }
 
+      kcif.admiral_level = Number(json.api_data.api_basic.api_level);
       kcif.ship_max = Number(json.api_data.api_basic.api_max_chara);
       kcif.item_max = Number(json.api_data.api_basic.api_max_slotitem) + 3;
     }
@@ -1646,6 +1723,7 @@ var kcif = {
   ship_max: 0,
   item_num: 0,
   item_max: 0,
+  admiral_revel: 1,
   material: [0, 0, 0, 0, 0, 0, 0, 0],
   timer: null,
 
@@ -2008,6 +2086,10 @@ var kcif = {
           var dai = 0;
           var dai_ship = [];
           var seiku = 0;
+          var sakuteki = 0;
+          var sakuteki0 = 0;
+          var sakuteki1 = 0;
+          var sakuteki2 = 0;
           var ndock = [];
           var damage = false;
           for (var j = 0; j < 6; j++) {
@@ -2093,6 +2175,10 @@ var kcif = {
             }
             var drum_p = false;
             var dai_p = false;
+            var s_sakuteki = Math.sqrt(ship.sakuteki);
+            var s_sakuteki0 = ship.sakuteki;
+            var s_sakuteki1 = Math.sqrt(ship.sakuteki);
+            var s_sakuteki2 = Math.sqrt(ship.sakuteki) * 1.69;
             for (var k = 0; ship.slot && k < 5; k++) {
               if (ship.slot[k] < 0) {
                 break;
@@ -2110,6 +2196,10 @@ var kcif = {
                 else if (hasSeiku(item.type[2]) && ship.equip[k] > 0) {
                   seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
                 }
+                s_sakuteki += calcSakuteki(item);
+                s_sakuteki0 += item.sakuteki;
+                s_sakuteki1 += calcSakuteki(item, 1);
+                s_sakuteki2 += calcSakuteki(item, 2);
               }
             }
             if (drum_p) {
@@ -2118,7 +2208,15 @@ var kcif = {
             if (dai_p) {
               dai_ship.push(ship.name);
             }
+            sakuteki += Math.floor(s_sakuteki);
+            sakuteki0 += s_sakuteki0;
+            sakuteki1 += Math.floor(s_sakuteki1);
+            sakuteki2 += s_sakuteki2;
           }
+          sakuteki -= Math.floor(0.4 * kcif.admiral_level);
+          if (sakuteki < 0) sakuteki = 0;
+          sakuteki2 -= (Math.floor((kcif.admiral_level - 1) / 5) + 1) * 5 * 0.61;
+          if (sakuteki2 < 0) sakuteki2 = 0;
 
           if (s) {
             s = ' <span class="' + col + '">' + s + '</span>';
@@ -2153,7 +2251,8 @@ var kcif = {
 
           if (ships.length > 0) {
             s += ' <span class="color-gray" title="旗艦 ' + ships[0].name + '">LV:' + ships[0].level + '/' + level_sum + '</span>';
-            s += ' <span class="color-gray"">制空:' + seiku + '</span>';
+            s += ' <span class="color-gray">制空:' + seiku + '</span>';
+            s += ' <span class="color-gray" title="総計:' + sakuteki0 + ' 旧2-5式:' + Math.floor(sakuteki1) + ' 2-5秋式:' + sakuteki2.toFixed(1) + '">索敵:' + sakuteki + '</span>';
             s += ' <span class="color-gray" title="' + kira.join(', ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
             if (drum > 0) {
               s += ' <span class="color-gray" title="' + drum_ship.join(', ') + '">ドラム:' + drum + '/' + drum_ship.length + '</span>';

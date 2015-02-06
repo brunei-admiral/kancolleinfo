@@ -2068,7 +2068,7 @@ var kcif = {
         }
         else if (t) {
           if (getShowBattle() || t == "(連合艦隊)") {
-            s = "[出撃中 " + t + "]";
+            s = "[" + t + "]";
           }
           else {
             s = "[出撃中]";
@@ -2234,7 +2234,7 @@ var kcif = {
                 else if (rt < now + 60 * 1000) {
                   rcol = "color-orange";
                 }
-                t += " 予想更新時刻" + time2str(new Date(rt));
+                t += " 更新" + time2str(new Date(rt));
               }
               s = ' <span class="' + rcol + '">[修理中' + t + ']</span>';
             }

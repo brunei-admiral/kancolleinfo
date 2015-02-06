@@ -295,7 +295,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       </table>
     </div>
     <div id="fleet1" class="fleet">
-      <h2><a class="list-header" href="#" title="第1艦隊">第1艦隊</a> <span class="color-red">[出撃中<span id="battle-result" style="display: none;"> + 5-4-1 同航戦 <span style="letter-spacing: -2px;"><span class="color-gray" title="軽空 0/84">×</span><span class="color-green" title="軽巡 57/57">◎</span><span class="color-red" title="駆逐 9/43">△</span><span class="color-orange" title="駆逐 20/43">○</span><span class="color-gray" title="駆逐 0/30">×</span><span class="color-yellow" title="駆逐 22/30">◎</span></span></span>]</span> <span class="color-gray" title="旗艦 Bismarck drei">LV:105/475</span> <span class="color-gray">制空:159</span> <span class="color-gray">索敵:8</span> <span class="color-gray" title="Bismarck drei, Верный">キラ:2/6</span> <span class="color-gray" title="暁改, Верный">ドラム:4/2</span></h2>
+      <h2><a class="list-header" href="#" title="第1艦隊">第1艦隊</a> <span class="color-red">[<span id="battle-show">出撃中</span><span id="battle-result" style="display: none;">+ 5-4-1 同航戦 <span style="letter-spacing: -2px;"><span class="color-gray" title="軽空 0/84">×</span><span class="color-green" title="軽巡 57/57">◎</span><span class="color-red" title="駆逐 9/43">△</span><span class="color-orange" title="駆逐 20/43">○</span><span class="color-gray" title="駆逐 0/30">×</span><span class="color-yellow" title="駆逐 22/30">◎</span></span></span>]</span> <span class="color-gray" title="旗艦 Bismarck drei">LV:105/475</span> <span class="color-gray">制空:159</span> <span class="color-gray">索敵:8</span> <span class="color-gray" title="Bismarck drei, Верный">キラ:2/6</span> <span class="color-gray" title="暁改, Верный">ドラム:4/2</span></h2>
       <table>
         <tr><td class="ship-no color-red" title="応急修理要員">1</td><td class="ship-type">巡戦</td><td class="ship-name" title="38cm連装砲改 38cm連装砲改 61cm四連装(酸素)魚雷 応急修理要員">Bismarck drei</td><td class="ship-level">105</td><td class="ship-hp color-green">99/99</td><td class="ship-cond color-green blink">53</td><td class="ship-fuel color-green" title="93/93">100%</td><td class="ship-bull color-green" title="131/131">100%</td><td class="ship-exp" title="1020512/1025000">4488</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">戦艦</td><td class="ship-name" title="46cm三連装砲 46cm三連装砲 46cm三連装砲 46cm三連装砲">大和改</td><td class="ship-level">61</td><td class="ship-hp color-green">96/96</td><td class="ship-cond color-yellow">30</td><td class="ship-fuel color-orange" title="125/250">50%</td><td class="ship-bull color-orange" title="162/325">49%</td><td class="ship-exp" title="189084/195800">6716</td><td class="ship-desc"><td class="ship-desc"></td></tr>
@@ -772,7 +772,7 @@ kancolleinfoの中身を改造・流用するのは自由にやっていただ�
 <h2 id="histroy">履歴</h2>
 <dl>
   <dt>2015-??-??</dt>
-  <dd id="v150">ver 1.5.0<br><span class="feature"></span>艦隊索敵値の表示を追加。<br><span class="update"></span>耐久値変化時、ツールチップで直前の耐久値の表示を追加。<br><span class="bugfix"></span>応急修理要員使用時の耐久値計算の誤りを修正。</dd>
+  <dd id="v150">ver 1.5.0<br><span class="feature"></span>艦隊索敵値の表示を追加。<br><span class="update"></span>出撃中(結果表示付き)および明石修理中の表示を簡略化。<br><span class="update"></span>耐久値変化時、ツールチップで直前の耐久値の表示を追加。<br><span class="bugfix"></span>応急修理要員使用時の耐久値計算の誤りを修正。</dd>
   <dt>2015-01-13</dt>
   <dd id="v142">ver 1.4.2<br><span class="update"></span>工作艦による修理の予想更新時刻の算出方法を変更。<br><span class="update"></span>ツールチップで次の改造レベル表示を追加。<br><span class="bugfix"></span>ゲーム開始前の受信データ不完全時にメインタブの表示が乱れる問題を修正。<br><span class="bugfix"></span>『艦これ』以外のDMMのゲーム表示時にもkancolleinfoが挿入される問題を修正。<br><span class="bugfix"></span>建造完了1分前から完了サウンドが再生される問題を修正。<br><span class="bugfix"></span>大型艦建造後、高速建造に切り替えた際に高速建造材の消費量が正しくなかった問題を修正。</dd>
   <dt>2014-12-02</dt>
@@ -873,12 +873,15 @@ for (var i = 0; i < elems.length; i++) {
 // 設定
 var elem = kcif.info_div.querySelector("#show-battle");
 elem.addEventListener("click", function(evt){
-  var elem = kcif.info_div.querySelector("#battle-result");
-  if (this.checked && elem.style.display == "none") {
-    elem.style.display = "inline";
+  var elem1 = kcif.info_div.querySelector("#battle-show");
+  var elem2 = kcif.info_div.querySelector("#battle-result");
+  if (this.checked) {
+    elem1.style.display = "none";
+    elem2.style.display = "inline";
   }
-  else if (!this.checked && elem.style.display != "none") {
-    elem.style.display = "none";
+  else {
+    elem1.style.display = "inline";
+    elem2.style.display = "none";
   }
 }, false);
 elem.checked = false;

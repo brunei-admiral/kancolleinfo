@@ -345,4 +345,21 @@ JUST.testCase({
     assertEqual("color-default", getTimeColor(new Date(now.getTime() + 301 * 1000), false));
     assertEqual("color-default", getTimeColor(new Date(now.getTime() + 301 * 1000), true));
   },
+
+  testMap2str: function(){
+    var json = {
+      api_maparea_id: 1,
+      api_mapinfo_no: 2,
+      api_no: 3,
+      api_bosscell_no: 5,
+      api_enemy: 1, // dummy
+    };
+    assertEqual("+ 1-2-3", map2str(json));
+    json.api_no = 4;
+    json.api_enemy = 0;
+    assertEqual("- 1-2-4", map2str(json));
+    json.api_no = 5;
+    json.api_enemy = 1;
+    assertEqual("* 1-2-5", map2str(json));
+  },
 });

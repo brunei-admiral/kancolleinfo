@@ -1486,13 +1486,15 @@ function kcifCallback(request, content, query) {
     var deck_id = Number(query["api_deck_id"]);
     if (deck_id > 0) {
       kcif.mission[deck_id - 1] = map2str(json.api_data);
+      log("start: " + deck_id + ": " + kcif.mission[deck_id - 1]);
     }
     update_all = false;
   }
   else if (url.indexOf("_map/next") != -1) {
-    for (var i = 0, deck; deck = kcif.mission[i]; i++) {
-      if (deck && isNaN(Number(deck))) {
+    for (var i = 0, mission; mission = kcif.mission[i]; i++) {
+      if (mission && isNaN(Number(mission))) {
         kcif.mission[i] = map2str(json.api_data);
+        log("next: " + (i + 1) + ": " + kcif.mission[i]);
         break;
       }
     }

@@ -489,7 +489,11 @@ function type2str(type) {
     case 20:
       s = "潜母";
       break;
+    case 21:
+      s = "練巡";
+      break;
     default:
+      log("艦種不明: " + type);
       s = "不明";
       break;
   }

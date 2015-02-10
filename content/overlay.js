@@ -2136,8 +2136,13 @@ var kcif = {
                 lhtml += '<td class="ship-desc"></td>';
               }
               lhtml += '</tr>';
-              if (t && isNaN(Number(t)) && ship.hp <= ship.hp_max / 4) {
-                col = "color-red";
+              if (t && isNaN(Number(t))) {
+                if (ship.hp <= ship.hp_max / 4) {
+                  col = "color-red";
+                }
+                else if (ship.hp <= ship.hp_max / 2 && col != "color-red") {
+                  col = "color-orange";
+                }
               }
               if (ship.hp < ship.hp_max) {
                 damage = true;

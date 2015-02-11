@@ -1495,7 +1495,8 @@ function kcifCallback(request, content, query) {
     update_all = false;
   }
   else if (url.indexOf("_map/next") != -1) {
-    for (var i = 0, mission; mission = kcif.mission[i]; i++) {
+    for (var i = 0; i < 4; i++) {
+      var mission = kcif.mission[i]
       if (mission && isNaN(Number(mission))) {
         kcif.mission[i] = map2str(json.api_data);
         log("next: " + (i + 1) + ": " + kcif.mission[i]);

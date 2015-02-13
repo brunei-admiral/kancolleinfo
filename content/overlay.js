@@ -554,7 +554,7 @@ function shipLevel(ship) {
 function shipHp(ship) {
   var col = "color-default";
   var hp = ship.hp;
-  if (hp <= 0) {
+  if (hp <= 0 /*|| ship.taihi*/) {
     col = "color-gray";
     hp = 0;
   }
@@ -573,7 +573,7 @@ function shipHp(ship) {
   if (ship.p_hp != hp) {
     col += " blink";
   }
-  return '<td class="ship-hp ' + col + '"' + (ship.p_hp != hp ? ' title="直前:' + ship.p_hp + '"': '') + '>' + hp + '/' + ship.hp_max + '</td>';
+  return '<td class="ship-hp ' + col + '"' + (ship.p_hp != hp ? ' title="直前:' + ship.p_hp + '"': '') + '>' + (/*ship.taihi ? '退避' :*/ (hp + '/' + ship.hp_max)) + '</td>';
 }
 
 function shipCond(ship) {
@@ -999,7 +999,8 @@ function makeShip(data) {
     equip: data.api_onslot,
     ndock_item: data.api_ndock_item,
     sakuteki: data.api_sakuteki[0],
-    exp: data.api_exp
+    exp: data.api_exp,
+    taihi: false,
   };
   if (kcif.ship_master[data.api_ship_id]) {
     ship.name = kcif.ship_master[data.api_ship_id].name;
@@ -1486,6 +1487,23 @@ function kcifCallback(request, content, query) {
       battle(url, json);
     }
   }
+  else if (url.indexOf("goback_port") != -1) {
+    var ship1 = null, ship2 = null;
+    for (var i = 0, deck; i < 2 && (deck = kcif.deck_list[i]); i++) {
+      for (var j = 1, ship; j < 6 && (ship = kcif.ship_list[deck.api_ship[j]]); j++) {
+        if (!ship1 && !ship.taihi && ship.hp <= ship.hp_max / 4) {
+          ship1 = ship;
+        }
+        else if (!ship2 && !ship.taihi && ship.type == 2 && ship.hp > ship.hp_max * 3 / 4) {
+          ship2 = ship;
+        }
+      }
+    }
+    if (ship1 && ship2) {
+      ship1.taihi = true;
+      ship2.taihi = true;
+    }
+  }
   else if (url.indexOf("_map/start") != -1) {
     var deck_id = Number(query["api_deck_id"]);
     if (deck_id > 0) {
@@ -1695,7 +1713,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item|material)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle(_water)?|sp_midnight)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item|material)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle(_water)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);
@@ -2142,10 +2160,10 @@ var kcif = {
               }
               lhtml += '</tr>';
               if (t && isNaN(Number(t))) {
-                if (ship.hp <= ship.hp_max / 4) {
+                if (!ship.taihi && ship.hp <= ship.hp_max / 4) {
                   col = "color-red";
                 }
-                else if (ship.hp <= ship.hp_max / 2 && col != "color-red") {
+                else if (!ship.taihi && ship.hp <= ship.hp_max / 2 && col != "color-red") {
                   col = "color-orange";
                 }
               }

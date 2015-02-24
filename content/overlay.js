@@ -1475,7 +1475,6 @@ function kcifCallback(request, content, query) {
       }
       updateRepairStart(deck_id - 1);
     }
-    update_all = false;
   }
   else if (url.indexOf("battle") != -1) {
     if (getShowBattle()) {

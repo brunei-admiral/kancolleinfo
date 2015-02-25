@@ -1634,8 +1634,18 @@ function kcifCallback(request, content, query) {
         if (Array.isArray(kcif.mission[i]) || !leader || leader.type != 19) {
           continue;
         }
+        var num = 1;
+        if (leader.name.indexOf("改") != -1) {
+          num++;
+        }
+        for (var j = 0, slot; j < 5 && (slot = leader.slot[j]) >= 0; j++) {
+          var item = kcif.item_list[slot];
+          if (item && item.type[2] == 31) { // 艦艇修理施設
+            num++;
+          }
+        }
         var changed = false;
-        for (j = 0, ship; ship = kcif.ship_list[deck.api_ship[j]]; j++) {
+        for (var j = 0, ship; (ship = kcif.ship_list[deck.api_ship[j]]) && j < num; j++) {
           if (ship.hp != ship.p_hp) {
             changed = true;
             break;
@@ -2180,7 +2190,7 @@ var kcif = {
           var sakuteki1 = 0;
           var sakuteki2 = 0;
           var ndock = [];
-          var damage = false;
+          var damage = [];
           for (var j = 0; j < 6; j++) {
             var id = deck ? deck.api_ship[j] : -1
             if (id === -1 || id == null) {
@@ -2232,7 +2242,7 @@ var kcif = {
                 }
               }
               if (ship.hp < ship.hp_max) {
-                damage = true;
+                damage[j] = true;
               }
             }
 
@@ -2316,7 +2326,26 @@ var kcif = {
             s = ' <span class="' + col + '">' + s + '</span>';
           }
           else {
-            if (damage && ships.length > 0 && ships[0].type == 19) { // 工作艦
+            var reparing = false;
+            var num = 1;
+            if (ships.length > 0 && ships[0].type == 19) { // 工作艦
+              if (ships[0].name.indexOf("改") != -1) {
+                num++;
+              }
+              for (var j = 0, slot; j < 5 && (slot = ships[0].slot[j]) >= 0; j++) {
+                var item = kcif.item_list[slot];
+                  if (item && item.type[2] == 31) { // 艦艇修理施設
+                  num++;
+                }
+              }
+              for (var j = 0; j < num; j++) {
+                if (damage[j]) {
+                  reparing = true;
+                  break;
+                }
+              }
+            }
+            if (reparing) {
               var t = "";
               var rcol = "color-yellow";
               if (kcif.repair_start[i]) {
@@ -2330,7 +2359,7 @@ var kcif = {
                 }
                 t += " 更新" + time2str(new Date(rt));
               }
-              s = ' <span class="' + rcol + '">[修理中' + t + ']</span>';
+              s = ' <span class="' + rcol + '" title="' + num + '隻修理可能">[修理中' + t + ']</span>';
             }
             else {
               s = "";

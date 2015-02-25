@@ -1186,7 +1186,7 @@ function kcifCallback(request, content, query) {
     var deck_list = json.api_data;
     for (var i = 0, deck; deck = deck_list[i]; i++) {
       if (deck.api_mission[2] > 0) {
-        var master = kcif.master_mission[deck.api_mission[1]];
+        var master = kcif.mission_master[deck.api_mission[1]];
         kcif.mission[i] = [deck.api_mission[0], master ? master.name : "", deck.api_mission[2]];
       }
       else if (Array.isArray(kcif.mission[i])) {

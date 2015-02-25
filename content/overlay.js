@@ -634,6 +634,31 @@ function shipExp(ship) {
   return '<td class="ship-exp" title="' + total + '">' + need + '</td>';
 }
 
+function form2str(form, prefix) {
+  var s = "";
+  if (prefix) {
+    s = prefix + ":";
+  }
+  switch (form) {
+    case 1:
+      s += "単縦陣";
+      break;
+    case 2:
+      s += "複縦陣";
+      break;
+    case 3:
+      s += "輪形陣";
+      break;
+    case 4:
+      s += "梯形陣";
+      break;
+    case 5:
+      s += "単横陣";
+      break;
+  }
+  return s;
+}
+
 function reflectDamage(ship, damage) {
   ship.hp -= damage;
   if (ship.hp <= 0) {
@@ -750,21 +775,43 @@ function battle(url, json) {
       }
     }
     if (json.api_data.api_formation) {
-      var s = "";
+      var s = "<span title='" + form2str(json.api_data.api_formation[0], "自") + " " + form2str(json.api_data.api_formation[1], "敵");
+      if (json.api_data.api_kouku && json.api_data.api_kouku.api_stage1 && json.api_data.api_kouku.api_stage1.api_disp_seiku) {
+        s += " ";
+        switch (json.api_data.api_kouku.api_stage1.api_disp_seiku) {
+          case 1:
+            s += "制空権確保";
+            break;
+          case 2:
+            s += "制空優勢";
+            break;
+          case 0:
+            s += "制空互角";
+            break;
+          case 3:
+            s += "制空劣勢";
+            break;
+          case 4:
+            s += "制空権喪失";
+            break;
+        }
+      }
+      s += "'>";
       switch (json.api_data.api_formation[2]) {
         case 1:
-          s = "同航戦";
+          s += "同航戦";
           break;
         case 2:
-          s = "反航戦";
+          s += "反航戦";
           break;
         case 3:
-          s = "T字有利";
+          s += "T字有利";
           break;
         case 4:
-          s = "T字不利";
+          s += "T字不利";
           break;
       }
+      s += "</span>";
       kcif.mission[deck_id - 1] += " " + s;
     }
 
@@ -1139,7 +1186,8 @@ function kcifCallback(request, content, query) {
     var deck_list = json.api_data;
     for (var i = 0, deck; deck = deck_list[i]; i++) {
       if (deck.api_mission[2] > 0) {
-        kcif.mission[i] = deck.api_mission[2];
+        var master = kcif.master_mission[deck.api_mission[1]];
+        kcif.mission[i] = [deck.api_mission[0], master ? master.name : "", deck.api_mission[2]];
       }
       else if (Array.isArray(kcif.mission[i])) {
         kcif.mission[i] = null;

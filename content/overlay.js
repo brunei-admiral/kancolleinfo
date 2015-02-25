@@ -1141,7 +1141,7 @@ function kcifCallback(request, content, query) {
       if (deck.api_mission[2] > 0) {
         kcif.mission[i] = deck.api_mission[2];
       }
-      else if (!isNaN(Number(kcif.mission[i]))) {
+      else if (Array.isArray(kcif.mission[i])) {
         kcif.mission[i] = null;
       }
       log("deck mission: " + i + ": " + kcif.mission[i]);
@@ -1367,7 +1367,7 @@ function kcifCallback(request, content, query) {
     kcif.ship_master = master;
 
     var mst_item_type = json.api_data.api_mst_slotitem_equiptype;
-    item_type = {}
+    item_type = {};
     for (var i = 0, item; item = mst_item_type[i]; i++) {
       item_type[item.api_id] = {
         type_id: item.api_id,
@@ -1376,7 +1376,7 @@ function kcifCallback(request, content, query) {
     }
 
     var mst_item = json.api_data.api_mst_slotitem;
-    master = {}
+    master = {};
     for (var i = 0, item; item = mst_item[i]; i++) {
       master[item.api_id] = {
         name: item.api_name,
@@ -1388,6 +1388,16 @@ function kcifCallback(request, content, query) {
       };
     }
     kcif.item_master = master;
+
+    var mst_mission = json.api_data.api_mst_mission;
+    master = {};
+    for (var i = 0, item; item = mst_mission[i]; i++) {
+      master[item.api_id] = {
+        name: item.api_name,
+        time: item.api_time,
+      };
+    }
+    kcif.mission_master = master;
 
     log("ship_master and item_master parsed");
     return;
@@ -1514,7 +1524,7 @@ function kcifCallback(request, content, query) {
   else if (url.indexOf("_map/next") != -1) {
     for (var i = 0; i < 4; i++) {
       var mission = kcif.mission[i]
-      if (mission && isNaN(Number(mission))) {
+      if (mission && !Array.isArray(mission)) {
         kcif.mission[i] = map2str(json.api_data);
         log("next: " + (i + 1) + ": " + kcif.mission[i]);
         break;
@@ -1534,7 +1544,13 @@ function kcifCallback(request, content, query) {
     var deck_list = port ? json.api_data.api_deck_port : ship2 ? json.api_data_deck : json.api_data.api_deck_data;
     if (port) {
       for (var i = 0, deck; deck = deck_list[i]; i++) {
-        kcif.mission[i] = deck.api_mission[2];
+        master = kcif.mission_master[deck.api_mission[1]];
+        if (deck.api_mission[2] > 0) {
+          kcif.mission[i] = [deck.api_mission[1], master ? master.name : "", deck.api_mission[2]];
+        }
+        else {
+          kcif.mission[i] = null;
+        }
       }
 
       var dock_list = json.api_data.api_ndock;
@@ -1567,7 +1583,7 @@ function kcifCallback(request, content, query) {
       var now = new Date().getTime();
       for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
         var leader = kcif.ship_list[deck.api_ship[0]];
-        if (kcif.mission[i] || !leader || leader.type != 19) {
+        if (Array.isArray(kcif.mission[i]) || !leader || leader.type != 19) {
           continue;
         }
         var changed = false;
@@ -1737,6 +1753,7 @@ var kcif = {
   storage: null,
   ship_master: {},
   item_master: {},
+  mission_master: {},
   ship_list: {},
   item_list: {},
   mission: [],
@@ -2085,9 +2102,9 @@ var kcif = {
         var col = "color-default";
         var t = kcif.mission[i];
         var s = null;
-        if (t && !isNaN(Number(t))) {
-          var dt = new Date(t);
-          s = "[遠征中 <label>" + time2str(dt) + "<input id='check-fleet" + (i + 1) + "' type='checkbox' class='check-timer check-expedition'></label>]";
+        if (Array.isArray(t)) {
+          var dt = new Date(t[2]);
+          s = "[<span title='" + t[1] + "'>遠征中</span> <label>" + time2str(dt) + "<input id='check-fleet" + (i + 1) + "' type='checkbox' class='check-timer check-expedition'></label>]";
           col = getTimeColor(dt);
         }
         else if (t) {

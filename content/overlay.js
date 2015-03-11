@@ -8,8 +8,15 @@
 //  http://www.softwareishard.com/blog/firebug/nsitraceablechannel-intercept-http-traffic/
 //  http://fartersoft.com/blog/2011/03/07/using-localstorage-in-firefox-extensions-for-persistent-data-storage/
 
+function logging(level, args)
+{
+  if (level <= getLogLevel()) {
+    Services.console.logStringMessage("[kcif]: " + Array.join(args, " "));
+  }
+}
+
 function log() {
-  Services.console.logStringMessage("[kcif]: " + Array.join(arguments, " "));
+  logging(5, arguments); // Debug
 }
 
 function selectTab(evt) {
@@ -271,6 +278,10 @@ function getShowBattle() {
 
 function getShowBuilt() {
   return myPref().getBoolPref("show.built");
+}
+
+function getLogLevel() {
+  return myPref().getIntPref("debug.loglevel");
 }
 
 function saveCheckboxes() {

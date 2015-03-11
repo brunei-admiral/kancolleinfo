@@ -7,3 +7,4 @@ pref("extensions.kancolleinfo.beep.dock", false);
 pref("extensions.kancolleinfo.beep.built", false);
 pref("extensions.kancolleinfo.show.battle", false);
 pref("extensions.kancolleinfo.show.built", false);
+pref("extensions.kancolleinfo.debug.loglevel", 0);

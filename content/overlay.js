@@ -960,7 +960,7 @@ function makeItem(data, ship_id) {
   var item = {
     api_id: data.api_id,
     item_id: data.api_slotitem_id,
-    level: data.api_level : 0,
+    level: typeof data.api_level != "undefined" ? data.api_level : 0,
     name: kcif.item_master[data.api_slotitem_id].name,
     type: kcif.item_master[data.api_slotitem_id].type,
     sort_no: kcif.item_master[data.api_slotitem_id].sort_no,
@@ -1454,6 +1454,25 @@ function kcifCallback(request, content, query) {
       for (var i = 0, data; data = json.api_data.api_material[i]; i++) {
         kcif.material[data.api_id - 1] = data.api_value;
       }
+
+      var now = new Date().getTime();
+      for (var i = 0, deck; i < 4; i++) {
+        var deck = kcif.deck_list[i];
+        var leader = kcif.ship_list[deck.api_ship[0]];
+        if (kcif.mission[i] || !leader || leader.type != 19) {
+          continue;
+        }
+        var changed = false;
+        for (j = 0, ship; ship = kcif.ship_list[deck.api_ship[j]]; j++) {
+          if (ship.hp != ship.p_hp) {
+            changed = true;
+            break;
+          }
+        }
+        if (changed && ((kcif.repair_start[i] && kcif.repair_start[i] < now) || !kcif.repair_start[i])) {
+          kcif.repair_start[i] = now;
+        }
+      }
     }
 
     log("etc: " + String(kcif.ship_num) + " ships (" + (port ? "port" : ship2 ? "ship2" : "ship3") + ")");
@@ -1464,61 +1483,9 @@ function kcifCallback(request, content, query) {
 
   kcif.renderInfo(update_all);
 
-  for (var i = 0, deck; deck = kcex.deck_list[i]; i++) {
-    var r = [];
-    r.push("<b>" + String(i + 1) + ":" + deck.api_name + "</b>");
-    var t = kcex.mission[i];
-    if (t && !isNaN(Number(kcex.mission[i]))) {
-      var dt = new Date(t);
-      var now = new Date().getTime();
-      var s = "[" + time2str(dt) + "]";
-      if (dt.getTime() <= now) {
-        s = "<font color='#d00'>" + s + "</font>";
-      } else if (dt.getTime() - 60000 <= now) {
-        s = "<font color='#c60'>" + s + "</font>";
-      }
-      r.push(s);
-    }
-    else if (t) {
-      r.push("<b>" + t + "</b>");
-    }
-    var id_list = deck.api_ship;
-    for (var j = 0, id; id = id_list[j]; j++) {
-      if (id === -1) break;
-      var ship = kcex.ship_list[String(id)];
-      if (ship != null) {
-        var s = String(j + 1) + '.&nbsp;';
-        var shp = ship.nowhp + '/' + ship.maxhp +'&nbsp;';
-        if (ship.nowhp <= ship.maxhp / 4) {
-          shp = "<font color='#d00'><b>" + shp + "</b></font>";
-        } else if (ship.nowhp <= ship.maxhp / 2) {
-          shp = "<font color='#c60'>" + shp + "</font>";
-        } else if (ship.nowhp <= ship.maxhp * 3 / 4) {
-          shp = "<font color='#a90'>" + shp + "</font>";
-        } else if (ship.nowhp >= ship.maxhp) {
-          shp = "<font color='#0d0'>" + shp + "</font>";
-        }
-        if (ship.prehp != ship.nowhp) {
-          shp = "<span style='background-color: #d8d8d8;'>" + shp + "</span>";
-        }
-        var scd = ship.c_cond;
-        var diff = ship.c_cond - ship.p_cond;
-        if (diff != 0) {
-          scd += "&nbsp;(" + ((diff > 0) ? '+' : '') + diff + ")";
-        }
-        if (ship.c_cond < 20) {
-          scd = "<font color='#d00'>" + scd + "</font>";
-        } else if (ship.c_cond < 30) {
-          scd = "<font color='#c60'>" + scd + "</font>";
-        } else if (ship.c_cond < 40) {
-          scd = "<font color='#a90'>" + scd + "</font>";
-        } else if (ship.c_cond >= 50) {
-          scd = "<font color='#0d0'>" + scd + "</font>";
-        }
-        r.push(s + shp + scd + " " + ship2str(ship));
-      }
-    }
-    p.push(r);
+  if (kcif.timer) {
+    window.clearTimeout(kcif.timer);
+    kcif.timer = null;
   }
   kcif.timer = window.setTimeout(kcifCallback, 10 * 1000);
 }
@@ -1797,11 +1764,10 @@ var kcif = {
       }
       var game_frame = doc.querySelector("#game_frame");
       if (game_frame) {
-        game_frame.style.height = '920px';
         kcif.game_frame = game_frame;
       }
 
-      doc.body.setAttribute("onload", "if (DMM && DMM.netgame) DMM.netgame.reloadDialog = function(){};");
+      doc.body.setAttribute("onload", "if (typeof DMM != 'undefined' && DMM.netgame) DMM.netgame.reloadDialog = function(){};");
     }
   },
 
@@ -1944,7 +1910,6 @@ var kcif = {
 
   renderInfo: function(all) {
     if (kcif.info_div) {
-      kcif.game_frame.style.height = '920px'; // なぜかここでないとダメ
       var html = "";
 
       // ベース
@@ -2144,15 +2109,19 @@ var kcif = {
           else {
             if (ships.length > 0 && ships[0].type == 19) { // 工作艦
               var t = "";
+              var rcol = "color-yellow";
               if (kcif.repair_start[i]) {
-                var rt = kcif.repair_start[i];
                 var now = new Date().getTime();
-                while (rt < now) {
-                  rt += 20 * 60 * 1000;
+                var rt = kcif.repair_start[i] + 20 * 60 * 1000;
+                if (rt < now) {
+                  rcol = "color-red";
+                }
+                else if (rt < now + 60 * 1000) {
+                  rcol = "color-orange";
                 }
                 t += " 予想更新時刻" + time2str(new Date(rt));
               }
-              s = ' <span class="color-yellow">[修理中' + t + ']</span>';
+              s = ' <span class="' + rcol + '">[修理中' + t + ']</span>';
             }
             else {
               s = "";

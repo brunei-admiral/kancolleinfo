@@ -2329,9 +2329,7 @@ var kcif = {
             sakuteki2 += s_sakuteki2;
           }
           sakuteki -= Math.floor(0.4 * kcif.admiral_level);
-          if (sakuteki < 0) sakuteki = 0;
           sakuteki2 -= (Math.floor((kcif.admiral_level - 1) / 5) + 1) * 5 * 0.61;
-          if (sakuteki2 < 0) sakuteki2 = 0;
 
           if (s) {
             s = ' <span class="' + col + '">' + s + '</span>';

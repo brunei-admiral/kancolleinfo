@@ -1082,7 +1082,6 @@ function calcSakuteki(item, type) {
   var co = 0;
   if (type == 1) { // 旧2-5式
     switch (item.type[2]) {
-      case 8: // 艦攻
       case 9: // 艦偵
       case 10:// 水偵
       case 11:// 水爆
@@ -1096,28 +1095,28 @@ function calcSakuteki(item, type) {
   else if (type == 2) { // 2-5秋式
     switch (item.type[2]) {
       case 7: // 艦爆
-        co = 1.04;
+        co = 1.0376255;
         break;
       case 8: // 艦攻
-        co = 1.37;
+        co = 1.3677954;
         break;
       case 9: // 艦偵
-        co = 1.66;
+        co = 1.6592780;
         break;
       case 10:// 水偵
-        co = 2.00;
+        co = 2.0000000;
         break;
       case 11:// 水爆
-        co = 1.78;
+        co = 1.7787282;
         break;
       case 12:// 小型電探
-        co = 1.00;
+        co = 1.0045358;
         break;
       case 13:// 大型電探
-        co = 0.99;
+        co = 0.9906638;
         break;
       default:// その他
-        co = 0.91;
+        co = 0.9067950;
         break;
     }
   }
@@ -2199,6 +2198,7 @@ var kcif = {
           var sakuteki = 0;
           var sakuteki0 = 0;
           var sakuteki1 = 0;
+          var sakuteki1i = 0;
           var sakuteki2 = 0;
           var ndock = [];
           var damage = [];
@@ -2290,10 +2290,10 @@ var kcif = {
             }
             var drum_p = false;
             var dai_p = false;
-            var s_sakuteki = Math.sqrt(ship.sakuteki);
-            var s_sakuteki0 = ship.sakuteki;
-            var s_sakuteki1 = Math.sqrt(ship.sakuteki);
-            var s_sakuteki2 = Math.sqrt(ship.sakuteki) * 1.69;
+            var s_base = ship.sakuteki;
+            var s_sakuteki = 0;
+            var s_sakuteki1 = 0;
+            var s_sakuteki2 = 0;
             for (var k = 0; ship.slot && k < 5; k++) {
               if (ship.slot[k] < 0) {
                 break;
@@ -2311,8 +2311,8 @@ var kcif = {
                 else if (hasSeiku(item.type[2]) && ship.equip[k] > 0) {
                   seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
                 }
+                s_base -= item.sakuteki;
                 s_sakuteki += calcSakuteki(item);
-                s_sakuteki0 += item.sakuteki;
                 s_sakuteki1 += calcSakuteki(item, 1);
                 s_sakuteki2 += calcSakuteki(item, 2);
               }
@@ -2323,13 +2323,17 @@ var kcif = {
             if (dai_p) {
               dai_ship.push(ship.name);
             }
+            s_sakuteki += Math.sqrt(s_base);
+            s_sakuteki2 += Math.sqrt(s_base) * 1.6841056;
             sakuteki += Math.floor(s_sakuteki);
-            sakuteki0 += s_sakuteki0;
-            sakuteki1 += Math.floor(s_sakuteki1);
+            sakuteki0 += ship.sakuteki;
+            sakuteki1 += s_base;
+            sakuteki1i += s_sakuteki1;
             sakuteki2 += s_sakuteki2;
           }
           sakuteki -= Math.floor(0.4 * kcif.admiral_level);
-          sakuteki2 -= (Math.floor((kcif.admiral_level - 1) / 5) + 1) * 5 * 0.61;
+          sakuteki1 = Math.floor(Math.sqrt(sakuteki1)) + sakuteki1i;
+          sakuteki2 -= Math.ceil((kcif.admiral_level) / 5) * 5.0 * 0.6142467;
 
           if (s) {
             s = ' <span class="' + col + '">' + s + '</span>';

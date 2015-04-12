@@ -343,4 +343,19 @@ JUST.testCase({
     json.api_enemy = 1;
     assertEqual("* 1-2-5", map2str(json));
   },
+
+  testFormatMaterial: function(){
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">0</td></tr>', formatMaterial("test", 0, 1));
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">999</td></tr>', formatMaterial("test", 999, 1));
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">1000</td></tr>', formatMaterial("test", 1000, 1));
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">299999</td></tr>', formatMaterial("test", 299999, 1));
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-red">300000</td></tr>', formatMaterial("test", 300000, 1));
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">1000</td></tr>', formatMaterial("test", 1000, 2));
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">1249</td></tr>', formatMaterial("test", 1249, 2));
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">1250</td></tr>', formatMaterial("test", 1250, 2));
+
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">0</td></tr>', formatMaterial("test", 0));
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">2999</td></tr>', formatMaterial("test", 2999));
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-red">3000</td></tr>', formatMaterial("test", 3000));
+  },
 });

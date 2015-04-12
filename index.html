@@ -285,9 +285,9 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
     <div id="resource">
       <h2><span class="list-header">資源等</span></h2>
       <table>
-        <tr><th class="res-name">燃料</th><td class="res-value">35824</td></tr>
+        <tr><th class="res-name">燃料</th><td class="res-value color-yellow">35824</td></tr>
         <tr><th class="res-name">弾薬</th><td class="res-value">9586</td></tr>
-        <tr><th class="res-name">鋼材</th><td class="res-value">105342</td></tr>
+        <tr><th class="res-name">鋼材</th><td class="res-value color-yellow">105342</td></tr>
         <tr><th class="res-name">ボーキサイト</th><td class="res-value">10988</td></tr>
         <tr><th class="res-name">&nbsp;</th><td class="res-value">&nbsp;</td></tr>
         <tr><th class="res-name">高速修復材</th><td class="res-value">1602</td></tr>
@@ -624,6 +624,8 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 <p>
 <b>資源等情報</b>は、各種の資源および一部の表示アイテムの残数を表示します。
 見てのとおりのものです。
+資源については、自然回復上限以上になると文字色が黄色になります。
+資源・資材とも、所持上限に達すると文字色が赤になります。
 </p>
 <p>
 <b>入渠ドック情報</b>は、各ドックについて、ドック番号(こちらは装備にかかわらず色は変わりません)を先頭に、艦種から疲労度までは艦隊内各艦の情報と同じものが表示されます。
@@ -777,7 +779,7 @@ kancolleinfoの中身を改造・流用するのは自由にやっていただ�
 <h2 id="histroy">履歴</h2>
 <dl>
   <dt>2015-??-??</dt>
-  <dd id="v161">ver 1.6.1<br><span class="bugfix"></span>各索敵値が高めに算出されていた不具合を修正。</dd>
+  <dd id="v161">ver 1.6.1<br><span class="update"></span>資源・資材が自然回復上限以上または所持上限数に達したら色を変更するように。<br><span class="bugfix"></span>各索敵値が高めに算出されていた不具合を修正。</dd>
   <dt>2015-04-10</dt>
   <dd id="v160">ver 1.6.0<br><span class="feature"></span>戦闘結果表示時、航空戦マスでの戦闘結果表示に対応(2014-04-10アップデート対応)。<br><span class="update"></span>索敵値の負値を認めるように変更。</dd>
   <dt>2015-02-26</dt>

@@ -645,6 +645,18 @@ function shipExp(ship) {
   return '<td class="ship-exp" title="' + total + '">' + need + '</td>';
 }
 
+function formatMaterial(name, value, level) {
+  var col;
+  if (level) {
+    var max = (level + 3) * 250;
+    col = value >= 300000 ? " color-red" : value >= max ? " color-yellow" : "";
+  }
+  else {
+    col = value >= 3000 ? " color-red" : "";
+  }
+  return '<tr><th class="res-name">' + name + '</th><td class="res-value' + col + '">' + value + '</td></tr>';
+}
+
 function form2str(form, prefix) {
   var s = "";
   if (prefix) {
@@ -2151,15 +2163,15 @@ var kcif = {
       html += '<div id="resource">';
       html += '<h2><span class="list-header">資源等</span></h2>';
       html += '<table>';
-      html += '<tr><th class="res-name">燃料</th><td class="res-value">' + kcif.material[0] + '</td></tr>';
-      html += '<tr><th class="res-name">弾薬</th><td class="res-value">' + kcif.material[1] + '</td></tr>';
-      html += '<tr><th class="res-name">鋼材</th><td class="res-value">' + kcif.material[2] + '</td></tr>';
-      html += '<tr><th class="res-name">ボーキサイト</th><td class="res-value">' + kcif.material[3] + '</td></tr>';
+      html += formatMaterial("燃料", kcif.material[0], kcif.admiral_level);
+      html += formatMaterial("弾薬", kcif.material[1], kcif.admiral_level);
+      html += formatMaterial("鋼材", kcif.material[2], kcif.admiral_level);
+      html += formatMaterial("ボーキサイト", kcif.material[3], kcif.admiral_level);
       html += '<tr><th class="res-name">&nbsp;</th><td class="res-value">&nbsp;</td></tr>';
-      html += '<tr><th class="res-name">高速修復材</th><td class="res-value">' + kcif.material[5] + '</td></tr>';
-      html += '<tr><th class="res-name">開発資材</th><td class="res-value">' + kcif.material[6] + '</td></tr>';
-      html += '<tr><th class="res-name">高速建造材</th><td class="res-value">' + kcif.material[4] + '</td></tr>';
-      html += '<tr><th class="res-name">改修資材</th><td class="res-value">' + kcif.material[7] + '</td></tr>';
+      html += formatMaterial("高速修復材", kcif.material[5]);
+      html += formatMaterial("開発資材", kcif.material[6]);
+      html += formatMaterial("高速建造材", kcif.material[4]);
+      html += formatMaterial("改修資材", kcif.material[7]);
       html += '</table>';
       html += '</div>';
 

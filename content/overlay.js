@@ -428,7 +428,7 @@ function hash2str(obj) {
 
 function map2str(map) {
   var cell = "-";
-  if (map.api_no == map.api_bosscell_no) {
+  if (map.api_no == map.api_bosscell_no || map.api_event_id == 5) {
     cell = "*";
   }
   else if (map.api_enemy) {

@@ -800,8 +800,7 @@ function damageHougeki(deck, enemies, hougeki) {
 }
 
 function judgeBattleResult(friends, enemies, myresult, eresult) {
-  var fcount = friends.length;
-  var ecount = enemies.length;
+  var fcount = 0;
   var fsunks = 0;
   var fall = 0;
   var fdmg = 0;
@@ -810,18 +809,23 @@ function judgeBattleResult(friends, enemies, myresult, eresult) {
     if (friends[i].hp <= 0 && myresult[i] > 0) {
       fsunks++;
     }
-    log(i + ": hp=", friends[i].hp + ", damage=" + myresult[i]);
+    fcount++;
     fall += friends[i].hp + myresult[i];
     fdmg += myresult[i];
   }
+  var ecount = 0;
   var esunks = 0;
   var eall = 0;
   var edmg = 0;
   for (var i = 0; enemies[i]; i++) {
     if (!eresult[i]) eresult[i] = 0;
-    if (enemies[i].hp <= 0) {
+    if (enemies[i].hp <= 0 && eresult[i] > 0) {
       esunks++;
     }
+    else if (enemies[i].hp <= 0 && eresult[i] <= 0) {
+      break;
+    }
+    ecount++;
     eall += enemies[i].hp + eresult[i];
     edmg += eresult[i];
   }
@@ -947,7 +951,7 @@ function battle(url, json) {
       }
     }
 
-    var s = "";
+    var rank = "";
     for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
       if (deck.api_id == deck_id) {
         if (json.api_data.api_kouku) {
@@ -1043,20 +1047,21 @@ function battle(url, json) {
           }
         }
 
-        s = judgeBattleResult(deck2ships(deck), enemies, kcif.battle_result[0], kcif.battle_result[1]);
+        rank = judgeBattleResult(deck2ships(deck), enemies, kcif.battle_result[0], kcif.battle_result[1]);
         break;
       }
     }
+    if (rank == "C" || rank == "D" || rank == "E") {
+      rank = "<span class='color-red'>" + rank + "</span> ";
+    }
+    else if (rank == "SS" || rank == "S") {
+      rank = "<span class='color-green'>" + rank + "</span> ";
+    }
+    else if (rank) {
+      rank = "<span class='color-gray'>" + rank + "</span> ";
+    }
 
-    if (s == "C" || s == "D" || s == "E") {
-      s = "<span class='color-red'>" + s + "</span> ";
-    }
-    else if (s == "SS" || s == "S") {
-      s = "<span class='color-green'>" + s + "</span> ";
-    }
-    else if (s) {
-      s = "<span class='color-gray'>" + s + "</span> ";
-    }
+    var s = "";
     for (var i = 0; i < 6; i++) {
       if (enemies[i] && enemies[i].hp_max > 0) {
         var t = "";
@@ -1089,7 +1094,7 @@ function battle(url, json) {
     if (n != -1) {
       kcif.mission[deck_id - 1] = kcif.mission[deck_id - 1].substring(0, n);
     }
-    kcif.mission[deck_id - 1] += " <span style='letter-spacing: -2px;'>" + s + "</span>";
+    kcif.mission[deck_id - 1] += " " + rank + "<span style='letter-spacing: -2px;'>" + s + "</span>";
   }
   catch (exc) {
     log("  failed: " + String(deck_id) + ": " + String(exc));

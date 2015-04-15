@@ -8,8 +8,7 @@
 //  http://www.softwareishard.com/blog/firebug/nsitraceablechannel-intercept-http-traffic/
 //  http://fartersoft.com/blog/2011/03/07/using-localstorage-in-firefox-extensions-for-persistent-data-storage/
 
-function logging(level, args)
-{
+function logging(level, args) {
   if (level <= getLogLevel()) {
     Services.console.logStringMessage("[kcif]: " + Array.join(args, " "));
   }
@@ -682,7 +681,20 @@ function form2str(form, prefix) {
   return s;
 }
 
-function reflectDamage(ship, damage) {
+function reflectDamage(buf, idx, ship, damage) {
+  if (buf) {
+    var d = damage;
+    if (ship.hp < d) {
+      d = ship.hp;
+    }
+    if (!buf[idx]) {
+      buf[idx] = d;
+    }
+    else {
+      buf[idx] += d;
+    }
+  }
+
   ship.hp -= damage;
   if (ship.hp <= 0) {
     var found = false;
@@ -723,7 +735,7 @@ function damageKouku(deck, enemies, kouku) {
           var damage = Math.floor(damage_list[i + 1]);
           log("    fleet " + deck.api_id + " ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
           var ship = kcif.ship_list[id];
-          reflectDamage(ship, damage);
+          reflectDamage(kcif.battle_result[0], i, ship, damage);
         }
       }
     }
@@ -735,7 +747,7 @@ function damageKouku(deck, enemies, kouku) {
           if (damage_list[i + 1] >= 0 && (kouku.api_erai_flag[i + 1] > 0 || kouku.api_ebak_flag[i + 1] > 0)) {
             var damage = Math.floor(damage_list[i + 1]);
             log("    enemy " + (i + 1) + " damaged " + damage);
-            reflectDamage(enemies[i], damage);
+            reflectDamage(kcif.battle_result[1], i, enemies[i], damage);
           }
         }
       }
@@ -751,7 +763,7 @@ function damageRaigeki(deck, enemies, raigeki) {
       var damage = Math.floor(damage_list[i + 1]);
       log("    fleet " + deck.api_id + " ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
       var ship = kcif.ship_list[id];
-      reflectDamage(ship, damage);
+      reflectDamage(kcif.battle_result[0], i, ship, damage);
     }
   }
 
@@ -761,7 +773,7 @@ function damageRaigeki(deck, enemies, raigeki) {
       if (damage_list[i + 1] >= 0 && raigeki.api_frai.indexOf(i + 1) != -1) {
         var damage = Math.floor(damage_list[i + 1]);
         log("    enemy " + (i + 1) + " damaged " + damage);
-        reflectDamage(enemies[i], damage);
+        reflectDamage(kcif.battle_result[1], i, enemies[i], damage);
       }
     }
   }
@@ -775,16 +787,94 @@ function damageHougeki(deck, enemies, hougeki) {
         var id = deck.api_ship[target - 1];
         log("    fleet " + deck.api_id + " ship " + target + "(" + String(id) + ") damaged " + damage);
         var ship = kcif.ship_list[id];
-        reflectDamage(ship, damage);
+        reflectDamage(kcif.battle_result[0], target - 1, ship, damage);
       }
       else if (target >= 7 && target <= 12) {
         if (enemies[target - 7]) {
           log("    enemy " + (target - 6) + " damaged " + damage);
-          reflectDamage(enemies[target - 7], damage);
+          reflectDamage(kcif.battle_result[1], target - 7, enemies[target - 7], damage);
         }
       }
     }
   }
+}
+
+function judgeBattleResult(friends, enemies, myresult, eresult) {
+  var fcount = friends.length;
+  var ecount = enemies.length;
+  var fsunks = 0;
+  var fall = 0;
+  var fdmg = 0;
+  for (var i = 0; friends[i]; i++) {
+    if (!myresult[i]) myresult[i] = 0;
+    if (friends[i].hp <= 0 && myresult[i] > 0) {
+      fsunks++;
+    }
+    log(i + ": hp=", friends[i].hp + ", damage=" + myresult[i]);
+    fall += friends[i].hp + myresult[i];
+    fdmg += myresult[i];
+  }
+  var esunks = 0;
+  var eall = 0;
+  var edmg = 0;
+  for (var i = 0; enemies[i]; i++) {
+    if (!eresult[i]) eresult[i] = 0;
+    if (enemies[i].hp <= 0) {
+      esunks++;
+    }
+    eall += enemies[i].hp + eresult[i];
+    edmg += eresult[i];
+  }
+  var frate = fdmg / fall;
+  var erate = edmg / eall;
+  log("fcount=" + fcount + ", fsunks=" + fsunks + ", fdmg=" + fdmg + ", fall=" + fall + ", frate=" + frate);
+  log("ecount=" + ecount + ", esunks=" + esunks + ", edmg=" + edmg + ", eall=" + eall + ", erate=" + erate);
+
+  if (fsunks == 0) { // 自軍沈没なし
+    if (erate >= 1) { // 敵軍殲滅
+      if (frate <= 0) { // 自軍ノーダメ
+        return "SS";
+      }
+      else {
+        return "S";
+      }
+    }
+    else if (esunks >= Math.round(ecount * 0.6)) { // 半数以上沈めた
+      return "A";
+    }
+    else if (enemies[0].hp <= 0 || // 旗艦沈めた または
+             frate * 2.5 < erate) { // 敵損害率が自損害率の2.5倍以上
+      return "B";
+    }
+  }
+  else { // 自軍沈没あり
+    if (erate >= 1 || // 敵軍殲滅 または
+        (enemies[0].hp <= 0 && fsunks < esunks) || // 旗艦沈めかつ撃沈数が上 または
+        frate * 2.5 < erate) { // 敵損害率が自損害率の2.5倍以上
+      return "B";
+    }
+    else if (enemies[0].hp <= 0) { // 旗艦沈め(て、撃沈数が同じまたは負け)
+      return "C"; // Dになることもあるらしいが条件不詳
+    }
+  }
+  if (frate * 0.9 < erate) { // 敵損害率が自損害率の0.9倍以上
+    return "C";
+  }
+  else if (fsunks > 0 && fcount - fsunks <= 1) { // 撃沈により残存数1
+    return "E";
+  }
+
+  return "D";
+}
+
+function deck2ships(deck) {
+  var ships = [];
+  var id_list = deck.api_ship;
+  for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
+    var ship = kcif.ship_list[id];
+    ships.push(ship);
+  }
+  return ships;
 }
 
 function battle(url, json) {
@@ -857,6 +947,7 @@ function battle(url, json) {
       }
     }
 
+    var s = "";
     for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
       if (deck.api_id == deck_id) {
         if (json.api_data.api_kouku) {
@@ -884,7 +975,7 @@ function battle(url, json) {
             var damage = support.api_support_airatack.api_damage;
             for (var i = 0; i < 6; i++) {
               if (damage[i + 1] > 0 && enemies[i]) {
-                reflectDamage(enemies[i], Math.floor(damage[i + 1]));
+                reflectDamage(kcif.battle_result[1], i, enemies[i], Math.floor(damage[i + 1]));
               }
             }
           }
@@ -893,7 +984,7 @@ function battle(url, json) {
             var damage = support.api_support_hourai.api_damage;
             for (var i = 0; i < 6; i++) {
               if (damage[i + 1] > 0 && enemies[i]) {
-                reflectDamage(enemies[i], Math.floor(damage[i + 1]));
+                reflectDamage(kcif.battle_result[1], i, enemies[i], Math.floor(damage[i + 1]));
               }
             }
           }
@@ -951,11 +1042,21 @@ function battle(url, json) {
             damageRaigeki(kcif.deck_list[1], enemies, json.api_data.api_raigeki);
           }
         }
+
+        s = judgeBattleResult(deck2ships(deck), enemies, kcif.battle_result[0], kcif.battle_result[1]);
         break;
       }
     }
 
-    var s = "";
+    if (s == "C" || s == "D" || s == "E") {
+      s = "<span class='color-red'>" + s + "</span> ";
+    }
+    else if (s == "SS" || s == "S") {
+      s = "<span class='color-green'>" + s + "</span> ";
+    }
+    else if (s) {
+      s = "<span class='color-gray'>" + s + "</span> ";
+    }
     for (var i = 0; i < 6; i++) {
       if (enemies[i] && enemies[i].hp_max > 0) {
         var t = "";
@@ -1584,6 +1685,7 @@ function kcifCallback(request, content, query) {
     }
   }
   else if (url.indexOf("_map/start") != -1) {
+    kcif.battle_result = [[], []];
     var deck_id = Number(query["api_deck_id"]);
     if (deck_id > 0) {
       kcif.mission[deck_id - 1] = map2str(json.api_data);
@@ -1592,6 +1694,7 @@ function kcifCallback(request, content, query) {
     update_all = false;
   }
   else if (url.indexOf("_map/next") != -1) {
+    kcif.battle_result = [[], []];
     for (var i = 0; i < 4; i++) {
       var mission = kcif.mission[i]
       if (mission && !Array.isArray(mission)) {
@@ -1846,6 +1949,7 @@ var kcif = {
   item_max: 0,
   admiral_revel: 1,
   material: [0, 0, 0, 0, 0, 0, 0, 0],
+  battle_result: [[], []],
   timer: null,
 
   init: function(event) {

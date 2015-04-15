@@ -1,6 +1,9 @@
 phantom.injectJs("just.js");
 phantom.injectJs("mock.js");
 phantom.injectJs("../content/overlay.js");
+getLogLevel = function() {
+  return 0;
+};
 
 JUST.testCase({
   setup: function(){
@@ -260,32 +263,53 @@ JUST.testCase({
       hp_max: 20,
       slot: [-1, -1, -1, -1, -1],
     };
-    reflectDamage(ship, 5);
+    buf = []
+    reflectDamage(buf, 0, ship, 5);
     assertEqual(5, ship.hp);
-    reflectDamage(ship, 3);
+    assertEqual(5, buf[0]);
+    reflectDamage(buf, 0, ship, 3);
     assertEqual(2, ship.hp);
-    reflectDamage(ship, 3);
+    assertEqual(8, buf[0]);
+    reflectDamage(buf, 0, ship, 3);
     assertEqual(0, ship.hp);
+    assertEqual(10, buf[0]);
 
     ship.hp = 2;
     ship.slot = [1, 3, 2, -1, -1]
-    reflectDamage(ship, 3);
+    reflectDamage(buf, 1, ship, 3);
     assertEqual(4, ship.hp);
     assertEqual([1, 2, -1, -1, -1], ship.slot);
+    assertEqual(2, buf[1]);
 
     ship.hp = 2;
     ship.slot = [1, 4, 2, -1, -1]
-    reflectDamage(ship, 3);
+    reflectDamage(buf, 2, ship, 3);
     assertEqual(20, ship.hp);
     assertEqual([1, 2, -1, -1, -1], ship.slot);
+    assertEqual(2, buf[2]);
 
     // enemy
     var ship = {
       hp: 10,
       hp_max: 20,
     };
-    reflectDamage(ship, 5);
+    reflectDamage(null, 0, ship, 5);
     assertEqual(5, ship.hp);
+  },
+
+  testJudgeBattleResult: function(){
+    assertEqual("SS", judgeBattleResult([{hp: 1}], [{hp: 0}], [0], [1]));
+    assertEqual("S", judgeBattleResult([{hp: 1}], [{hp: 0}], [1], [1]));
+    assertEqual("A", judgeBattleResult([{hp: 1}], [{hp: 1}, {hp: 0}], [1], [0, 1]));
+    assertEqual("A", judgeBattleResult([{hp: 1}], [{hp: 1}, {hp: 0}, {hp: 0}], [1], [0, 1, 1]));
+    assertEqual("A", judgeBattleResult([{hp: 1}], [{hp: 1}, {hp: 1}, {hp: 0}, {hp: 0}], [1], [0, 0, 1, 1]));
+    assertEqual("A", judgeBattleResult([{hp: 1}], [{hp: 1}, {hp: 1}, {hp: 0}, {hp: 0}, {hp: 0}], [1], [0, 0, 1, 1, 1]));
+    assertEqual("A", judgeBattleResult([{hp: 1}], [{hp: 1}, {hp: 1}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}], [1], [0, 0, 1, 1, 1, 1]));
+    assertEqual("B", judgeBattleResult([{hp: 1}], [{hp: 0}, {hp: 1}, {hp: 1}, {hp: 1}, {hp: 0}, {hp: 0}], [1], [1, 0, 0, 0, 1, 1]));
+    assertEqual("B", judgeBattleResult([{hp: 1}], [{hp: 1}, {hp: 1}, {hp: 1}, {hp: 0}, {hp: 0}, {hp: 0}], [0], [0, 0, 0, 1, 1, 1]));
+    assertEqual("C", judgeBattleResult([{hp: 1}], [{hp: 1}, {hp: 1}, {hp: 1}, {hp: 0}, {hp: 0}, {hp: 0}], [1], [0, 0, 0, 1, 1, 1]));
+    assertEqual("D", judgeBattleResult([{hp: 1}], [{hp: 1}], [0], [0]));
+    assertEqual("B", judgeBattleResult([{hp: 17}, {hp: 19}, {hp: 23}, {hp: 28}, {hp: 22}, {hp: 22}], [{hp: 79}, {hp: 59}, {hp: 27}, {hp: 0}, {hp: 0}, {hp: 0}], [0, 0, 0, 0, 0, 0], [11, 17, 49, 50, 43, 45]));
   },
 
   testUpdateRepairStart: function(){

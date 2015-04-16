@@ -810,6 +810,7 @@ function judgeBattleResult(friends, enemies, myresult, eresult) {
       fsunks++;
     }
     fcount++;
+    log("friend " + i + ": hp=" + friends[i].hp + ", damage=" + myresult[i]);
     fall += friends[i].hp + myresult[i];
     fdmg += myresult[i];
   }
@@ -826,6 +827,7 @@ function judgeBattleResult(friends, enemies, myresult, eresult) {
       break;
     }
     ecount++;
+    log("enemy " + i + ": hp=" + enemies[i].hp + ", damage=" + eresult[i]);
     eall += enemies[i].hp + eresult[i];
     edmg += eresult[i];
   }
@@ -1090,11 +1092,11 @@ function battle(url, json) {
     if (url.indexOf("combined") != -1 && url.indexOf("midnight") != -1) {
       deck_id = 1;
     }
-    var n = kcif.mission[deck_id - 1].indexOf(" <span style=");
+    var n = kcif.mission[deck_id - 1].indexOf(' <span class="battle-result"');
     if (n != -1) {
       kcif.mission[deck_id - 1] = kcif.mission[deck_id - 1].substring(0, n);
     }
-    kcif.mission[deck_id - 1] += " " + rank + "<span style='letter-spacing: -2px;'>" + s + "</span>";
+    kcif.mission[deck_id - 1] += ' <span class="battle-result">' + rank + '<span style="letter-spacing: -2px;">' + s + '</span>';
   }
   catch (exc) {
     log("  failed: " + String(deck_id) + ": " + String(exc));

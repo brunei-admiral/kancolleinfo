@@ -561,6 +561,29 @@ function shipLevel(ship) {
   return '<td class="ship-level ' + col + '"' + title + '>' + (ship ? ship.level : "") + '</td>';
 }
 
+function hp2meter(cur, max) {
+  var status = "";
+  if (cur >= max) {
+    status = "full";
+  }
+  else if (cur > max * 0.75) {
+    status = "little";
+  }
+  else if (cur > max * 0.5) {
+    status = "slight";
+  }
+  else if (cur > max * 0.25) {
+    status = "half";
+  }
+  else if (cur > 0) {
+    status = "serious";
+  }
+  else {
+    status = "empty";
+  }
+  return '<meter value="' + cur + '" min="0" max="' + max + '" title="' + Math.floor(cur * 100 / max) + '" class="' + status + '"></meter>';
+}
+
 function shipHp(ship) {
   var col = "color-default";
   var hp = ship.hp;
@@ -583,7 +606,7 @@ function shipHp(ship) {
   if (ship.p_hp != hp) {
     col += " blink";
   }
-  return '<td class="ship-hp ' + col + '"' + (ship.p_hp != hp ? ' title="直前:' + ship.p_hp + '"': '') + '>' + (/*ship.taihi ? '退避' :*/ (hp + '/' + ship.hp_max)) + '</td>';
+  return '<td class="ship-hp ' + col + '"' + (ship.p_hp != hp ? ' title="直前:' + ship.p_hp + '"': '') + '>' + (/*ship.taihi ? '退避' :*/ (hp + '/' + ship.hp_max)) + hp2meter(ship.hp, ship.hp_max) + '</td>';
 }
 
 function shipCond(ship) {
@@ -608,34 +631,42 @@ function shipCond(ship) {
 }
 
 function fuelBullColor(cur, max) {
-  if (cur == 0) {
-    return "color-red";
-  }
-  else if (cur < max / 2.0) {
-    return "color-orange";
-  }
-  else if (cur < max) {
-    return "color-yellow";
-  }
-  else {
+  if (cur >= max) {
     return "color-green";
   }
+  else if (cur > max * 0.5) {
+    return "color-yellow";
+  }
+  else if (cur > 0) {
+    return "color-orange";
+  }
+  else {
+    return "color-red";
+  }
 }
 
-function shipFuel(ship) {
-  var col = fuelBullColor(ship.fuel, ship.fuel_max);
-  if (ship.fuel != ship.p_fuel) {
-    col += " blink";
+function fuel2meter(cur, max) {
+  var status = "";
+  if (cur >= max) {
+    status = "full";
   }
-  return '<td class="ship-fuel ' + col + '" title="' + ship.fuel + '/' + ship.fuel_max + '">' + Math.floor(ship.fuel * 100 / ship.fuel_max) + '%</td>';
+  else if (cur > max * 0.5) {
+    status = "slight";
+  }
+  else if (cur > max * 0.2) {
+    status = "half";
+  }
+  else if (cur > 0) {
+    status = "serious";
+  }
+  else {
+    status = "empty";
+  }
+  return '<meter value="' + cur + '" min="0" max="' + max + '" class="' + status + '"></meter>';
 }
 
-function shipBull(ship) {
-  var col = fuelBullColor(ship.bull, ship.bull_max);
-  if (ship.bull != ship.p_bull) {
-    col += " blink";
-  }
-  return '<td class="ship-bull ' + col + '" title="' + ship.bull + '/' + ship.bull_max + '">' + Math.floor(ship.bull * 100 / ship.bull_max) + '%</td>';
+function shipFuelBull(ship) {
+  return '<td class="ship-fuel-bull" title="燃料: ' + ship.fuel + '/' + ship.fuel_max + ' (' + Math.floor(ship.fuel * 100 / ship.fuel_max) + '%)&#10;弾薬: ' + ship.bull + '/' + ship.bull_max + ' (' + Math.floor(ship.bull * 100 / ship.bull_max) + '%)">' + fuel2meter(ship.fuel, ship.fuel_max) + fuel2meter(ship.bull, ship.bull_max) + '</td>';
 }
 
 function shipExp(ship) {
@@ -2018,6 +2049,12 @@ var kcif = {
       sheet.insertRule('#kancolle-info #base-info { float: right; margin-right: 8px; color: white; font-weight: normal; }', sheet.length);
       sheet.insertRule('#kancolle-info #base-info button { height: 21px; position: relative; top: -1px; font-size: 10px; }', sheet.length);
       sheet.insertRule('#kancolle-info #updated { font-weight: bold; color: lightgreen; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab meter { background: -moz-linear-gradient(top, #aaa, #eee 20%, #aaa 30%, #888 60%, #666); }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab meter.full::-moz-meter-bar { background: -moz-linear-gradient(top, #5f7, #cfd 20%, #5f7 30%, #3c5 60%, #2a3); }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab meter.little::-moz-meter-bar { background: -moz-linear-gradient(top, #8f6, #efc 20%, #8f6 30%, #7b5 60%, #673); }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab meter.slight::-moz-meter-bar { background: -moz-linear-gradient(top, #ed4, #eec 20%, #ed4 30%, #aa3 60%, #882); }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab meter.half::-moz-meter-bar { background: -moz-linear-gradient(top, #f93, #fdb 20%, #f93 30%, #b72 60%, #861); }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab meter.serious::-moz-meter-bar { background: -moz-linear-gradient(top, #f55, #faa 20%, #f55 30%, #d44 60%, #a33); }', sheet.length);
       sheet.insertRule('#kancolle-info .tab-header a { color: inherit; text-decoration: none; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab-header a:hover { color: yellow; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab { padding: 2px 8px 2px 8px; }', sheet.length);
@@ -2035,10 +2072,13 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .ship-no, #kancolle-info .tab .item-no, #kancolle-info .tab .item-num { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-type { width: 2.7em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 4.5em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 7.8em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-fuel, #kancolle-info .tab .ship-bull { text-align: right; width: 3.8em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; padding-right: 15px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-hp-header { width: 70px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-hp { padding-top: 4px; text-align: right; width: 70px; line-height: 0; font-size: 8pt; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-hp meter { width: 70px; height: 6px; margin-top: 5px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 7.4em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-fuel-bull { width: 4.0em; line-height: 0; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-fuel-bull meter { width: 4.0em; height: 5px; margin-bottom: 1px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-exp { text-align: right; width: 5.0em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-type { width: 8em; }', sheet.length);
@@ -2359,8 +2399,7 @@ var kcif = {
               lhtml += shipLevel(ship);
               lhtml += shipHp(ship);
               lhtml += shipCond(ship);
-              lhtml += shipFuel(ship);
-              lhtml += shipBull(ship);
+              lhtml += shipFuelBull(ship);
               lhtml += shipExp(ship);
               if (kcif.repair.filter(function(e){return e.api_ship_id == ship.api_id}).length != 0) {
                 lhtml += '<td class="ship-desc color-red">入渠中</td>';
@@ -2639,8 +2678,7 @@ var kcif = {
         html += shipLevel(ship);
         html += shipHp(ship);
         html += shipCond(ship);
-        html += shipFuel(ship);
-        html += shipBull(ship);
+        html += shipFuelBull(ship);
         html += shipExp(ship);
         var fleet = null;
         for (var j = 0, deck; deck = kcif.deck_list[j]; j++) {

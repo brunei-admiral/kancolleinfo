@@ -88,34 +88,45 @@ JUST.testCase({
       hp: 10,
       hp_max: 10,
     };
-    assertMatch(/^<td class="ship-hp color-green">10\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-green">10\/10</, shipHp(ship));
+    assertMatch(/class="full"/, shipHp(ship));
     ship.hp = 9;
-    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:10">9\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:10">9\/10</, shipHp(ship));
+    assertMatch(/class="little"/, shipHp(ship));
     ship.p_hp = ship.hp;
-    assertMatch(/^<td class="ship-hp(?: color-default)?">9\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp(?: color-default)?">9\/10</, shipHp(ship));
+    assertMatch(/class="little"/, shipHp(ship));
     ship.hp = 8;
-    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:9">8\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:9">8\/10</, shipHp(ship));
+    assertMatch(/class="little"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 7;
-    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:8">7\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:8">7\/10</, shipHp(ship));
+    assertMatch(/class="slight"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 6;
-    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:7">6\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:7">6\/10</, shipHp(ship));
+    assertMatch(/class="slight"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 5;
-    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:6">5\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:6">5\/10</, shipHp(ship));
+    assertMatch(/class="half"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 3;
-    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:5">3\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:5">3\/10</, shipHp(ship));
+    assertMatch(/class="half"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 2;
-    assertMatch(/^<td class="ship-hp color-red blink" title="直前:3">2\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-red blink" title="直前:3">2\/10</, shipHp(ship));
+    assertMatch(/class="serious"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 0;
-    assertMatch(/^<td class="ship-hp color-gray blink" title="直前:2">0\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-gray blink" title="直前:2">0\/10</, shipHp(ship));
+    assertMatch(/class="empty"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = -1;
-    assertMatch(/^<td class="ship-hp color-gray">0\/10<\/td>$/, shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-gray">0\/10</, shipHp(ship));
+    assertMatch(/class="empty"/, shipHp(ship));
   },
 
   testShipCond: function(){
@@ -146,58 +157,56 @@ JUST.testCase({
     assertMatch(/^<td class="ship-cond color-red blink">0<\/td>$/, shipCond(ship));
   },
 
-  testShipFuel: function(){
+  testShipFuelBull: function(){
     var ship = {
       p_fuel: 100,
       fuel: 100,
       fuel_max: 100,
-    };
-    assertMatch(/^<td class="ship-fuel color-green" title="100\/100">100%<\/td>$/, shipFuel(ship));
-    ship.fuel = 99;
-    assertMatch(/^<td class="ship-fuel color-yellow blink" title="99\/100">99%<\/td>$/, shipFuel(ship));
-    ship.p_fuel = ship.fuel;
-    assertMatch(/^<td class="ship-fuel color-yellow" title="99\/100">99%<\/td>$/, shipFuel(ship));
-    ship.fuel = 50;
-    assertMatch(/^<td class="ship-fuel color-yellow blink" title="50\/100">50%<\/td>$/, shipFuel(ship));
-    ship.fuel = 49;
-    assertMatch(/^<td class="ship-fuel color-orange blink" title="49\/100">49%<\/td>$/, shipFuel(ship));
-    ship.fuel = 1;
-    assertMatch(/^<td class="ship-fuel color-orange blink" title="1\/100">1%<\/td>$/, shipFuel(ship));
-    ship.fuel = 0;
-    assertMatch(/^<td class="ship-fuel color-red blink" title="0\/100">0%<\/td>$/, shipFuel(ship));
-    ship.fuel = ship.p_fuel = 50;
-    ship.fuel_max = 99;
-    assertMatch(/^<td class="ship-fuel color-yellow" title="50\/99">50%<\/td>$/, shipFuel(ship));
-    ship.fuel = ship.p_fuel = 49;
-    ship.fuel_max = 99;
-    assertMatch(/^<td class="ship-fuel color-orange" title="49\/99">49%<\/td>$/, shipFuel(ship));
-  },
-
-  testShipBull: function(){
-    var ship = {
       p_bull: 100,
       bull: 100,
       bull_max: 100,
     };
-    assertMatch(/^<td class="ship-bull color-green" title="100\/100">100%<\/td>$/, shipBull(ship));
+    assertMatch(/"full"><\/meter><meter /, shipFuelBull(ship));
+    ship.fuel = 99;
+    assertMatch(/"slight"><\/meter><meter /, shipFuelBull(ship));
+    ship.fuel = 51;
+    assertMatch(/"slight"><\/meter><meter /, shipFuelBull(ship));
+    ship.fuel = 50;
+    assertMatch(/"half"><\/meter><meter /, shipFuelBull(ship));
+    ship.fuel = 21;
+    assertMatch(/"half"><\/meter><meter /, shipFuelBull(ship));
+    ship.fuel = 20;
+    assertMatch(/"serious"><\/meter><meter /, shipFuelBull(ship));
+    ship.fuel = 1;
+    assertMatch(/"serious"><\/meter><meter /, shipFuelBull(ship));
+    ship.fuel = 0;
+    assertMatch(/"empty"><\/meter><meter /, shipFuelBull(ship));
+    ship.fuel = ship.p_fuel = 50;
+    ship.fuel_max = 99;
+    assertMatch(/"slight"><\/meter><meter /, shipFuelBull(ship));
+    ship.fuel = ship.p_fuel = 49;
+    assertMatch(/"half"><\/meter><meter /, shipFuelBull(ship));
+
+    assertMatch(/"full"><\/meter><\/td>/, shipFuelBull(ship));
     ship.bull = 99;
-    assertMatch(/^<td class="ship-bull color-yellow blink" title="99\/100">99%<\/td>$/, shipBull(ship));
-    ship.p_bull = ship.bull;
-    assertMatch(/^<td class="ship-bull color-yellow" title="99\/100">99%<\/td>$/, shipBull(ship));
+    assertMatch(/"slight"><\/meter><\/td>/, shipFuelBull(ship));
+    ship.bull = 51;
+    assertMatch(/"slight"><\/meter><\/td>/, shipFuelBull(ship));
     ship.bull = 50;
-    assertMatch(/^<td class="ship-bull color-yellow blink" title="50\/100">50%<\/td>$/, shipBull(ship));
-    ship.bull = 49;
-    assertMatch(/^<td class="ship-bull color-orange blink" title="49\/100">49%<\/td>$/, shipBull(ship));
+    assertMatch(/"half"><\/meter><\/td>/, shipFuelBull(ship));
+    ship.bull = 21;
+    assertMatch(/"half"><\/meter><\/td>/, shipFuelBull(ship));
+    ship.bull = 20;
+    assertMatch(/"serious"><\/meter><\/td>/, shipFuelBull(ship));
     ship.bull = 1;
-    assertMatch(/^<td class="ship-bull color-orange blink" title="1\/100">1%<\/td>$/, shipBull(ship));
+    assertMatch(/"serious"><\/meter><\/td>/, shipFuelBull(ship));
     ship.bull = 0;
-    assertMatch(/^<td class="ship-bull color-red blink" title="0\/100">0%<\/td>$/, shipBull(ship));
+    assertMatch(/"empty"><\/meter><\/td>/, shipFuelBull(ship));
     ship.bull = ship.p_bull = 50;
     ship.bull_max = 99;
-    assertMatch(/^<td class="ship-bull color-yellow" title="50\/99">50%<\/td>$/, shipBull(ship));
+    assertMatch(/"slight"><\/meter><\/td>/, shipFuelBull(ship));
     ship.bull = ship.p_bull = 49;
-    ship.bull_max = 99;
-    assertMatch(/^<td class="ship-bull color-orange" title="49\/99">49%<\/td>$/, shipBull(ship));
+    assertMatch(/"half"><\/meter><\/td>/, shipFuelBull(ship));
   },
 
   testCompareShip: function(){

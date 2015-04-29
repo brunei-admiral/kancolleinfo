@@ -587,7 +587,7 @@ function hp2meter(cur, max) {
 function shipHp(ship) {
   var col = "color-default";
   var hp = ship.hp;
-  if (hp <= 0 /*|| ship.taihi*/) {
+  if (hp <= 0 || ship.taihi) {
     col = "color-gray";
     hp = 0;
   }
@@ -606,7 +606,7 @@ function shipHp(ship) {
   if (ship.p_hp != hp) {
     col += " blink";
   }
-  return '<td class="ship-hp ' + col + '"' + (ship.p_hp != hp ? ' title="直前:' + ship.p_hp + '"': '') + '>' + (/*ship.taihi ? '退避' :*/ (hp + '/' + ship.hp_max)) + hp2meter(ship.hp, ship.hp_max) + '</td>';
+  return '<td class="ship-hp ' + col + '"' + (ship.p_hp != hp ? ' title="直前:' + ship.p_hp + '"': '') + '>' + (ship.taihi ? '退避' : (hp + '/' + ship.hp_max)) + hp2meter(ship.hp, ship.hp_max) + '</td>';
 }
 
 function shipCond(ship) {
@@ -692,7 +692,7 @@ function form2str(form, prefix) {
   if (prefix) {
     s = prefix + ":";
   }
-  switch (form) {
+  switch (Number(form)) {
     case 1:
       s += "単縦陣";
       break;
@@ -707,6 +707,18 @@ function form2str(form, prefix) {
       break;
     case 5:
       s += "単横陣";
+      break;
+    case 11:
+      s += "第一(対潜警戒)";
+      break;
+    case 12:
+      s += "第二(前方警戒)";
+      break;
+    case 13:
+      s += "第三(輪形陣)";
+      break;
+    case 14:
+      s += "第四(戦闘隊形)";
       break;
   }
   return s;
@@ -926,9 +938,10 @@ function battle(url, json) {
     }
     if (json.api_data.api_formation) {
       var s = "<span title='" + form2str(json.api_data.api_formation[0], "自") + " " + form2str(json.api_data.api_formation[1], "敵");
-      if (json.api_data.api_kouku && json.api_data.api_kouku.api_stage1 && json.api_data.api_kouku.api_stage1.api_disp_seiku) {
+      log("json.json.api_data.api_kouku = " + (json.api_data.api_kouku ? "exist" : "not exist"));
+      if (json.api_data.api_kouku && json.api_data.api_kouku.api_stage1) {
         s += " ";
-        switch (json.api_data.api_kouku.api_stage1.api_disp_seiku) {
+        switch (Number(json.api_data.api_kouku.api_stage1.api_disp_seiku)) {
           case 1:
             s += "制空権確保";
             break;
@@ -1188,7 +1201,7 @@ function makeItem(data, ship_id) {
   return item;
 }
 
-function makeShip(data) {
+function makeShip(data, taihi) {
   var prev = kcif.ship_list[data.api_id];
   var ship = {
     api_id: data.api_id,
@@ -1209,7 +1222,7 @@ function makeShip(data) {
     ndock_item: data.api_ndock_item,
     sakuteki: data.api_sakuteki[0],
     exp: data.api_exp,
-    taihi: false,
+    taihi: taihi && prev ? prev.taihi : false,
   };
   if (kcif.ship_master[data.api_ship_id]) {
     ship.name = kcif.ship_master[data.api_ship_id].name;
@@ -1695,19 +1708,6 @@ function kcifCallback(request, content, query) {
       updateRepairStart(deck_id - 1);
     }
   }
-  else if (url.indexOf("battle") != -1) {
-    if (getShowBattle()) {
-      log("battle: " + url);
-      var deck_id = Number(json.api_data.api_dock_id || json.api_data.api_deck_id);
-      if (url.indexOf("practice") != -1 && (!kcif.mission[deck_id - 1] || kcif.mission[deck_id - 1].indexOf("演習") == -1)) {
-        kcif.mission[deck_id - 1] = "演習";
-        if (url.indexOf("midnight") == -1) {
-          kcif.battle_result = [[], []];
-        }
-      }
-      battle(url, json);
-    }
-  }
   else if (url.indexOf("goback_port") != -1) {
     var ship1 = null, ship2 = null;
     for (var i = 0, deck; i < 2 && (deck = kcif.deck_list[i]); i++) {
@@ -1723,6 +1723,19 @@ function kcifCallback(request, content, query) {
     if (ship1 && ship2) {
       ship1.taihi = true;
       ship2.taihi = true;
+    }
+  }
+  else if (url.indexOf("battle") != -1) {
+    if (getShowBattle()) {
+      log("battle: " + url);
+      var deck_id = Number(json.api_data.api_dock_id || json.api_data.api_deck_id);
+      if (url.indexOf("practice") != -1 && (!kcif.mission[deck_id - 1] || kcif.mission[deck_id - 1].indexOf("演習") == -1)) {
+        kcif.mission[deck_id - 1] = "演習";
+        if (url.indexOf("midnight") == -1) {
+          kcif.battle_result = [[], []];
+        }
+      }
+      battle(url, json);
     }
   }
   else if (url.indexOf("_map/start") != -1) {
@@ -1779,7 +1792,7 @@ function kcifCallback(request, content, query) {
     kcif.deck_list = deck_list;
 
     for (var i = 0, data; data = data_list[i]; i++) {
-      var ship = makeShip(data);
+      var ship = makeShip(data, !port);
       for (var j = 0, slot; slot = data.api_slot[j]; j++) {
         if (slot >= 0 && kcif.item_list[slot]) {
           kcif.item_list[slot].ship_id = ship.api_id;

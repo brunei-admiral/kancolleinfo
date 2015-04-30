@@ -528,12 +528,17 @@ function shipName(ship) {
     s = ship.name || "(" + ship.ship_id + ")";
     for (var i = 0; ship.slot && i < 5; i++) {
       if (ship.slot[i] >= 0 && kcif.item_list[ship.slot[i]]) {
-        items.push(kcif.item_list[ship.slot[i]].name);
+        var item = kcif.item_list[ship.slot[i]]
+        var name = String(i + 1) + ": " + item.name;
+        if (item.type && isPlane(item.type[2])) {
+          name += " [" + String(ship.equip[i]) + "/" + String(ship.equip_max[i]) + "]";
+        }
+        items.push(name);
       }
     }
   }
   if (items.length > 0) {
-    items = ' title="' + items.join(", ") + '"';
+    items = ' title="' + items.join("&#10;") + '"';
   }
   else {
     items = "";
@@ -1240,6 +1245,10 @@ function makeShip(data, taihi) {
 
 function hasSeiku(type) {
   return (type >= 6 && type <= 8) || type == 11;
+}
+
+function isPlane(type) {
+  return (type >= 6 && type <= 11);
 }
 
 function calcSakuteki(item, type) {

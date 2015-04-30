@@ -7,7 +7,7 @@ getLogLevel = function() {
 
 JUST.testCase({
   setup: function(){
-    kcif.item_list = {1: {"name": "アイテム1"}, 2: {"name": "アイテム2"}, 3: {"name": "応急修理要員", item_id: 42}, 4: {"name": "応急修理女神", item_id: 43}};
+    kcif.item_list = {1: {"name": "アイテム1"}, 2: {"name": "アイテム2", type: [0, 0, 6]}, 3: {"name": "応急修理要員", item_id: 42}, 4: {"name": "応急修理女神", item_id: 43}};
     kcif.ship_list = {100: {"name": "明石", type: 19}};
     kcif.ship_master = {100: {"name": "テスト100", type: 2}};
   },
@@ -58,13 +58,15 @@ JUST.testCase({
     var ship = {
       ship_id: 1,
       name: "テスト1",
-      slot: []
+      slot: [],
+      equip: [0, 0, 0, 0],
+      equip_max: [2, 2, 2, 2],
     };
     assertMatch(/^<td class="ship-name">テスト1<\/td>$/, shipName(ship));
     ship.slot = [1];
-    assertMatch(/^<td class="ship-name" title="アイテム1">テスト1<\/td>$/, shipName(ship));
+    assertMatch(/^<td class="ship-name" title="1: アイテム1">テスト1<\/td>$/, shipName(ship));
     ship.slot = [2, 1];
-    assertMatch(/^<td class="ship-name" title="アイテム2, アイテム1">テスト1<\/td>$/, shipName(ship));
+    assertMatch(/^<td class="ship-name" title="1: アイテム2 \[0\/2\]&#10;2: アイテム1">テスト1<\/td>$/, shipName(ship));
   },
 
   testShipLevel: function(){

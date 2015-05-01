@@ -853,6 +853,9 @@ function judgeBattleResult(friends, enemies, myresult, eresult) {
   var fall = 0;
   var fdmg = 0;
   for (var i = 0; friends[i]; i++) {
+    if (friends[i].taihi) {
+      continue;
+    }
     if (!myresult[i]) myresult[i] = 0;
     if (friends[i].hp <= 0 && myresult[i] > 0) {
       fsunks++;
@@ -934,13 +937,6 @@ function deck2ships(deck) {
 function battle(url, json) {
   try {
     var deck_id = json.api_data.api_dock_id || json.api_data.api_deck_id || 1;
-    if (url.indexOf("combined") != -1) {
-      kcif.mission[1] = "(連合艦隊)";
-      if (url.indexOf("midnight") != -1) {
-        // if it's combined fleet and midnight battle, it must be 2nd fleet.
-        deck_id = 2;
-      }
-    }
     if (json.api_data.api_formation) {
       var s = "<span title='" + form2str(json.api_data.api_formation[0], "自") + " " + form2str(json.api_data.api_formation[1], "敵");
       log("json.json.api_data.api_kouku = " + (json.api_data.api_kouku ? "exist" : "not exist"));
@@ -981,6 +977,13 @@ function battle(url, json) {
       }
       s += "</span>";
       kcif.mission[deck_id - 1] += " " + s;
+    }
+    if (url.indexOf("combined") != -1) {
+      kcif.mission[1] = "(連合艦隊)";
+      if (url.indexOf("midnight") != -1) {
+        // if it's combined fleet and midnight battle, it must be 2nd fleet.
+        deck_id = 2;
+      }
     }
 
     // enemies

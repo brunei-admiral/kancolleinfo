@@ -510,6 +510,49 @@ function type2str(type) {
   return s;
 }
 
+function seiku2str(seiku) {
+  var seikuText = "敵制空値:&#10; ";
+  var tmp = Math.floor(seiku / 3);
+  if (tmp < 1) {
+    seikuText += "0: ";
+  }
+  else {
+    seikuText += "0～" + tmp + ": ";
+  }
+  seikuText += "制空権確保&#10; ";
+  tmp++;
+  var tmp2 = Math.floor(seiku / 1.5);
+  if (tmp <= tmp2) {
+    seikuText += tmp;
+    if (tmp < tmp2) {
+      seikuText += "～" + tmp2;
+    }
+    seikuText += ": 航空優勢&#10; ";
+    tmp = tmp2 + 1;
+  }
+  tmp2 = Math.floor(seiku * 1.5);
+  if (tmp <= tmp2) {
+    seikuText += tmp;
+    if (tmp < tmp2) {
+      seikuText += "～" + tmp2;
+    }
+    seikuText += ": 航空均衡&#10; ";
+    tmp = tmp2 + 1;
+  }
+  tmp2 = Math.floor(seiku * 3);
+  if (tmp <= tmp2) {
+    seikuText += tmp;
+    if (tmp < tmp2) {
+      seikuText += "～" + tmp2;
+    }
+    seikuText += ": 航空劣勢&#10; ";
+    tmp = tmp2 + 1;
+  }
+  seikuText += tmp + "～: 制空権喪失";
+
+  return seikuText;
+}
+
 function shipType(ship) {
   var s = "";
   if (ship && ship.type) {
@@ -959,13 +1002,13 @@ function battle(url, json) {
             s += "制空権確保";
             break;
           case 2:
-            s += "制空優勢";
+            s += "航空優勢";
             break;
           case 0:
-            s += "制空互角";
+            s += "航空均衡";
             break;
           case 3:
-            s += "制空劣勢";
+            s += "航空劣勢";
             break;
           case 4:
             s += "制空権喪失";
@@ -2596,7 +2639,7 @@ var kcif = {
 
           if (ships.length > 0) {
             s += ' <span class="color-gray" title="旗艦 ' + ships[0].name + '">LV:' + ships[0].level + '/' + level_sum + '</span>';
-            s += ' <span class="color-gray">制空:' + seiku + '</span>';
+            s += ' <span class="color-gray" title="' + seiku2str(seiku) + '">制空:' + seiku + '</span>';
             s += ' <span class="color-gray" title="総計:' + sakuteki0 + ' 旧2-5式:' + Math.floor(sakuteki1) + ' 2-5秋式:' + sakuteki2.toFixed(1) + '">索敵:' + sakuteki + '</span>';
             s += ' <span class="color-gray" title="' + kira.join(', ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
             if (drum > 0) {

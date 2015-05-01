@@ -393,4 +393,12 @@ JUST.testCase({
     assertEqual('<tr><th class="res-name">test</th><td class="res-value">2999</td></tr>', formatMaterial("test", 2999));
     assertEqual('<tr><th class="res-name">test</th><td class="res-value color-red">3000</td></tr>', formatMaterial("test", 3000));
   },
+
+  testSeiku2str: function(){
+    assertEqual("敵制空値:&#10; 0: 制空権確保&#10; 1～: 制空権喪失", seiku2str(0));
+    assertEqual("敵制空値:&#10; 0: 制空権確保&#10; 1: 航空均衡&#10; 2～3: 航空劣勢&#10; 4～: 制空権喪失", seiku2str(1));
+    assertEqual("敵制空値:&#10; 0: 制空権確保&#10; 1: 航空優勢&#10; 2～3: 航空均衡&#10; 4～6: 航空劣勢&#10; 7～: 制空権喪失", seiku2str(2));
+    assertEqual("敵制空値:&#10; 0～1: 制空権確保&#10; 2: 航空優勢&#10; 3～4: 航空均衡&#10; 5～9: 航空劣勢&#10; 10～: 制空権喪失", seiku2str(3));
+    assertEqual("敵制空値:&#10; 0～1: 制空権確保&#10; 2～3: 航空優勢&#10; 4～7: 航空均衡&#10; 8～15: 航空劣勢&#10; 16～: 制空権喪失", seiku2str(5));
+  },
 });

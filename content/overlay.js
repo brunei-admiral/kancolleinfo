@@ -1713,7 +1713,9 @@ function kcifCallback(request, content, query) {
               break;
             }
           }
-          updateRepairStart(i);
+          if (found) {
+            updateRepairStart(i);
+          }
         }
         deck.api_ship[idx] = ship_id;
       }

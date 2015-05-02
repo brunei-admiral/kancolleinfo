@@ -979,12 +979,19 @@ function judgeBattleResult(friends, enemies, myresult, eresult) {
   return "D";
 }
 
-function deck2ships(deck) {
+function deck2ships(deck, deck2) {
   var ships = [];
   var id_list = deck.api_ship;
   for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
     var ship = kcif.ship_list[id];
-    ships.push(ship);
+    ships[i] = ship;
+  }
+  if (deck2) {
+    id_list = deck2.api_ship;
+    for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
+      var ship = kcif.ship_list[id];
+      ships[i + 6] = ship;
+    }
   }
   return ships;
 }
@@ -1161,7 +1168,14 @@ function battle(url, json) {
           }
         }
 
-        rank = judgeBattleResult(deck2ships(deck), enemies, kcif.battle_result[0], kcif.battle_result[1]);
+        var ships;
+        if (url.indexOf("combined") != -1) {
+          ships = deck2ships(kcif.deck_list[0], kcif.deck_list[1]);
+        }
+        else {
+          ships = deck2ships(deck);
+        }
+        rank = judgeBattleResult(ships, enemies, kcif.battle_result[0], kcif.battle_result[1]);
         break;
       }
     }

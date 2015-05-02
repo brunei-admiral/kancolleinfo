@@ -1325,7 +1325,7 @@ function hasSeiku(type) {
 }
 
 function isPlane(type) {
-  return (type >= 6 && type <= 11);
+  return (type >= 6 && type <= 11 || type == 41);
 }
 
 function calcSakuteki(item, type) {
@@ -1335,6 +1335,7 @@ function calcSakuteki(item, type) {
       case 9: // 艦偵
       case 10:// 水偵
       case 11:// 水爆
+      case 41:// 大艇
         co = 2.0;
         break;
       default:// その他
@@ -1354,6 +1355,7 @@ function calcSakuteki(item, type) {
         co = 1.6592780;
         break;
       case 10:// 水偵
+      case 41:// 大艇
         co = 2.0000000;
         break;
       case 11:// 水爆
@@ -1382,6 +1384,7 @@ function calcSakuteki(item, type) {
         co = 1.0;
         break;
       case 10:// 水偵
+      case 41:// 大艇
         co = 1.2;
         break;
       case 11:// 水爆

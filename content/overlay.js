@@ -426,12 +426,19 @@ function hash2str(obj) {
 }
 
 function map2str(map) {
-  var cell = "-";
-  if (map.api_no == map.api_bosscell_no || map.api_event_id == 5) {
-    cell = "*";
+  var cell;
+  if (map.api_enemy) {
+    if (map.api_no == map.api_bosscell_no || map.api_event_id == 5) {
+      cell = "*";
+    }
+    else {
+      cell = "+";
+    }
+    kcif.enemy_id = map.api_enemy.api_enemy_id;
   }
-  else if (map.api_enemy) {
-    cell = "+";
+  else {
+    cell = "-";
+    kcif.enemy_id = null;
   }
   return cell + " " + map.api_maparea_id + "-" + map.api_mapinfo_no + "-" + map.api_no;
 }
@@ -1000,6 +1007,7 @@ function battle(url, json) {
   try {
     var deck_id = json.api_data.api_dock_id || json.api_data.api_deck_id || 1;
     if (json.api_data.api_formation) {
+      kcif.enemy_formation = json.api_data.api_formation[1];
       var s = "<span title='" + form2str(json.api_data.api_formation[0], "自") + " " + form2str(json.api_data.api_formation[1], "敵");
       log("json.json.api_data.api_kouku = " + (json.api_data.api_kouku ? "exist" : "not exist"));
       if (json.api_data.api_kouku && json.api_data.api_kouku.api_stage1) {
@@ -1816,6 +1824,29 @@ function kcifCallback(request, content, query) {
       ship2.taihi = true;
     }
   }
+  else if (url.indexOf("battleresult") != -1) {
+    if (kcif.enemy_id && kcif.enemy_fleets &&
+        (!kcif.enemy_fleets[kcif.enemy_id] || !kcif.enemy_fleets[kcif.enemy_id].id_list) &&
+        json.api_data.api_ship_id) {
+      var ef = {
+        enemy_id: kcif.enemy_id,
+        name: json.api_data.api_enemy_info.api_deck_name,
+        formation: kcif.enemy_formation,
+        id_list: [],
+      };
+      for (var i = 0; i < 6; i++) {
+        ef.id_list[i] = json.api_data.api_ship_id[i + 1];
+        if (!ef.id_list[i]) {
+          ef.id_list[i] = -1;
+        }
+        log(" " + i + ": " + ef.id_list[i]);
+      }
+      kcif.enemy_fleets[kcif.enemy_id] = ef;
+      kcif.putStorage("enemy_fleets", JSON.stringify(kcif.enemy_fleets));
+      log("enemy: ID" + kcif.enemy_id + " saved (ef.id_list=" + (ef.id_list ? "exist" : "not exist") + ", fleets.id_list=" + (kcif.enemy_fleets[kcif.enemy_id].id_list ? "exist" : "not exist") + ")");
+    }
+    update_all = false;
+  }
   else if (url.indexOf("battle") != -1) {
     if (getShowBattle()) {
       log("battle: " + url);
@@ -1835,6 +1866,9 @@ function kcifCallback(request, content, query) {
     if (deck_id > 0) {
       kcif.mission[deck_id - 1] = map2str(json.api_data);
       log("start: " + deck_id + ": " + kcif.mission[deck_id - 1]);
+      if (kcif.enemy_id) {
+        log("  enemy: ID" + kcif.enemy_id);
+      }
     }
     update_all = false;
   }
@@ -1845,6 +1879,9 @@ function kcifCallback(request, content, query) {
       if (mission && !Array.isArray(mission)) {
         kcif.mission[i] = map2str(json.api_data);
         log("next: " + (i + 1) + ": " + kcif.mission[i]);
+        if (kcif.enemy_id) {
+          log("  enemy: ID" + kcif.enemy_id);
+        }
         break;
       }
     }
@@ -1879,6 +1916,7 @@ function kcifCallback(request, content, query) {
       kcif.admiral_level = Number(json.api_data.api_basic.api_level);
       kcif.ship_max = Number(json.api_data.api_basic.api_max_chara);
       kcif.item_max = Number(json.api_data.api_basic.api_max_slotitem) + 3;
+      kcif.enemy_id = null;
     }
     kcif.deck_list = deck_list;
 
@@ -2056,7 +2094,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item|material)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/(air)?battle|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle(_water)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|kdock|ndock|slot_item|material)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/(air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);
@@ -2095,6 +2133,9 @@ var kcif = {
   admiral_revel: 1,
   material: [0, 0, 0, 0, 0, 0, 0, 0],
   battle_result: [[], []],
+  enemy_fleets: null,
+  enemy_id: null,
+  enemy_formation: null,
   timer: null,
 
   init: function(event) {
@@ -2235,6 +2276,22 @@ var kcif = {
       }
 
       doc.body.setAttribute("onload", "if (typeof DMM != 'undefined' && DMM.netgame) DMM.netgame.reloadDialog = function(){};");
+
+      if (!kcif.enemy_fleets) {
+        var s = kcif.getStorage("enemy_fleets");
+        if (s) {
+          try {
+            kcif.enemy_fleets = JSON.parse(s);
+          }
+          catch (exc) {
+            log("  JSON.parse failed: " + String(exc));
+            kcif.enemy_fleets = null;
+          }
+        }
+        if (!kcif.enemy_fleets) {
+          kcif.enemy_fleets = {};
+        }
+      }
     }
   },
 
@@ -2447,6 +2504,31 @@ var kcif = {
         }
         else if (t) {
           if (getShowBattle() || t == "(連合艦隊)") {
+            if (kcif.enemy_id) {
+              var efs = "";
+              var ef = kcif.enemy_fleets[kcif.enemy_id];
+              if (ef && ef.id_list) {
+                efs += ef.name + "(ID" + kcif.enemy_id + ") " + form2str(ef.formation);
+                for (var j = 0, id; (id = ef.id_list[j]) && id >= 0; j++) {
+                  efs += "&#10; " + (j + 1) + ": ";
+                  var mst = kcif.ship_master[id];
+                  if (mst) {
+                    efs += mst.name;
+                    if (mst.sort_no == 0 && mst.yomi != "-") {
+                      efs += mst.yomi;
+                    }
+                  }
+                  else {
+                    efs += "(不明:" + id + ")";
+                  }
+                }
+              }
+              else {
+                efs += "不明(ID" + kcif.enemy_id + ")";
+              }
+              log("enemy: " + efs + ", ef=" + (ef ? "exist" : "not exist") + ", ef.id_list=" + (ef && ef.id_list ? "exist" : "not exist"));
+              t = t.replace(/^[\*\+] \d+-\d+-\d/, '<span title="' + efs + '">$&</span>');
+            }
             s = "[" + t + "]";
           }
           else {

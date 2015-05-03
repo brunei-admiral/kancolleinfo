@@ -104,6 +104,16 @@ function saveConfig(evt) {
     myPref().setBoolPref("show.built", elem.checked);
   }
 
+  elem = kcif.info_div.querySelector("#hp-by-meter");
+  if (elem) {
+    myPref().setBoolPref("meter.hp", elem.checked);
+  }
+
+  elem = kcif.info_div.querySelector("#fuel-by-meter");
+  if (elem) {
+    myPref().setBoolPref("meter.fuel", elem.checked);
+  }
+
   restoreCheckboxes(saveCheckboxes());
   beepOnOff();
 
@@ -112,7 +122,7 @@ function saveConfig(evt) {
     elems[i].disabled = true;
   }
 
-  kcif.renderInfo(false);
+  kcif.renderInfo(true);
 }
 
 function resetConfig(evt) {
@@ -161,6 +171,16 @@ function resetConfig(evt) {
   elem = kcif.info_div.querySelector("#show-built");
   if (elem) {
     elem.checked = getShowBuilt();
+  }
+
+  elem = kcif.info_div.querySelector("#hp-by-meter");
+  if (elem) {
+    elem.checked = getHpByMeter();
+  }
+
+  elem = kcif.info_div.querySelector("#fuel-by-meter");
+  if (elem) {
+    elem.checked = getFuelByMeter();
   }
 
   var elems = kcif.info_div.querySelectorAll("#tab-config div.config-buttons button");
@@ -236,6 +256,20 @@ function checkConfigChanged() {
     }
   }
 
+  var elem = kcif.info_div.querySelector("#hp-by-meter");
+  if (elem) {
+    if (elem.checked != getHpByMeter()) {
+      changed = true;
+    }
+  }
+
+  var elem = kcif.info_div.querySelector("#fuel-by-meter");
+  if (elem) {
+    if (elem.checked != getFuelByMeter()) {
+      changed = true;
+    }
+  }
+
   return changed;
 }
 
@@ -277,6 +311,14 @@ function getShowBattle() {
 
 function getShowBuilt() {
   return myPref().getBoolPref("show.built");
+}
+
+function getHpByMeter() {
+  return myPref().getBoolPref("meter.hp");
+}
+
+function getFuelByMeter() {
+  return myPref().getBoolPref("meter.fuel");
 }
 
 function getLogLevel() {
@@ -661,7 +703,7 @@ function shipHp(ship) {
   if (ship.p_hp != hp) {
     col += " blink";
   }
-  return '<td class="ship-hp ' + col + '"' + (ship.p_hp != hp ? ' title="直前:' + ship.p_hp + '"': '') + '>' + (ship.taihi ? '退避' : (hp + '/' + ship.hp_max)) + hp2meter(ship.hp, ship.hp_max) + '</td>';
+  return '<td class="ship-hp' + (getHpByMeter() ? '-meter ' : ' ') + col + '"' + (ship.p_hp != hp ? ' title="直前:' + ship.p_hp + '"': '') + '>' + (ship.taihi ? '退避' : (hp + '/' + ship.hp_max)) + (getHpByMeter() ? hp2meter(ship.hp, ship.hp_max) : '') + '</td>';
 }
 
 function shipCond(ship) {
@@ -721,7 +763,23 @@ function fuel2meter(cur, max) {
 }
 
 function shipFuelBull(ship) {
-  return '<td class="ship-fuel-bull" title="燃料: ' + ship.fuel + '/' + ship.fuel_max + ' (' + Math.floor(ship.fuel * 100 / ship.fuel_max) + '%)&#10;弾薬: ' + ship.bull + '/' + ship.bull_max + ' (' + Math.floor(ship.bull * 100 / ship.bull_max) + '%)">' + fuel2meter(ship.fuel, ship.fuel_max) + fuel2meter(ship.bull, ship.bull_max) + '</td>';
+  if (getFuelByMeter()) {
+    return '<td class="ship-fuel-bull" title="燃料: ' + ship.fuel + '/' + ship.fuel_max + ' (' + Math.floor(ship.fuel * 100 / ship.fuel_max) + '%)&#10;弾薬: ' + ship.bull + '/' + ship.bull_max + ' (' + Math.floor(ship.bull * 100 / ship.bull_max) + '%)">' + fuel2meter(ship.fuel, ship.fuel_max) + fuel2meter(ship.bull, ship.bull_max) + '</td>';
+  }
+  else {
+    var f = "";
+    var col = fuelBullColor(ship.fuel, ship.fuel_max);
+    if (ship.fuel != ship.p_fuel) {
+      col += " blink";
+    }
+    f = '<td class="ship-fuel ' + col + '" title="' + ship.fuel + '/' + ship.fuel_max + '">' + Math.floor(ship.fuel * 100 / ship.fuel_max) + '%</td>';
+
+    col = fuelBullColor(ship.bull, ship.bull_max);
+    if (ship.bull != ship.p_bull) {
+      col += " blink";
+    }
+    return f + '<td class="ship-bull ' + col + '" title="' + ship.bull + '/' + ship.bull_max + '">' + Math.floor(ship.bull * 100 / ship.bull_max) + '%</td>';
+  }
 }
 
 function shipExp(ship) {
@@ -2219,11 +2277,14 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; padding-right: 15px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-hp-header { width: 70px; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-hp { padding-top: 4px; text-align: right; width: 70px; line-height: 0; font-size: 8pt; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-hp meter { width: 70px; height: 6px; margin-top: 5px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 70px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-hp-meter { padding-top: 4px; text-align: right; width: 70px; line-height: 0; font-size: 8pt; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-hp-meter meter { width: 70px; height: 6px; margin-top: 5px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 7.4em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-fuel-bull { width: 4.0em; line-height: 0; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-fuel-bull meter { width: 4.0em; height: 5px; margin-bottom: 1px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-fuel, #kancolle-info .tab .ship-bull { text-align: right; width: 3.8em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-fuel-bull-header { width: 4.2em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-fuel-bull { width: 4.2em; line-height: 0; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-fuel-bull meter { width: 4.2em; height: 5px; margin-bottom: 1px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-exp { text-align: right; width: 5.0em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-type { width: 8em; }', sheet.length);
@@ -2245,8 +2306,9 @@ var kcif = {
       sheet.insertRule('#kancolle-info #tab-config td.config-input input[type=text] { width: 40em; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-config td.config-input input[type=number] { width: 4em; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-config td.config-input input[type=checkbox] { padding: 0; margin: 0 4px 0 0; position: relative; top: 2px; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config td.config-input button { padding: 0; margin: 0; height: 24px; font-size: 10.5px; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-config div.config-buttons { text-align: center; }', sheet.length);
-      sheet.insertRule('#kancolle-info #tab-config button { width: 5em; padding: 0; margin: 0; height: 24px; font-size: 10.5px; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-config div.config-buttons button { width: 5em; padding: 0; margin: 0; height: 24px; font-size: 10.5px; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-green { color: lightgreen; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-yellow { color: yellow; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-orange { color: orange; }', sheet.length);
@@ -2323,7 +2385,7 @@ var kcif = {
       html += '</div>';
 
       html += '<div id="tab-config" class="tab">';
-      html += '<table>';
+      html += '<div class="table-inner"><table>';
       html += '<tr><td class="config-header">画面キャプチャ</td><td></td></tr>';
       html += '<tr><td class="config-label">保存先</td><td class="config-input"><input id="capture-save-dir" type="text" value="' + getCaptureSaveDir() + '"></td></tr>';
       html += '<tr><td class="config-label">ベース名</td><td class="config-input"><input id="capture-save-base" type="text" value="' + getCaptureSaveBase() + '"></td></tr>';
@@ -2336,7 +2398,12 @@ var kcif = {
       html += '<tr><td class="config-header">情報表示</td><td></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-battle" type="checkbox"' + (getShowBattle() ? ' checked' : '') + '>戦闘結果を表示する</label></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-built" type="checkbox"' + (getShowBuilt() ? ' checked' : '') + '>建造結果を表示する</label></td></tr>';
-      html += '</table>';
+      html += '<tr><td class="config-header">画面カスタマイズ</td><td></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="hp-by-meter" type="checkbox"' + (getHpByMeter() ? ' checked' : '') + '>耐久値をメーター表示する</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox"' + (getFuelByMeter() ? ' checked' : '') + '>燃料・弾薬をメーター表示する</label></td></tr>';
+      html += '<tr><td class="config-header">敵艦隊編成情報</td><td></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><button id="load-enemy-fleets">ファイル読み込み</button> <button id="save-enemy-fleets">ファイル書き出し</button> <button id="reset-enemy-fleets">リセット</button></td></tr>';
+      html += '</table></div>';
       html += '<div class="config-buttons">';
       html += '<button id="config-save">保存</button>';
       html += '<button id="config-reset">クリア</button>';
@@ -2379,6 +2446,26 @@ var kcif = {
           kcif.info_div.querySelector("#config-save").disabled = !checkConfigChanged();
           kcif.info_div.querySelector("#config-reset").disabled = !checkConfigChanged();
         }, false);
+      }
+
+      // 設定:敵艦隊編成情報ファイル読み込み
+      // XXX TODO
+
+      // 設定:敵艦隊編成情報ファイル書き出し
+      // XXX TODO
+
+      // 設定:敵艦隊編成情報リセット
+      var elem = kcif.info_div.querySelector("#reset-enemy-fleets");
+      if (elem) {
+        elem.addEventListener("click", function(evt){
+          evt.preventDefault();
+
+          if (window.confirm("敵艦隊編成情報をリセットします。&#10;本当によろしいですか？")) {
+            kcif.enemy_fleets = {};
+            kcif.putStorage("enemy_fleets", JSON.stringify(kcif.enemy_fleets));
+            log("enemy fleets reset");
+          }
+        }, false, true);
       }
 
       // 設定:保存
@@ -2846,7 +2933,7 @@ var kcif = {
       var pos = table ? table.scrollTop : 0;
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="ship-no th-right"><a class="list-header' + (kcif.sort_ships.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="ship-type"><a class="list-header' + (kcif.sort_ships.startsWith("type") ? ' sort-current' : '') + '" href="#">艦種</a></th><th class="ship-name' + (kcif.sort_ships.startsWith("name") ? ' sort-current' : '') + '"><a class="list-header" href="#">艦名</a></th><th class="ship-level th-right"><a class="list-header' + (kcif.sort_ships.startsWith("level") ? ' sort-current' : '') + '" href="#">LV</a></th><th class="ship-hp th-right"><a class="list-header' + (kcif.sort_ships.startsWith("hp") ? ' sort-current' : '') + '" href="#">耐久</a></th><th class="ship-cond th-right"><a class="list-header' + (kcif.sort_ships.startsWith("cond") ? ' sort-current' : '') + '" href="#">疲労</a></th><th class="ship-fuel th-right">燃料</th><th class="ship-bull th-right">弾薬</th><th class="ship-exp th-right">経験値</th><th class="ship-desc">所在</th></tr></thead>';
+      html += '<thead><tr><th class="ship-no th-right"><a class="list-header' + (kcif.sort_ships.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="ship-type"><a class="list-header' + (kcif.sort_ships.startsWith("type") ? ' sort-current' : '') + '" href="#">艦種</a></th><th class="ship-name' + (kcif.sort_ships.startsWith("name") ? ' sort-current' : '') + '"><a class="list-header" href="#">艦名</a></th><th class="ship-level th-right"><a class="list-header' + (kcif.sort_ships.startsWith("level") ? ' sort-current' : '') + '" href="#">LV</a></th><th class="ship-hp-header' + (getHpByMeter() ? '' : ' th-right') + '"><a class="list-header' + (kcif.sort_ships.startsWith("hp") ? ' sort-current' : '') + '" href="#">耐久</a></th><th class="ship-cond th-right"><a class="list-header' + (kcif.sort_ships.startsWith("cond") ? ' sort-current' : '') + '" href="#">疲労</a></th>' + (getFuelByMeter() ? '<th class="ship-fuel-bull-header">燃料弾薬</th>' : '<th class="ship-fuel th-right">燃料</th><th class="ship-bull th-right">弾薬</th>') + '<th class="ship-exp th-right">経験値</th><th class="ship-desc">所在</th></tr></thead>';
       html += '<tbody>';
 
       var ships = [];

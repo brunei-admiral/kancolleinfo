@@ -1,8 +1,14 @@
 phantom.injectJs("just.js");
 phantom.injectJs("mock.js");
 phantom.injectJs("../content/overlay.js");
-getLogLevel = function() {
+getLogLevel = function(){
   return 0;
+};
+getHpByMeter = function(){
+  return true;
+};
+getFuelByMeter = function(){
+  return true;
 };
 
 JUST.testCase({
@@ -90,44 +96,44 @@ JUST.testCase({
       hp: 10,
       hp_max: 10,
     };
-    assertMatch(/^<td class="ship-hp color-green">10\/10</, shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-green">10\/10</, shipHp(ship));
     assertMatch(/class="full"/, shipHp(ship));
     ship.hp = 9;
-    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:10">9\/10</, shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter(?: color-default)? blink" title="直前:10">9\/10</, shipHp(ship));
     assertMatch(/class="little"/, shipHp(ship));
     ship.p_hp = ship.hp;
-    assertMatch(/^<td class="ship-hp(?: color-default)?">9\/10</, shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter(?: color-default)?">9\/10</, shipHp(ship));
     assertMatch(/class="little"/, shipHp(ship));
     ship.hp = 8;
-    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:9">8\/10</, shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter(?: color-default)? blink" title="直前:9">8\/10</, shipHp(ship));
     assertMatch(/class="little"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 7;
-    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:8">7\/10</, shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-yellow blink" title="直前:8">7\/10</, shipHp(ship));
     assertMatch(/class="slight"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 6;
-    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:7">6\/10</, shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-yellow blink" title="直前:7">6\/10</, shipHp(ship));
     assertMatch(/class="slight"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 5;
-    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:6">5\/10</, shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-orange blink" title="直前:6">5\/10</, shipHp(ship));
     assertMatch(/class="half"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 3;
-    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:5">3\/10</, shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-orange blink" title="直前:5">3\/10</, shipHp(ship));
     assertMatch(/class="half"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 2;
-    assertMatch(/^<td class="ship-hp color-red blink" title="直前:3">2\/10</, shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-red blink" title="直前:3">2\/10</, shipHp(ship));
     assertMatch(/class="serious"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = 0;
-    assertMatch(/^<td class="ship-hp color-gray blink" title="直前:2">0\/10</, shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-gray blink" title="直前:2">0\/10</, shipHp(ship));
     assertMatch(/class="empty"/, shipHp(ship));
     ship.p_hp = ship.hp;
     ship.hp = -1;
-    assertMatch(/^<td class="ship-hp color-gray">0\/10</, shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-gray">0\/10</, shipHp(ship));
     assertMatch(/class="empty"/, shipHp(ship));
   },
 

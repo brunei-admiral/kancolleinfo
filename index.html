@@ -199,11 +199,14 @@ span.bugfix:after {
 #kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }
 #kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; padding-right: 15px; }
 #kancolle-info .tab .ship-hp-header { width: 70px; }
-#kancolle-info .tab .ship-hp { padding-top: 4px; text-align: right; width: 70px; line-height: 0; font-size: 8pt; }
-#kancolle-info .tab .ship-hp meter { width: 70px; height: 6px; margin-top: 5px; }
+#kancolle-info .tab .ship-hp { text-align: right; width: 70px; }
+#kancolle-info .tab .ship-hp-meter { padding-top: 4px; text-align: right; width: 70px; line-height: 0; font-size: 8pt; }
+#kancolle-info .tab .ship-hp-meter meter { width: 70px; height: 6px; margin-top: 5px; }
 #kancolle-info .tab .ship-at { text-align: right; width: 7.4em; }
-#kancolle-info .tab .ship-fuel-bull { width: 4.0em; line-height: 0; }
-#kancolle-info .tab .ship-fuel-bull meter { width: 4.0em; height: 5px; margin-bottom: 1px; }
+#kancolle-info .tab .ship-fuel, #kancolle-info .tab .ship-bull { text-align: right; width: 3.8em; }
+#kancolle-info .tab .ship-fuel-bull-header { width: 4.2em; }
+#kancolle-info .tab .ship-fuel-bull { width: 4.2em; line-height: 0; }
+#kancolle-info .tab .ship-fuel-bull meter { width: 4.2em; height: 5px; margin-bottom: 1px; }
 #kancolle-info .tab .ship-exp { text-align: right; width: 5.0em; }
 #kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }
 #kancolle-info .tab .item-type { width: 8em; }
@@ -269,7 +272,7 @@ function hp2html(now, max, prev) {
     col += " blink";
     prev = ' title="直前: ' + prev + '"';
   }
-  return '<td class="ship-hp' + col + '"' + prev + '>' + now + '/' + max + '<meter title="' + Math.floor(now * 100 / max) + '%" value="' + now + '" min="0" max="' + max + '" class="' + status + '"></meter></td>';
+  return '<td class="ship-hp-meter' + col + '"' + prev + '>' + now + '/' + max + '<meter title="' + Math.floor(now * 100 / max) + '%" value="' + now + '" min="0" max="' + max + '" class="' + status + '"></meter></td>';
 }
 
 function fuel2meter(now, max) {
@@ -386,8 +389,8 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
         <tr><td class="ship-no">2</td><td class="ship-type">航巡</td><td class="ship-name" title="1: 瑞雲 [5/5]&#10;2: 瑞雲(六三四空) [6/6]&#10;3: 瑞雲 [5/5]&#10;4: 零式水上偵察機 [3/3]">最上改</td><td class="ship-level">27</td><script>document.write(hp2html(50, 50));</script><td class="ship-cond color-default">49</td><script>document.write(fuel2html(50, 50, 55, 55));</script><td class="ship-exp" title="36465/37800">1335</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">3</td><td class="ship-type">重巡</td><td class="ship-name" title="1: 20.3cm連装砲&#10;2: 20.3cm連装砲&#10;3: 61cm四連装魚雷">羽黒</td><td class="ship-level" title="LV25 羽黒改(重巡)">3</td><script>document.write(hp2html(44, 44));</script><td class="ship-cond color-default">49</td><script>document.write(fuel2html(40, 40, 65, 65));</script><td class="ship-exp" title="465/600">135</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">4</td><td class="ship-type">揚陸</td><td class="ship-name" title="1: 三式指揮連絡機(対潜) [8/8]&#10;2: カ号観測機 [8/8]&#10;3: 紫電改二 [8/8]">あきつ丸改</td><td class="ship-level">33</td><script>document.write(hp2html(40, 40));</script><td class="ship-cond color-default">49</td><script>document.write(fuel2html(45, 45, 25, 25));</script><td class="ship-exp" title="53514/56100">2586</td><td class="ship-desc"></td></tr>
-        <tr><td class="ship-no">5</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
-        <tr><td class="ship-no">6</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">5</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">6</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
       </table>
     </div>
     <div id="fleet3" class="fleet">
@@ -396,9 +399,9 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
         <tr><td class="ship-no">1</td><td class="ship-type">駆逐</td><td class="ship-name" title="1: 12.7cm連装砲&#10;2: 12.7cm連装砲&#10;3: 13号対空電探">吹雪改</td><td class="ship-level" title="LV70 吹雪改二(駆逐)">55</td><script>document.write(hp2html(30, 30));</script><td class="ship-cond color-default">49</td><script>document.write(fuel2html(15, 15, 20, 20));</script><td class="ship-exp" title="151958/155500">3542</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">駆逐</td><td class="ship-name" title="1: 12.7cm連装砲&#10;2: 三式水中探信儀&#10;3: 九四式爆雷投射機">天津風改</td><td class="ship-level">24</td><script>document.write(hp2html(34, 34));</script><td class="ship-cond color-default">49</td><script>document.write(fuel2html(20, 20, 20, 20));</script><td class="ship-exp" title="28135/30000">1865</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">3</td><td class="ship-type">駆逐</td><td class="ship-name" title="1: 12.7cm単装砲&#10;2: 2cm 四連装FlaK 38&#10;3: 61cm三連装魚雷">Z1 zwei</td><td class="ship-level">73</td><script>document.write(hp2html(35, 35));</script><td class="ship-cond color-default">49</td><script>document.write(fuel2html(20, 20, 25, 25));</script><td class="ship-exp" title="292635/296200">3565</td><td class="ship-desc"></td></tr>
-        <tr><td class="ship-no">4</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
-        <tr><td class="ship-no">5</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
-        <tr><td class="ship-no">6</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">4</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">5</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">6</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
       </table>
     </div>
     <div id="fleet4" class="fleet">
@@ -406,16 +409,16 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type">水母</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 甲標的&#10;3: 大発動艇">千歳甲</td><td class="ship-level" title="LV15 千歳航(軽空)">12</td><script>document.write(hp2html(40, 42));</script><td class="ship-cond">49</td><script>document.write(fuel2html(35, 35, 45, 45));</script><td class="ship-exp" title="6726/7800">1074</td><td class="ship-desc color-red">入渠中</td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">潜母</td><td class="ship-name" title="1: 15.5cm三連装副砲&#10;2: 15.5cm三連装副砲&#10;3: 新型高温高圧缶">大鯨</td><td class="ship-level color-green" title="改造後 龍鳳(軽空)">52</td><script>document.write(hp2html(39, 39));</script><td class="ship-cond">49</td><script>document.write(fuel2html(28, 35, 8, 10));</script><td class="ship-exp" title="132638/132700">62</td><td class="ship-desc"></td></tr>
-        <tr><td class="ship-no">3</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
-        <tr><td class="ship-no">4</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
-        <tr><td class="ship-no">5</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
-        <tr><td class="ship-no">6</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">3</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">4</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">5</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
+        <tr><td class="ship-no">6</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
       </table>
     </div>
     <div id="ndock">
       <h2><span class="list-header">入渠</span></h2>
       <table>
-        <tr><td class="ship-no">1</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp"></td><td class="ship-cond"></td><td class="ship-at"></td></tr>
+        <tr><td class="ship-no">1</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-at"></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">水母</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 甲標的&#10;3: 大発動艇">千歳甲</td><td class="ship-level" title="LV15 千歳航(軽空)">12</td><script>document.write(hp2html(40, 42));</script><td class="ship-cond">49</td><td class="ship-at color-orange"><label>20:36<input class="check-timer" type="checkbox"></label></td></tr>
         <tr><td class="ship-no">3</td><td class="ship-type">航戦</td><td class="ship-name" title="1: 41cm連装砲&#10;2: 41cm連装砲&#10;3: 瑞雲(六三四空) [11/11]&#10;4: 瑞雲 [14/14]">伊勢改</td><td class="ship-level">83</td><script>document.write(hp2html(2, 77));</script><td class="ship-cond color-yellow blink">30</td><td class="ship-at"><label>10/09 02:34<input class="check-timer" type="checkbox"></label></td></tr>
         <tr><td class="ship-no">4</td><td class="ship-type">潜空</td><td class="ship-name" title="1: 61cm四連装(酸素)魚雷&#10;2: 61cm四連装(酸素)魚雷">伊58改</td><td class="ship-level">51</td><script>document.write(hp2html(8, 18));</script><td class="ship-cond color-orange blink">20</td><td class="ship-at color-red"><label>20:34<input class="check-timer" type="checkbox"></label></td></tr>
@@ -434,7 +437,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <div id="tab-ships" class="tab">
     <div class="table-outer"><div class="table-inner"><table>
       <thead>
-        <tr><th class="ship-no th-right"><a class="list-header" href="#">#</a></th><th class="ship-type"><a class="list-header" href="#">艦種</a></th><th class="ship-name"><a class="list-header" href="#">艦名</a></th><th class="ship-level th-right"><a class="list-header sort-current" href="#">LV</a></th><th class="ship-hp-header"><a class="list-header" href="#">耐久</a></th><th class="ship-cond th-right"><a class="list-header" href="#">疲労</a></th><th class="ship-fuel-bull">燃料弾薬</th><th class="ship-exp th-right">経験値</th><th class="ship-desc">所在</th></tr>
+        <tr><th class="ship-no th-right"><a class="list-header" href="#">#</a></th><th class="ship-type"><a class="list-header" href="#">艦種</a></th><th class="ship-name"><a class="list-header" href="#">艦名</a></th><th class="ship-level th-right"><a class="list-header sort-current" href="#">LV</a></th><th class="ship-hp-header"><a class="list-header" href="#">耐久</a></th><th class="ship-cond th-right"><a class="list-header" href="#">疲労</a></th><th class="ship-fuel-bull-header">燃料弾薬</th><th class="ship-exp th-right">経験値</th><th class="ship-desc">所在</th></tr>
       </thead>
       <tbody>
         <tr><td class="ship-no">1</td><td class="ship-type">正空</td><td class="ship-name" title="1: 応急修理女神">飛龍改二</td><td class="ship-level">150</td><script>document.write(hp2html(74, 74));</script><td class="ship-cond color-green blink">53</td><script>document.write(fuel2html(59, 59, 63, 63));</script><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
@@ -561,8 +564,8 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       <tr><td class="config-label"></td><td class="config-input"><label><input id="show-battle" type="checkbox">戦闘結果を表示する</label></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="show-built" type="checkbox">建造結果を表示する</label></td></tr>
       <tr><td class="config-header">表示カスタマイズ</td><td></td></tr>
-      <tr><td class="config-label"></td><td class="config-input"><label><input id="hp-meter" type="checkbox" checked>耐久値をメーター表示する</label></td></tr>
-      <tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-meter" type="checkbox" checked>燃料・弾薬をメーター表示する</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="hp-by-meter" type="checkbox" checked>耐久値をメーター表示する</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox" checked>燃料・弾薬をメーター表示する</label></td></tr>
       <tr><td class="config-header">敵艦隊編成情報</td><td></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><button>ファイル読み込み</button> <button>ファイル書き出し</button> <button>リセット</button></td></tr>
     </table></div>

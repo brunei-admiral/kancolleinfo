@@ -2553,11 +2553,11 @@ var kcif = {
               stream.init(picker.file, 0x04 | 0x08 | 0x20, 0644, 0);
               var conv = CCIN("@mozilla.org/intl/scriptableunicodeconverter", "nsIScriptableUnicodeConverter");
               conv.charset = "Windows-31J";
-              var data = conv.ConvertFromUnicode(csvHeader + "\n");
+              var data = conv.ConvertFromUnicode(csvHeader + "\r\n");
               if (kcif.enemy_fleets) {
                 for (var k in kcif.enemy_fleets) {
                   var v = kcif.enemy_fleets[k];
-                  data += conv.ConvertFromUnicode(String(k) + "," + v.name + "," + v.formation + "," + v.id_list.join(",") + "\n");
+                  data += conv.ConvertFromUnicode(String(k) + "," + v.name + "," + v.formation + "," + v.id_list.join(",") + "\r\n");
                 }
               }
               data += conv.Finish();

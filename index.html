@@ -225,8 +225,9 @@ span.bugfix:after {
 #kancolle-info #tab-config td.config-input input[type=text] { width: 40em; }
 #kancolle-info #tab-config td.config-input input[type=number] { width: 4em; }
 #kancolle-info #tab-config td.config-input input[type=checkbox] { padding: 0; margin: 0 4px 0 0; position: relative; top: 2px; }
+#kancolle-info #tab-config td.config-input button { padding: 0; margin: 0; height: 24px; font-size: 10.5px; }
 #kancolle-info #tab-config div.config-buttons { text-align: center; }
-#kancolle-info #tab-config button { width: 5em; padding: 0; margin: 0; height: 24px; font-size: 10.5px; }
+#kancolle-info #tab-config div.config-buttons button { width: 5em; padding: 0; margin: 0; height: 24px; font-size: 10.5px; }
 #kancolle-info .color-green { color: lightgreen; }
 #kancolle-info .color-yellow { color: yellow; }
 #kancolle-info .color-orange { color: orange; }
@@ -546,7 +547,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
     </table></div></div>
   </div>
   <div id="tab-config" class="tab">
-    <table>
+    <div class="table-inner"><table>
       <tr><td class="config-header">画面キャプチャ</td><td></td></tr>
       <tr><td class="config-label">保存先</td><td class="config-input"><input id="capture-save-dir" type="text" value="C:\Users\提督\AppData\Local\Temp"></td></tr>
       <tr><td class="config-label">ベース名</td><td class="config-input"><input id="capture-save-base" type="text" value="kancolle-"></td></tr>
@@ -559,7 +560,12 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       <tr><td class="config-header">情報表示</td><td></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="show-battle" type="checkbox">戦闘結果を表示する</label></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="show-built" type="checkbox">建造結果を表示する</label></td></tr>
-    </table>
+      <tr><td class="config-header">表示カスタマイズ</td><td></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="hp-meter" type="checkbox" checked>耐久値をメーター表示する</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-meter" type="checkbox" checked>燃料・弾薬をメーター表示する</label></td></tr>
+      <tr><td class="config-header">敵艦隊編成情報</td><td></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><button>ファイル読み込み</button> <button>ファイル書き出し</button> <button>リセット</button></td></tr>
+    </table></div>
     <div class="config-buttons">
       <button id="config-save">保存</button>
       <button id="config-reset">クリア</button>
@@ -796,9 +802,29 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <dd>先に説明したとおりです。</dd>
 </dl>
 <p>
-設定を変更しても、<samp>保存</samp>ボタンを押下しない限り反映はされません(<a href="#kancolle-info">モック</a>では<samp>情報表示</samp>の各項目のチェック状態を変更すると即時に反映されますが、これは実物の挙動とは異なります)。
-また、<samp>リセット</samp>ボタンを押すと、書き換えた各設定項目の値が前回保存した状態に戻ります。
-前回の保存状態から何か変更しない限りは、<samp>保存</samp>ボタンも<samp>リセット</samp>ボタンも押せません(<a href="#kancolle-info">モック</a>ではいつでも押せますが、押しても意味はありません)。
+<samp>表示カスタマイズ</samp>では、情報表示形式の一部をカスタマイズできます。
+</p>
+<dl>
+  <dt><samp>耐久値を～</samp></td>
+  <dd>このチェックを入れると艦の耐久値がメーター表示されます。チェックを外すと数値がそのまま表示されます。初期状態ではチェックが入っています。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd>
+  <dt><samp>燃料・弾薬を～</samp></td>
+  <dd>このチェックを入れると艦の燃料・弾薬がメーター表示されます。チェックを外すと総量に対する残量が%で表示されます。初期状態ではチェックが入っています。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd>
+</dl>
+<p>
+<samp>敵艦隊編成情報</samp>では、敵艦隊編成情報をファイルから読み込んだり、ファイルに書き出したりすることができます。なお、敵艦隊編成情報は、新しい編成の敵艦隊に遭遇するたびに、自動的に記憶されていきます。
+</p>
+<dl>
+  <dt><samp>ファイル読み込み</samp></td>
+  <dd>ファイルから敵艦隊編成情報を読み込みます。なおファイルのフォーマットは所定のCSV形式で、エンコーディングはいわゆるシフトJISまたはUTF-8である必要があります。どのようなCSVである必要があるかは、ファイルに書き出してみてご確認ください。もっとも、基本的に手で編集することは想定していません。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd></dd>
+  <dt><samp>ファイル書き込み</samp></td>
+  <dd>ファイルに敵艦隊編成情報を書き出します。エンコーディングはいわゆるシフトJISとなりますが、将来は変更するかもしれません。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd></dd>
+  <dt><samp>リセット</samp></td>
+  <dd>現在記憶している敵艦隊編成情報をクリアします。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd></dd>
+</dl>
+<p>
+<samp>敵艦隊編成情報</samp>以外の各項目については、設定を変更しても、<samp>保存</samp>ボタンを押下しない限り反映はされません(<a href="#kancolle-info">モック</a>では<samp>情報表示</samp>の各項目のチェック状態を変更すると即時に反映されますが、これは実物の挙動とは異なります)。
+また、<samp>クリア</samp>ボタンを押すと、書き換えた各設定項目の値が前回保存した状態に戻ります。
+前回の保存状態から何か変更しない限りは、<samp>保存</samp>ボタンも<samp>クリア</samp>ボタンも押せません(<a href="#kancolle-info">モック</a>ではいつでも押せますが、押しても意味はありません)。
 </p>
 
 <h3 id="bugs">動作上の制限事項など</h3>

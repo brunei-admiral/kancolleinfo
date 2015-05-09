@@ -114,6 +114,11 @@ function saveConfig(evt) {
     myPref().setBoolPref("meter.fuel", elem.checked);
   }
 
+  elem = kcif.info_div.querySelector("#search-formula");
+  if (elem) {
+    myPref().setIntPref("search.formula", elem.options[elem.selectedIndex].value);
+  }
+
   restoreCheckboxes(saveCheckboxes());
   beepOnOff();
 
@@ -181,6 +186,16 @@ function resetConfig(evt) {
   elem = kcif.info_div.querySelector("#fuel-by-meter");
   if (elem) {
     elem.checked = getFuelByMeter();
+  }
+
+  elem = kcif.info_div.querySelector("#search-formula");
+  if (elem) {
+    for (var i = 0; elem.options.length; i++) {
+      if (Number(elem.options[i].value) == getSearchFormula()) {
+        elem.selectedIndex = i;
+        break;
+      }
+    }
   }
 
   var elems = kcif.info_div.querySelectorAll("#tab-config div.config-buttons button");
@@ -270,6 +285,13 @@ function checkConfigChanged() {
     }
   }
 
+  elem = kcif.info_div.querySelector("#search-formula");
+  if (elem) {
+    if (elem.options[elem.selectedIndex].value != getSearchFormula()) {
+      changed = true;
+    }
+  }
+
   return changed;
 }
 
@@ -319,6 +341,10 @@ function getHpByMeter() {
 
 function getFuelByMeter() {
   return myPref().getBoolPref("meter.fuel");
+}
+
+function getSearchFormula() {
+  return myPref().getIntPref("search.formula");
 }
 
 function getLogLevel() {
@@ -2411,6 +2437,7 @@ var kcif = {
       html += '<tr><td class="config-header">表示カスタマイズ</td><td></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="hp-by-meter" type="checkbox"' + (getHpByMeter() ? ' checked' : '') + '>耐久値をメーター表示する</label></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox"' + (getFuelByMeter() ? ' checked' : '') + '>燃料・弾薬をメーター表示する</label></td></tr>';
+      html += '<tr><td class="config-label">索敵値計算式</td><td class="config-input"><select id="search-formula"><option value="0"' + (getSearchFormula() == 0 ? ' selected' : '') + '>総計</option><option value="1"' + (getSearchFormula() == 1 ? ' selected' : '') + '>旧2-5式</option><option value="2"' + (getSearchFormula() == 2 ? ' selected' : '') + '>2-5秋式</option><option value="3"' + (getSearchFormula() == 3 ? ' selected' : '') + '>秋簡易式</option></select></td></tr>';
       html += '<tr><td class="config-header">敵艦隊編成情報</td><td></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><button id="load-enemy-fleets">ファイル読み込み</button> <button id="save-enemy-fleets">ファイル書き出し</button> <button id="reset-enemy-fleets">リセット</button></td></tr>';
       html += '</table></div>';
@@ -2453,6 +2480,15 @@ var kcif = {
       var elems = kcif.info_div.querySelectorAll("#tab-config input[type=checkbox]");
       for (var i = 0; i < elems.length; i++) {
         elems[i].addEventListener("click", function() {
+          kcif.info_div.querySelector("#config-save").disabled = !checkConfigChanged();
+          kcif.info_div.querySelector("#config-reset").disabled = !checkConfigChanged();
+        }, false);
+      }
+
+      // 設定:リストボックス
+      var elems = kcif.info_div.querySelectorAll("#tab-config select");
+      for (var i = 0; i < elems.length; i++) {
+        elems[i].addEventListener("change", function() {
           kcif.info_div.querySelector("#config-save").disabled = !checkConfigChanged();
           kcif.info_div.querySelector("#config-reset").disabled = !checkConfigChanged();
         }, false);
@@ -2953,7 +2989,34 @@ var kcif = {
           if (ships.length > 0) {
             s += ' <span class="color-gray" title="旗艦 ' + ships[0].name + '">LV:' + ships[0].level + '/' + level_sum + '</span>';
             s += ' <span class="color-gray" title="' + seiku2str(seiku) + '">制空:' + seiku + '</span>';
-            s += ' <span class="color-gray" title="総計:' + sakuteki0 + ' 旧2-5式:' + Math.floor(sakuteki1) + ' 2-5秋式:' + sakuteki2.toFixed(1) + '">索敵:' + sakuteki + '</span>';
+            s += ' <span class="color-gray" title="';
+            var formula = getSearchFormula();
+            if (formula != 0) {
+              s += '総計:' + sakuteki0 + '&#10;';
+            }
+            if (formula != 1) {
+              s += '旧2-5式:' + Math.floor(sakuteki1) + '&#10;';
+            }
+            if (formula != 2) {
+              s += '2-5秋式:' + sakuteki2.toFixed(1) + '&#10;';
+            }
+            if (formula != 3) {
+              s += '秋簡易式:' + sakuteki + '&#10;';
+            }
+            s += '">索敵:';
+            if (formula == 0) {
+              s += sakuteki0;
+            }
+            else if (formula == 1) {
+              s += Math.floor(sakuteki1);
+            }
+            else if (formula == 2) {
+              s += sakuteki2.toFixed(1);
+            }
+            else {
+              s += sakuteki;
+            }
+            s += '</span>';
             s += ' <span class="color-gray" title="' + kira.join(', ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
             if (drum > 0) {
               s += ' <span class="color-gray" title="' + drum_ship.join(', ') + '">ドラム:' + drum + '/' + drum_ship.length + '</span>';

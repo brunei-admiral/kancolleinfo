@@ -298,6 +298,17 @@ function fuel2meter(now, max) {
 function fuel2html(fnow, fmax, bnow, bmax) {
   return '<td class="ship-fuel-bull" title="燃料: ' + fnow + '/' + fmax + ' (' + Math.floor(fnow * 100 / fmax) + '%)&#10;弾薬: ' + bnow + '/' + bmax + ' (' + Math.floor(bnow * 100 / bmax) + '%)">' + fuel2meter(fnow, fmax) + fuel2meter(bnow, bmax) + '</td>';
 }
+
+function toggleShowOlds(evt) {
+  if (evt) evt.preventDefault();
+  var elem = document.querySelector("li#toggle a");
+  var hide = elem.innerHTML.indexOf("隠す") != -1;
+  elem.innerHTML = "過去のバージョンを" + (hide ? "表示する" : "隠す");
+  var elems = document.querySelectorAll("li.old")
+  for (var i = 0; i < elems.length; i++) {
+    elems[i].style.display = hide ? "none" : "list-item";
+  }
+}
 //--></script>
 </head>
 <body>
@@ -327,21 +338,22 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 </p>
 <ul class="download">
   <li><a href="http://bit.ly/1KEWyRs" class="current">ver 1.8.0 [最新]</a> <a href="#v180">(概要)</a></li>
-  <li><a href="http://bit.ly/1JJwLtC">ver 1.7.1</a> <a href="#v170">(概要)</a></li>
-  <li><a href="http://bit.ly/1Ji2Rt4">ver 1.7.0</a> <a href="#v170">(概要)</a></li>
-  <li><a href="http://bit.ly/1DULGu9">ver 1.6.1</a> <a href="#v161">(概要)</a></li>
-  <li><a href="http://bit.ly/1GRPHpa">ver 1.6.0</a> <a href="#v160">(概要)</a></li>
-  <li><a href="http://bit.ly/1QbsnEH">ver 1.5.1</a> <a href="#v151">(概要)</a></li>
-  <li><a href="http://bit.ly/1I3qEhK">ver 1.5.0</a> <a href="#v150">(概要)</a></li>
-  <li><a href="http://bit.ly/1I3qR4o">ver 1.4.2</a> <a href="#v142">(概要)</a></li>
-  <li><a href="http://bit.ly/1EJh814">ver 1.4.1</a> <a href="#v141">(概要)</a></li>
-  <li><a href="http://bit.ly/1zomrnq">ver 1.4.0</a> <a href="#v140">(概要)</a></li>
-  <li><a href="http://bit.ly/1GRPW3R">ver 1.3.1</a> <a href="#v131">(概要)</a></li>
-  <li><a href="http://bit.ly/1GRPYbW">ver 1.3.0</a> <a href="#v130">(概要)</a></li>
-  <li><a href="http://bit.ly/1bpI9fj">ver 1.2.0</a> <a href="#v120">(概要)</a></li>
-  <li><a href="http://bit.ly/1bQutdP">ver 1.1.0</a> <a href="#v110">(概要)</a></li>
-  <li><a href="http://bit.ly/1dEtTkB">ver 1.0.1</a> <a href="#v101">(概要)</a></li>
-  <li><a href="http://bit.ly/1I3rbjL">ver 1.0.0</a> <a href="#v100">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1JJwLtC">ver 1.7.1</a> <a href="#v171">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1Ji2Rt4">ver 1.7.0</a> <a href="#v170">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1DULGu9">ver 1.6.1</a> <a href="#v161">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1GRPHpa">ver 1.6.0</a> <a href="#v160">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1QbsnEH">ver 1.5.1</a> <a href="#v151">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1I3qEhK">ver 1.5.0</a> <a href="#v150">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1I3qR4o">ver 1.4.2</a> <a href="#v142">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1EJh814">ver 1.4.1</a> <a href="#v141">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1zomrnq">ver 1.4.0</a> <a href="#v140">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1GRPW3R">ver 1.3.1</a> <a href="#v131">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1GRPYbW">ver 1.3.0</a> <a href="#v130">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1bpI9fj">ver 1.2.0</a> <a href="#v120">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1bQutdP">ver 1.1.0</a> <a href="#v110">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1dEtTkB">ver 1.0.1</a> <a href="#v101">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1I3rbjL">ver 1.0.0</a> <a href="#v100">(概要)</a></li>
+  <li id="toggle"><a href="#" onclick="toggleShowOlds();">過去のバージョンを表示する</a></li>
 </ul>
 
 <h2 id="ss">スクリーンショット</h2>
@@ -567,6 +579,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       <tr><td class="config-header">表示カスタマイズ</td><td></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="hp-by-meter" type="checkbox" checked>耐久値をメーター表示する</label></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox" checked>燃料・弾薬をメーター表示する</label></td></tr>
+      <tr><td class="config-label">索敵値計算式</td><td class="config-input"><select id="search-formula"><option value="0">総計</option><option value="1">旧2-5式</option><option value="2">2-5秋式</option><option value="3" selected>秋簡易式</option></select></td></tr>
       <tr><td class="config-header">敵艦隊編成情報</td><td></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><button>ファイル読み込み</button> <button>ファイル書き出し</button> <button>リセット</button></td></tr>
     </table></div>
@@ -631,7 +644,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <dt><samp>制空:</samp></dt>
   <dd>いわゆる制空値の合計</dd>
   <dt><samp>索敵:</samp></dt>
-  <dd>こしあん氏による<a href="http://nekokan333.blog.fc2.com/blog-entry-345.html" target="_blank">2-5新秋簡易式モデルA</a>と呼ばれる値 ※(旧)2-5式、2-5秋式、2-5新秋簡易式モデルBとは値が異なるので注意すること</dd>
+  <dd>こしあん氏による<a href="http://nekokan333.blog.fc2.com/blog-entry-345.html" target="_blank">2-5新秋簡易式モデルA</a>と呼ばれる値。<samp>設定</samp>タブで表示する値を変更することも可能(<a href="#desc-config">後述</a>)</dd>
   <dt><samp>キラ:</samp><dt>
   <dd>いわゆる「キラキラ状態」の艦数/艦隊所属艦数</dd>
   <dt><samp>ドラム:</samp></dt>
@@ -814,17 +827,19 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <dd>このチェックを入れると艦の耐久値がメーター表示されます。チェックを外すと数値がそのまま表示されます。初期状態ではチェックが入っています。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd>
   <dt><samp>燃料・弾薬を～</samp></td>
   <dd>このチェックを入れると艦の燃料・弾薬がメーター表示されます。チェックを外すと総量に対する残量が%で表示されます。初期状態ではチェックが入っています。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd>
+  <dt><samp>索敵値算出式</samp></td>
+  <dd>艦隊の索敵値算出式をデフォルトの2-5秋簡易式から変更します。総計、旧2-5式、2-5秋式、秋簡易式、から選択できます。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd>
 </dl>
 <p>
 <samp>敵艦隊編成情報</samp>では、敵艦隊編成情報をファイルから読み込んだり、ファイルに書き出したりすることができます。なお、敵艦隊編成情報は、新しい編成の敵艦隊に遭遇するたびに、自動的に記憶されていきます。
 </p>
 <dl>
   <dt><samp>ファイル読み込み</samp></td>
-  <dd>ファイルから敵艦隊編成情報を読み込みます。なおファイルのフォーマットは所定のCSV形式で、エンコーディングはいわゆるシフトJISまたはUTF-8である必要があります。どのようなCSVである必要があるかは、ファイルに書き出してみてご確認ください。もっとも、基本的に手で編集することは想定していません。ちなみに、「<a href="http://electronicobserver.blog.fc2.com/">七四式電子観測儀</a>」さんの当該データファイルの形式と互換性があるつもりです。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd></dd>
+  <dd>ファイルから敵艦隊編成情報を読み込みます。なおファイルのフォーマットは所定のCSV形式で、エンコーディングはいわゆるシフトJISまたはUTF-8である必要があります。どのようなCSVである必要があるかは、ファイルに書き出してみてご確認ください。もっとも、基本的に手で編集することは想定していません。ちなみに、「<a href="http://electronicobserver.blog.fc2.com/">七四式電子観測儀</a>」さんの当該データファイルの形式と互換性があるつもりです。なお、<a href="#kancolle-info">モック</a>ではクリックしても効果はありません。</dd></dd>
   <dt><samp>ファイル書き込み</samp></td>
-  <dd>ファイルに敵艦隊編成情報を書き出します。エンコーディングはいわゆるシフトJISとなりますが、将来は変更するかもしれません。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd></dd>
+  <dd>ファイルに敵艦隊編成情報を書き出します。エンコーディングはいわゆるシフトJISとなりますが、将来は変更するかもしれません。なお、<a href="#kancolle-info">モック</a>ではクリックしても効果はありません。</dd></dd>
   <dt><samp>リセット</samp></td>
-  <dd>現在記憶している敵艦隊編成情報をクリアします。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd></dd>
+  <dd>現在記憶している敵艦隊編成情報をクリアします。なお、<a href="#kancolle-info">モック</a>ではクリックしても効果はありません。</dd></dd>
 </dl>
 <p>
 <samp>敵艦隊編成情報</samp>以外の各項目については、設定を変更しても、<samp>保存</samp>ボタンを押下しない限り反映はされません(<a href="#kancolle-info">モック</a>では<samp>情報表示</samp>の各項目のチェック状態を変更すると即時に反映されますが、これは実物の挙動とは異なります)。
@@ -882,7 +897,7 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 <h2 id="histroy">履歴</h2>
 <dl>
   <dt>2015-??-??</dt>
-  <dd id="v180">ver 1.8.1<br><span class="update"></span>起動直後等、泊地修理更新時刻が不明な場合、とりあえず20分後として表示するように変更。<br><span class="bugfix"></span>泊地修理時、艦隊内に入渠中の艦があって、それが修理完了した場合、泊地修理更新予想時刻がリセットされていた不具合を修正。</dd>
+  <dd id="v181">ver 1.8.1<br><span class="feature"></span>艦隊索敵値の算出式を選択できる設定を追加。<br><span class="update"></span>起動直後等、泊地修理更新時刻が不明な場合、とりあえず20分後として表示するように変更。<br><span class="bugfix"></span>泊地修理時、艦隊内に入渠中の艦があって、それが修理完了した場合、泊地修理更新予想時刻がリセットされていた不具合を修正。</dd>
 
   <dt>2015-05-04</dt>
   <dd id="v180">ver 1.8.0<br><span class="feature"></span>戦闘結果表示時、現在位置が戦闘マスでそれが既知の敵艦隊であれば、ツールチップでその情報を表示するように。<br><span class="feature"></span>敵艦隊編成情報をCSVファイルから読み込み、また、CSVファイルに書き出す機能を追加。<br><span class="feature"></span>耐久値、燃料・弾薬を、1.6.1以前の数値形式でも表示可能とする設定を追加。</dd>

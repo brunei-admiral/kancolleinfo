@@ -622,6 +622,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 </p>
 <p>
 艦隊の全体情報としては、出撃中・遠征中・修理中(工作艦が旗艦で母港にいる状態)であればその旨が表示されます。
+遠征中であれば帰還時刻が、修理中であれば耐久値更新予想時刻がそれぞれ表示されます。なお、修理の更新予想時刻はあくまで予想ですので、正確ではない可能性があります(特に起動直後)。
 その後ろに、以下の情報が表示されます。
 </p>
 <dl>
@@ -663,7 +664,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <dt>交戦形態</dt>
   <dd><samp>同航戦</samp>など</dd>
   <dt>結果ランク予想</dt>
-  <dd><samp style="color: lightgreen;">SS</samp>・<samp style="color: lightgreen;">S</samp>・<samp style="color: silver;">A</samp>・<samp style="color: silver;">B</samp>・<samp style="color: red;">C</samp>・<samp style="color: red;">D</samp>・<samp style="color: red;">E</samp>。SSはS勝利かつ自軍の被害が0を意味します。なお、あくまで予想なので、実際の結果とは異なる可能性があります。</dd>
+  <dd><samp style="color: lightgreen;">SS</samp>・<samp style="color: lightgreen;">S</samp>・<samp style="color: silver;">A</samp>・<samp style="color: silver;">B</samp>・<samp style="color: red;">C</samp>・<samp style="color: red;">D</samp>・<samp style="color: red;">E</samp>。SSは完全勝利(S勝利かつ自軍の被害が0)を意味します。なお、あくまで予想なので、実際の結果とは異なる可能性があります。</dd>
   <dt>敵艦隊被害状況</dt>
   <dd><samp style="color: lightgreen;">◎</samp>:無傷あるいは僅かな損害・<samp style="color: yellow;">◎</samp>:小破・<samp style="color: orange;">○</samp>中破</samp>・<samp style="color: red;">△</samp>:大破・<samp style="color: silver;">×</samp>:轟沈。</dd>
 </dl>
@@ -880,36 +881,54 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 
 <h2 id="histroy">履歴</h2>
 <dl>
+  <dt>2015-??-??</dt>
+  <dd id="v180">ver 1.8.1<br><span class="update"></span>起動直後等、泊地修理更新時刻が不明な場合、とりあえず20分後として表示するように変更。<br><span class="bugfix"></span>泊地修理時、艦隊内に入渠中の艦があって、それが修理完了した場合、泊地修理更新予想時刻がリセットされていた不具合を修正。</dd>
+
   <dt>2015-05-04</dt>
   <dd id="v180">ver 1.8.0<br><span class="feature"></span>戦闘結果表示時、現在位置が戦闘マスでそれが既知の敵艦隊であれば、ツールチップでその情報を表示するように。<br><span class="feature"></span>敵艦隊編成情報をCSVファイルから読み込み、また、CSVファイルに書き出す機能を追加。<br><span class="feature"></span>耐久値、燃料・弾薬を、1.6.1以前の数値形式でも表示可能とする設定を追加。</dd>
+
   <dt>2015-05-02</dt>
   <dd id="v171">ver 1.7.1<br><span class="update"></span>艦名のツールチップで表示される所持アイテム欄に、艦載機の場合、搭載数を表示するように。<br><span class="update"></span>制空値のツールチップで、敵制空値と制空状況の対応を表示するように。<br><span class="update"></span>索敵値算出時に新装備「二式大艇」(大型飛行艇)を考慮するように。倍率は水上偵察機と同じという見込み。<br><span class="bugfix"></span>戦闘結果表示時、連合艦隊夜戦マスで陣形が第2艦隊側に表示されていた不具合を修正。<br><span class="bugfix"></span>戦闘結果表示時、連合艦隊での戦闘結果ランクの予想が不正確だった不具合を修正。(※それでもあくまで予想です)<br><span class="bugfix"></span>泊地修理中に他艦隊の編成を変更した時、修理時間予想がリセットされていた不具合を修正。</dd>
+
   <dt>2015-04-30</dt>
   <dd id="v170">ver 1.7.0<br><span class="feature"></span>連合艦隊での退避に対応。<br><span class="update"></span>耐久・燃料・弾薬の表示をメーター化。<br><span class="bugfix"></span>戦闘結果表示時、連合艦隊での自陣形が表示されなかった不具合を修正。<br><span class="bugfix"></span>戦闘結果表示時、航空均衡が表示されなかった不具合を修正。</dd>
+
   <dt>2015-04-16</dt>
   <dd id="v161">ver 1.6.1<br><span class="update"></span>戦闘結果表示時、結果ランク(SS～E)予想を表示するように。<br><span class="update"></span>資源・資材が自然回復上限以上または所持上限数に達したら色を変更するように。<br><span class="bugfix"></span>各索敵値が高めに算出されることがあった不具合を修正。<br><span class="bugfix"></span>ボスマス判定を正確に。</dd>
+
   <dt>2015-04-10</dt>
   <dd id="v160">ver 1.6.0<br><span class="feature"></span>戦闘結果表示時、航空戦マスでの戦闘結果表示に対応(2014-04-10アップデート対応)。<br><span class="update"></span>索敵値の負値を認めるように変更。</dd>
+
   <dt>2015-02-26</dt>
   <dd id="v151">ver 1.5.1<br><span class="update"></span>戦闘結果表示時、両軍陣形および制空状況のツールチップでの表示を追加。<br><span class="update"></span>実行中の遠征名のツールチップでの表示を追加。<br><span class="update"></span>工作艦による修理時、修理可能艦数のツールチップでの表示を追加。<br><span class="bugfix"></span>戦闘情報表示時、第2艦隊以降で出撃した場合に現在位置が正しく表示されていなかった不具合を修正。<br><span class="bugfix"></span>艦隊編成変更時、艦娘一覧の所在が更新されなかった不具合を修正。<br><span class="bugfix"></span>泊地修理時、修理可能数以降の艦のみが破損していた場合も修理中と表示していた不具合を修正。</dd>
+
   <dt>2015-02-10</dt>
   <dd id="v150">ver 1.5.0<br><span class="feature"></span>艦隊索敵値の表示を追加。<br><span class="update"></span>新艦種「練習巡洋艦」表示に対応。<br><span class="update"></span>出撃中(結果表示付き)および泊地修理中の表示を簡略化。<br><span class="update"></span>出撃中、中破時にも艦隊情報表示色を変更するように。<br><span class="update"></span>耐久値変化時、ツールチップで直前の耐久値の表示を追加。<br><span class="bugfix"></span>応急修理要員使用時の耐久値計算の誤りを修正。</dd>
+
   <dt>2015-01-13</dt>
   <dd id="v142">ver 1.4.2<br><span class="update"></span>工作艦による修理の予想更新時刻の算出方法を変更。<br><span class="update"></span>ツールチップで次の改造レベル表示を追加。<br><span class="bugfix"></span>ゲーム開始前の受信データ不完全時にメインタブの表示が乱れていた不具合を修正。<br><span class="bugfix"></span>『艦これ』以外のDMMのゲーム表示時にもkancolleinfoが挿入されていた不具合を修正。<br><span class="bugfix"></span>建造完了1分前から完了サウンドが再生されていた不具合を修正。<br><span class="bugfix"></span>大型艦建造後、高速建造に切り替えた際に高速建造材の消費量が正しくなかった不具合を修正。</dd>
+
   <dt>2014-12-02</dt>
   <dd id="v141">ver 1.4.1<br><span class="bugfix"></span>ゲーム画面(とkancolleinfo画面)下の各種公式情報表示が正しく機能しなかった不具合を多少改善。<br><span class="bugfix"></span>装備タブでアイテムの改修レベルが正しく表示されないことがあった不具合を修正。</dd>
+
   <dt>2014-11-19</dt>
   <dd id="v140">ver 1.4.0<br><span class="feature"></span>メインタブ・艦娘タブに経験値表示を追加。</dd>
+
   <dt>2014-11-15</dt>
   <dd id="v131">ver 1.3.1<br><span class="bugfix"></span>連合艦隊での戦闘結果が表示されない場合があった不具合を修正。</dd>
+
   <dt>2014-11-14</dt>
   <dd id="v130">ver 1.3.0<br><span class="feature"></span>秋イベント連合艦隊に対応。まだE-1でしか確認していませんが、たぶんE-3やEOも大丈夫じゃないかな……。</dd>
+
   <dt>2014-10-24</dt>
   <dd id="v120">ver 1.2.0<br><span class="feature"></span>メインタブに資源等の表示を追加。<br><span class="feature"></span>戦闘結果表示時、敵艦名等のツールチップ表示を追加。<br><span class="feature"></span>泊地修理中の場合、可能であれば予想更新時刻を表示するように。<br><span class="feature"></span><del>明石のアトリエ</del><ins>改修工廠</ins>での装備改修(10/24アップデート)に対応。<br><span class="feature"></span>装備タブで改修値(10/24アップデート)の表示を追加しソート対象に。<br><span class="update"></span>高速修復時の疲労強制回復を表示に反映するように。<br><span class="bugfix"></span>戦闘結果を表示している場合の、応急修理要員/応急修理女神発動時の表示が轟沈扱いだった不具合を修正。</dd>
+
   <dt>2014-10-15</dt>
   <dd id="v110">ver 1.1.0<br><span class="feature"></span>艦娘を疲労度でソートできるように。<br><span class="update"></span>艦隊情報の「未補給艦あり」の文字色を艦隊内最低燃料/弾薬の文字色に合わせた。<br><span class="update"></span>艦隊情報の「入渠艦あり」の文字色を(出撃できないわけなので)赤色に変更。<br><span class="update"></span>大破艦があれば艦隊情報の「出撃中」の文字色を赤色に。<br><span class="bugfix"></span>戦闘結果を表示しない場合にも自艦隊の損害が表示されていた不具合を修正。<br><span class="bugfix"></span>戦闘結果を表示している場合の、自艦隊轟沈艦の表示の不具合を修正。</dd>
+
   <dt>2014-10-09</dt>
   <dd id="v101">ver 1.0.1<br><span class="bugfix"></span>編成変更の際、艦の並びが正しく反映されないことのあった不具合を修正。</dd>
+
   <dt>2014-10-08</dt>
   <dd id="v100">ver 1.0.0<br>最初のバージョン。</dd>
 </dl>

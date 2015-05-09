@@ -1984,11 +1984,6 @@ function kcifCallback(request, content, query) {
         }
       }
 
-      var dock_list = json.api_data.api_ndock;
-      for (var i = 0, dock; dock = dock_list[i]; i++) {
-        kcif.repair[i] = dock;
-      }
-
       kcif.admiral_level = Number(json.api_data.api_basic.api_level);
       kcif.ship_max = Number(json.api_data.api_basic.api_max_chara);
       kcif.item_max = Number(json.api_data.api_basic.api_max_slotitem) + 3;
@@ -2028,8 +2023,12 @@ function kcifCallback(request, content, query) {
             num++;
           }
         }
+
         var changed = false;
         for (var j = 0, ship; (ship = kcif.ship_list[deck.api_ship[j]]) && j < num; j++) {
+          if (kcif.repair.filter(function(e){return e.api_ship_id == ship.api_id}).length != 0) {
+            continue;
+          }
           if (ship.hp != ship.p_hp) {
             changed = true;
             break;
@@ -2038,6 +2037,11 @@ function kcifCallback(request, content, query) {
         if (changed && ((kcif.repair_start[i] && kcif.repair_start[i] < now) || !kcif.repair_start[i])) {
           kcif.repair_start[i] = now;
         }
+      }
+
+      var dock_list = json.api_data.api_ndock;
+      for (var i = 0, dock; dock = dock_list[i]; i++) {
+        kcif.repair[i] = dock;
       }
     }
 
@@ -2404,7 +2408,7 @@ var kcif = {
       html += '<tr><td class="config-header">情報表示</td><td></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-battle" type="checkbox"' + (getShowBattle() ? ' checked' : '') + '>戦闘結果を表示する</label></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-built" type="checkbox"' + (getShowBuilt() ? ' checked' : '') + '>建造結果を表示する</label></td></tr>';
-      html += '<tr><td class="config-header">画面カスタマイズ</td><td></td></tr>';
+      html += '<tr><td class="config-header">表示カスタマイズ</td><td></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="hp-by-meter" type="checkbox"' + (getHpByMeter() ? ' checked' : '') + '>耐久値をメーター表示する</label></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox"' + (getFuelByMeter() ? ' checked' : '') + '>燃料・弾薬をメーター表示する</label></td></tr>';
       html += '<tr><td class="config-header">敵艦隊編成情報</td><td></td></tr>';
@@ -2921,20 +2925,19 @@ var kcif = {
               }
             }
             if (reparing) {
-              var t = "";
               var rcol = "color-yellow";
-              if (kcif.repair_start[i]) {
-                var now = new Date().getTime();
-                var rt = kcif.repair_start[i] + 20 * 60 * 1000;
-                if (rt < now) {
-                  rcol = "color-red";
-                }
-                else if (rt < now + 60 * 1000) {
-                  rcol = "color-orange";
-                }
-                t += " 更新" + time2str(new Date(rt));
+              if (!kcif.repair_start[i]) {
+                kcif.repair_start[i] = new Date().getTime();
               }
-              s = ' <span class="' + rcol + '" title="' + num + '隻修理可能">[修理中' + t + ']</span>';
+              var now = new Date().getTime();
+              var rt = kcif.repair_start[i] + 20 * 60 * 1000;
+              if (rt < now) {
+                rcol = "color-red";
+              }
+              else if (rt < now + 60 * 1000) {
+                rcol = "color-orange";
+              }
+              s = ' <span class="' + rcol + '" title="' + num + '隻修理可能">[修理中 更新' + time2str(new Date(rt)) + ']</span>';
             }
             else {
               s = "";

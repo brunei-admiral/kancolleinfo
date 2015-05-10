@@ -845,7 +845,7 @@ function hp2meter(cur, max) {
   else {
     status = "empty";
   }
-  return '<meter value="' + cur + '" min="0" max="' + max + '" title="' + Math.floor(cur * 100 / max) + '" class="' + status + '"></meter>';
+  return '<meter value="' + cur + '" min="0" max="' + max + '" title="' + Math.floor(cur * 100 / max) + '%" class="' + status + '"></meter>';
 }
 
 function shipHp(ship) {
@@ -898,7 +898,7 @@ function fuelBullColor(cur, max) {
   if (cur >= max) {
     return "color-green";
   }
-  else if (cur > max * 0.5) {
+  else if (cur >= max * 0.5) {
     return "color-yellow";
   }
   else if (cur > 0) {

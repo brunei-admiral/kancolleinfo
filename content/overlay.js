@@ -2890,9 +2890,7 @@ var kcif = {
                   col = "color-orange";
                 }
               }
-              if (ship.hp < ship.hp_max) {
-                damage[j] = true;
-              }
+              damage[j] = (ship.hp_max - ship.hp) / ship.hp_max;
             }
 
             level_sum += ship.level;
@@ -2990,7 +2988,7 @@ var kcif = {
                 }
               }
               for (var j = 0; j < num; j++) {
-                if (damage[j] && kcif.repair.filter(function(e){ return e.api_ship_id == ships[j].api_id; }).length == 0) {
+                if (damage[j] && damage[j] < 0.5 && kcif.repair.filter(function(e){ return e.api_ship_id == ships[j].api_id; }).length == 0) {
                   reparing = true;
                   break;
                 }

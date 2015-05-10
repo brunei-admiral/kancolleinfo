@@ -387,7 +387,7 @@ function beepOnOff() {
   if (!kcif.beep) {
     kcif.beep = new Audio(url);
     kcif.beep.loop = true;
-    kcif.load();
+    kcif.beep.load();
   }
   kcif.beep.volume = getBeepVolume() / 100.0;
 
@@ -2367,7 +2367,7 @@ var kcif = {
 
   init: function(event) {
     log("init");
-  
+
     var url = "http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/";
     var ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
     var ssm = Cc["@mozilla.org/scriptsecuritymanager;1"].getService(Ci.nsIScriptSecurityManager);
@@ -2378,12 +2378,15 @@ var kcif = {
 
     Services.obs.addObserver(kcifHttpObserver, TOPIC, false);
   },
-  
+
   destroy: function(event) {
     log("destroy");
     Services.obs.removeObserver(kcifHttpObserver, TOPIC);
+    if (kcif.beep) {
+      kcif.beep.pause();
+    }
   },
-  
+
   putStorage: function(key, s) {
     kcif.storage.setItem(key, s);
   },

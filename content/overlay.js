@@ -94,6 +94,11 @@ function saveConfig(evt) {
     myPref().setBoolPref("beep.built", elem.checked);
   }
 
+  elem = kcif.info_div.querySelector("#beep-repair");
+  if (elem) {
+    myPref().setBoolPref("beep.repair", elem.checked);
+  }
+
   elem = kcif.info_div.querySelector("#show-battle");
   if (elem) {
     myPref().setBoolPref("show.battle", elem.checked);
@@ -166,6 +171,11 @@ function resetConfig(evt) {
   elem = kcif.info_div.querySelector("#beep-built");
   if (elem) {
     elem.checked = getBeepBuilt();
+  }
+
+  elem = kcif.info_div.querySelector("#beep-repair");
+  if (elem) {
+    elem.checked = getBeepRepair();
   }
 
   elem = kcif.info_div.querySelector("#show-battle");
@@ -257,6 +267,13 @@ function checkConfigChanged() {
     }
   }
 
+  var elem = kcif.info_div.querySelector("#beep-repair");
+  if (elem) {
+    if (elem.checked != getRepair()) {
+      changed = true;
+    }
+  }
+
   var elem = kcif.info_div.querySelector("#show-battle");
   if (elem) {
     if (elem.checked != getShowBattle()) {
@@ -327,6 +344,10 @@ function getBeepBuilt() {
   return myPref().getBoolPref("beep.built");
 }
 
+function getBeepRepair() {
+  return myPref().getBoolPref("beep.repair");
+}
+
 function getShowBattle() {
   return myPref().getBoolPref("show.battle");
 }
@@ -363,7 +384,10 @@ function saveCheckboxes() {
 function restoreCheckboxes(checks) {
   var elems = kcif.info_div.querySelectorAll("#tab-main input.check-timer");
   for (var i = 0; i < elems.length; i++) {
-    if (elems[i].className.indexOf("check-expedition") >= 0) {
+    if (elems[i].className.indexOf("check-repair") >= 0) {
+      elems[i].checked = getBeepRepair() && checks[elems[i].id] == null || checks[elems[i].id];
+    }
+    else if (elems[i].className.indexOf("check-expedition") >= 0) {
       elems[i].checked = getBeepExpedition() && checks[elems[i].id] == null || checks[elems[i].id];
     }
     else if (elems[i].className.indexOf("check-dock") >= 0) {
@@ -2555,6 +2579,7 @@ var kcif = {
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-expedition" type="checkbox"' + (getBeepExpedition() ? ' checked' : '') + '>遠征帰還時のサウンド再生を自動でONにする</label></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-dock" type="checkbox"' + (getBeepDock() ? ' checked' : '') + '>入渠終了時のサウンド再生を自動でONにする</label></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-built" type="checkbox"' + (getBeepBuilt() ? ' checked' : '') + '>建造終了時のサウンド再生を自動でONにする</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-repair" type="checkbox"' + (getBeepRepair() ? ' checked' : '') + '>泊地修理更新(予想)時のサウンド再生を自動でONにする</label></td></tr>';
       html += '<tr><td class="config-header">情報表示</td><td></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-battle" type="checkbox"' + (getShowBattle() ? ' checked' : '') + '>戦闘結果を表示する</label></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-built" type="checkbox"' + (getShowBuilt() ? ' checked' : '') + '>建造結果を表示する</label></td></tr>';
@@ -2984,7 +3009,7 @@ var kcif = {
               else if (rt < now + 60 * 1000) {
                 rcol = "color-orange";
               }
-              s = ' <span class="' + rcol + '" title="' + num + '隻修理可能">[修理中 更新' + time2str(new Date(rt)) + ']</span>';
+              s = ' <span class="' + rcol + '" title="' + num + '隻修理可能">[修理中 <label>更新' + time2str(new Date(rt)) + "<input id='check-fleet" + (i + 1) + "' type='checkbox' class='check-timer check-repair'></label>]</span>";
             }
             else {
               s = "";

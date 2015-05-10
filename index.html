@@ -573,6 +573,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-expedition" type="checkbox">遠征帰還時のサウンド再生を自動でONにする</label></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-dock" type="checkbox">入渠終了時のサウンド再生を自動でONにする</label></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-built" type="checkbox">建造終了時のサウンド再生を自動でONにする</label></td></tr>
+      <tr><td class="config-label"></td><td class="config-input"><label><input id="beep-repair" type="checkbox">泊地修理更新(予想)時のサウンド再生を自動でONにする</label></td></tr>
       <tr><td class="config-header">情報表示</td><td></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="show-battle" type="checkbox">戦闘結果を表示する</label></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="show-built" type="checkbox">建造結果を表示する</label></td></tr>
@@ -634,8 +635,8 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 各艦の情報は現在選択中の艦隊のみ表示されますので、他の艦隊各艦の情報を見たい場合は<samp>第n艦隊</samp>の部分(水色の箇所)をクリックしてください。
 </p>
 <p>
-艦隊の全体情報としては、出撃中・遠征中・修理中(工作艦が旗艦で母港にいる状態)であればその旨が表示されます。
-遠征中であれば帰還時刻が、修理中であれば耐久値更新予想時刻がそれぞれ表示されます。なお、修理の更新予想時刻はあくまで予想ですので、正確ではない可能性があります(特に起動直後)。
+艦隊の全体情報としては、出撃中・遠征中・修理中(泊地修理:工作艦が旗艦で母港にいる状態)であればその旨が表示されます。
+遠征中であれば帰還時刻が、修理中であれば耐久値更新予想時刻がそれぞれ表示されます。
 その後ろに、以下の情報が表示されます。
 </p>
 <dl>
@@ -688,6 +689,10 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 遠征中の艦隊(<a href="#kancolle-info">モック</a>の第2艦隊・第3艦隊を参照)については、帰還時刻(翌日以降になる場合は日付も)が表示されます。
 帰還5分前になると黄色で、1分前になるとオレンジ色で、帰還時刻以降になると赤色で表示されます。
 末尾のチェックボックスにチェックを入れてある場合、帰還1分前から<a href="#desc-config">設定</a>で指定したサウンドがループ再生されます(この<a href="#kancolle-info">モック</a>では何も起きません)。
+</p>
+<p>
+泊地修理中の艦隊については、修理の更新予想時刻が表示されます。通常は黄色で、更新予想時刻以降になると赤色で表示されます。なお、更新予想時刻はあくまで「予想」ですので、正確ではない可能性があります(特に起動直後)。
+末尾のチェックボックスにチェックを入れてある場合、更新予想時刻から<a href="#desc-config">設定</a>で指定したサウンドがループ再生されます(この<a href="#kancolle-info">モック</a>では泊地修理中の艦隊がないため確認できません)。
 </p>
 <p>
 艦隊内の各艦の情報は、左から順に、以下の通りです。
@@ -809,6 +814,8 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <dd>同上。</dd>
   <dt><samp>建造終了時の～</samp></dt>
   <dd>同上。</dd>
+  <dt><samp>泊地修理更新～</samp></dt>
+  <dd>同上。</dd>
 </dl>
 <p>
 <samp>情報表示</samp>では、<a href="#desc-main">メイン</a>で説明した、ゲームの興を殺いでしまいそうな機能に関する設定を行います。
@@ -897,7 +904,7 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 <h2 id="histroy">履歴</h2>
 <dl>
   <dt>2015-??-??</dt>
-  <dd id="v181">ver 1.8.1<br><span class="feature"></span>艦隊索敵値の算出式を選択できる設定を追加。<br><span class="update"></span>起動直後等、泊地修理更新時刻が不明な場合、とりあえず20分後として表示するように変更。<br><span class="bugfix"></span>泊地修理時、艦隊内に入渠中の艦があって、それが修理完了した場合、泊地修理更新予想時刻がリセットされていた不具合を修正。</dd>
+  <dd id="v181">ver 1.8.1<br><span class="feature"></span>艦隊索敵値の算出式を選択できる設定を追加。<br><span class="feature"></span>泊地修理更新時刻到来時にもサウンドを再生できるように。<br><span class="update"></span>起動直後等、泊地修理更新時刻が不明な場合、とりあえず20分後として表示するように変更。<br><span class="bugfix"></span>泊地修理時、艦隊内に入渠中の艦があって、それが修理完了した場合、泊地修理更新予想時刻がリセットされていた不具合を修正。</dd>
 
   <dt>2015-05-04</dt>
   <dd id="v180">ver 1.8.0<br><span class="feature"></span>戦闘結果表示時、現在位置が戦闘マスでそれが既知の敵艦隊であれば、ツールチップでその情報を表示するように。<br><span class="feature"></span>敵艦隊編成情報をCSVファイルから読み込み、また、CSVファイルに書き出す機能を追加。<br><span class="feature"></span>耐久値、燃料・弾薬を、1.6.1以前の数値形式でも表示可能とする設定を追加。</dd>

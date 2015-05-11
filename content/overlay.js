@@ -2174,10 +2174,20 @@ function kcifCallback(request, content, query) {
       kcif.ship_num = i;
     }
     if (port) {
+      // 轟沈艦削除
+      for (var ship_id in kcif.ship_list) {
+        var ship = kcif.ship_list[ship_id];
+        if (ship.hp <= 0) {
+          delete kcif.ship_list[ship_id];
+        }
+      }
+
+      // 資源数更新
       for (var i = 0, data; data = json.api_data.api_material[i]; i++) {
         kcif.material[data.api_id - 1] = data.api_value;
       }
 
+      // 泊地修理チェック
       var now = new Date().getTime();
       for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
         var leader = kcif.ship_list[deck.api_ship[0]];
@@ -2210,6 +2220,7 @@ function kcifCallback(request, content, query) {
         }
       }
 
+      // 入渠状況更新
       var dock_list = json.api_data.api_ndock;
       for (var i = 0, dock; dock = dock_list[i]; i++) {
         kcif.repair[i] = dock;

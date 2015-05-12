@@ -3015,9 +3015,6 @@ var kcif = {
               if (rt < now) {
                 rcol = "color-red";
               }
-              else if (rt < now + 60 * 1000) {
-                rcol = "color-orange";
-              }
               s = ' <span class="' + rcol + '" title="' + num + '隻修理可能">[修理中 <label>更新' + time2str(new Date(rt)) + "<input id='check-fleet" + (i + 1) + "' type='checkbox' class='check-timer check-repair'></label>]</span>";
             }
             else {

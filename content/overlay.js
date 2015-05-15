@@ -2111,6 +2111,7 @@ function kcifCallback(request, content, query) {
     kcif.battle_result = [[], []];
     var deck_id = Number(query["api_deck_id"]);
     if (deck_id > 0) {
+      kcif.repair_start[deck_id - 1] = null;
       kcif.mission[deck_id - 1] = map2str(json.api_data);
       log("start: " + deck_id + ": " + kcif.mission[deck_id - 1]);
       if (kcif.enemy_id) {

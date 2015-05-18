@@ -2634,6 +2634,13 @@ var kcif = {
       var elem = kcif.info_div.querySelector("#capture");
       if (elem) {
         elem.addEventListener("click", captureAndSave, false, true);
+        document.addEventListener("keypress", function(evt){
+          var url = content.document.URL;
+          if (url.match(/\/app_id=854854\//) &&
+              evt.keyCode == 113) { // F2
+            captureAndSave(evt);
+          }
+        }, false, true);
       }
 
       // タブ

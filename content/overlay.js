@@ -2092,9 +2092,9 @@ function kcifCallback(request, content, query) {
       saveEnemyFleetsToStorage();
       log("enemy: ID" + kcif.enemy_id + " saved (ef.id_list=" + (ef.id_list ? "exist" : "not exist") + ", fleets.id_list=" + (kcif.enemy_fleets[kcif.enemy_id].id_list ? "exist" : "not exist") + ")");
     }
-    if (json.api_data.api_get_ship && json.api_data.api_ship_id) {
+    if (json.api_data.api_get_ship && json.api_data.api_get_ship.api_ship_id) {
       kcif.ship_num++;
-      log("drop: " + json.api_data.api_ship_id);
+      log("drop: " + json.api_data.api_get_ship.api_ship_id);
     }
     update_all = false;
   }

@@ -337,7 +337,8 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 <b>先に<a href="#notice">注意事項</a>をよく読んでからダウンロードしてください。</b>
 </p>
 <ul class="download">
-  <li><a href="http://bit.ly/1S0p30Z" class="current">ver 1.8.1 [最新]</a> <a href="#v181">(概要)</a></li>
+  <li><a href="http://bit.ly/1L4qIgD" class="current">ver 1.8.2 [最新]</a> <a href="#v182">(概要)</a></li>
+  <li class="old" style="display: none;"><a href="http://bit.ly/1S0p30Z">ver 1.8.1</a> <a href="#v181">(概要)</a></li>
   <li class="old" style="display: none;"><a href="http://bit.ly/1KEWyRs">ver 1.8.0</a> <a href="#v180">(概要)</a></li>
   <li class="old" style="display: none;"><a href="http://bit.ly/1JJwLtC">ver 1.7.1</a> <a href="#v171">(概要)</a></li>
   <li class="old" style="display: none;"><a href="http://bit.ly/1Ji2Rt4">ver 1.7.0</a> <a href="#v170">(概要)</a></li>
@@ -904,6 +905,9 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 
 <h2 id="histroy">履歴</h2>
 <dl>
+  <dt>2015-05-19</dt>
+  <dd id="v182">ver 1.8.2<br><span class="bugfix"></span>設定の保存ができなくなっていた不具合を修正。</dd>
+
   <dt>2015-05-18</dt>
   <dd id="v181">ver 1.8.1<br><span class="feature"></span>出撃中艦隊情報取得API仕様変更に対応(2015-05-18アップデート対応)。<br><span class="feature"></span>艦隊索敵値の算出式を選択できる設定を追加。<br><span class="feature"></span>泊地修理更新時刻到来時にもサウンドを再生できるように。<br><span class="update"></span>起動直後等、泊地修理更新時刻が不明な場合、とりあえず20分後として表示するように変更。<br><span class="bugfix"></span>中破以上の艦や入渠中の艦しか損傷艦がいない場合も泊地修理扱いとなっていた不具合を修正。<br><span class="bugfix"></span>明石を旗艦として出撃した場合、出撃中～帰港後も出撃前の泊地修理が継続しているとして更新予想時刻を算出していた不具合を修正。<br><span class="bugfix"></span>泊地修理中、艦隊内に入渠中の艦があって、それが修理完了した場合、泊地修理更新予想時刻がリセットされていた不具合を修正。<br><span class="bugfix"></span>轟沈艦があった時、ページを開き直すまでそれが艦娘リストに残り続けていた不具合を修正。</dd>
 

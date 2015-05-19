@@ -1,6 +1,23 @@
 phantom.injectJs("just.js");
 phantom.injectJs("mock.js");
 phantom.injectJs("../content/overlay.js");
+myPref = function(){
+  var obj = {
+    getComplexValue: function(a, b){
+      var obj = {
+        data: a,
+      };
+      return obj;
+    },
+    getIntPref : function(a){
+      return 2;
+    },
+    getBoolPref : function(a){
+      return true;
+    },
+  };
+  return obj;
+}
 getLogLevel = function(){
   return 0;
 };
@@ -497,4 +514,78 @@ JUST.testCase({
     assertEqual("敵制空値:&#10; 0～1: 制空権確保&#10; 2: 航空優勢&#10; 3～4: 航空均衡&#10; 5～9: 航空劣勢&#10; 10～: 制空権喪失", seiku2str(3));
     assertEqual("敵制空値:&#10; 0～1: 制空権確保&#10; 2～3: 航空優勢&#10; 4～7: 航空均衡&#10; 8～15: 航空劣勢&#10; 16～: 制空権喪失", seiku2str(5));
   },
+
+  testCheckConfigChanged: function(){
+    kcif.info_div = document.body;
+    kcif.renderFrame();
+    resetConfig();
+    refute(checkConfigChanged(), "nothing is changed");
+
+    var elem = kcif.info_div.querySelector("#capture-save-dir");
+    elem.value = "hoge";
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    var elem = kcif.info_div.querySelector("#capture-save-base");
+    elem.value = "hoge";
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    var elem = kcif.info_div.querySelector("#beep-url");
+    elem.value = "hoge";
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    var elem = kcif.info_div.querySelector("#beep-volume");
+    elem.value = 0;
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    elem = kcif.info_div.querySelector("#beep-expedition");
+    elem.checked = false;
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    elem = kcif.info_div.querySelector("#beep-dock");
+    elem.checked = false;
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    elem = kcif.info_div.querySelector("#beep-built");
+    elem.checked = false;
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    elem = kcif.info_div.querySelector("#beep-repair");
+    elem.checked = false;
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    elem = kcif.info_div.querySelector("#show-battle");
+    elem.checked = false;
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    elem = kcif.info_div.querySelector("#show-built");
+    elem.checked = false;
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    elem = kcif.info_div.querySelector("#hp-by-meter");
+    elem.checked = false;
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    elem = kcif.info_div.querySelector("#fuel-by-meter");
+    elem.checked = false;
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    elem = kcif.info_div.querySelector("#search-formula");
+    elem.selectedIndex = 0;
+    assert(checkConfigChanged(), "is changed");
+
+    resetConfig();
+    refute(checkConfigChanged(), "nothing is changed");
+},
 });

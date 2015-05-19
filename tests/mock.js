@@ -31,3 +31,15 @@ String.prototype.startsWith = function(str){
 String.prototype.endsWith = function(str){
   return this.lastIndexOf(str) == this.length - str.length;
 };
+
+const Ci = {
+  nsISupportsString: null,
+};
+
+function Audio(){
+  obj = {
+    load: function(){
+    },
+  };
+  return obj;
+}

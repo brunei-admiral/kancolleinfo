@@ -136,7 +136,7 @@ function saveConfig(evt) {
 }
 
 function resetConfig(evt) {
-  evt.preventDefault();
+  if (evt) evt.preventDefault();
 
   var elem = kcif.info_div.querySelector("#capture-save-dir");
   if (elem) {
@@ -200,7 +200,7 @@ function resetConfig(evt) {
 
   elem = kcif.info_div.querySelector("#search-formula");
   if (elem) {
-    for (var i = 0; elem.options.length; i++) {
+    for (var i = 0; i < elem.options.length; i++) {
       if (Number(elem.options[i].value) == getSearchFormula()) {
         elem.selectedIndex = i;
         break;
@@ -224,21 +224,21 @@ function checkConfigChanged() {
     }
   }
 
-  var elem = kcif.info_div.querySelector("#capture-save-base");
+  elem = kcif.info_div.querySelector("#capture-save-base");
   if (elem) {
     if (elem.value != getCaptureSaveBase()) {
       changed = true;
     }
   }
 
-  var elem = kcif.info_div.querySelector("#beep-url");
+  elem = kcif.info_div.querySelector("#beep-url");
   if (elem) {
     if (elem.value != getBeepUrl()) {
       changed = true;
     }
   }
 
-  var elem = kcif.info_div.querySelector("#beep-volume");
+  elem = kcif.info_div.querySelector("#beep-volume");
   if (elem) {
     if (elem.value != getBeepVolume()) {
       log("checkConfigChaned: beep-volume: [" + elem.value + "] <- [" + getBeepVolume() + "] : " + elem.value != getBeepVolume());
@@ -246,56 +246,56 @@ function checkConfigChanged() {
     }
   }
 
-  var elem = kcif.info_div.querySelector("#beep-expedition");
+  elem = kcif.info_div.querySelector("#beep-expedition");
   if (elem) {
     if (elem.checked != getBeepExpedition()) {
       changed = true;
     }
   }
 
-  var elem = kcif.info_div.querySelector("#beep-dock");
+  elem = kcif.info_div.querySelector("#beep-dock");
   if (elem) {
     if (elem.checked != getBeepDock()) {
       changed = true;
     }
   }
 
-  var elem = kcif.info_div.querySelector("#beep-built");
+  elem = kcif.info_div.querySelector("#beep-built");
   if (elem) {
     if (elem.checked != getBeepBuilt()) {
       changed = true;
     }
   }
 
-  var elem = kcif.info_div.querySelector("#beep-repair");
+  elem = kcif.info_div.querySelector("#beep-repair");
   if (elem) {
-    if (elem.checked != getRepair()) {
+    if (elem.checked != getBeepRepair()) {
       changed = true;
     }
   }
 
-  var elem = kcif.info_div.querySelector("#show-battle");
+  elem = kcif.info_div.querySelector("#show-battle");
   if (elem) {
     if (elem.checked != getShowBattle()) {
       changed = true;
     }
   }
 
-  var elem = kcif.info_div.querySelector("#show-built");
+  elem = kcif.info_div.querySelector("#show-built");
   if (elem) {
     if (elem.checked != getShowBuilt()) {
       changed = true;
     }
   }
 
-  var elem = kcif.info_div.querySelector("#hp-by-meter");
+  elem = kcif.info_div.querySelector("#hp-by-meter");
   if (elem) {
     if (elem.checked != getHpByMeter()) {
       changed = true;
     }
   }
 
-  var elem = kcif.info_div.querySelector("#fuel-by-meter");
+  elem = kcif.info_div.querySelector("#fuel-by-meter");
   if (elem) {
     if (elem.checked != getFuelByMeter()) {
       changed = true;

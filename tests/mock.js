@@ -40,6 +40,8 @@ function Audio(){
   obj = {
     load: function(){
     },
+    pause: function(){
+    },
   };
   return obj;
 }

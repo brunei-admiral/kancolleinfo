@@ -1,6 +1,8 @@
 phantom.injectJs("just.js");
 phantom.injectJs("mock.js");
 phantom.injectJs("../content/overlay.js");
+
+// local stubs
 myPref = function(){
   var obj = {
     getComplexValue: function(a, b){
@@ -32,9 +34,38 @@ getFuelByMeter = function(){
 JUST.testCase({
   setup: function(){
     meter = true;
-    kcif.item_list = {1: {"name": "アイテム1"}, 2: {"name": "アイテム2", type: [0, 0, 6]}, 3: {"name": "応急修理要員", item_id: 42}, 4: {"name": "応急修理女神", item_id: 43}};
-    kcif.ship_list = {100: {"name": "明石", type: 19}};
+    kcif.item_list = {
+      1: {
+        "name": "アイテム1",
+        type: [0, 0, 0]
+      },
+      2: {
+        "name": "アイテム2",
+        type: [0, 0, 6]
+      },
+      3: {
+        "name": "応急修理要員",
+        item_id: 42,
+        type: [0, 0, 0]
+      },
+      4: {
+        "name": "応急修理女神",
+        item_id: 43,
+        type: [0, 0, 0]
+      },
+    };
+    kcif.ship_list = {
+      100: {
+        "name": "明石",
+        type: 19,
+        level: 1,
+        exp: [10, 100],
+        slot: [-1, -1, -1, -1, -1],
+      },
+    };
     kcif.ship_master = {100: {"name": "テスト100", type: 2}};
+    kcif.info_div = document.body;
+    kcif.renderFrame();
   },
 
   testTime2str: function(){
@@ -516,76 +547,100 @@ JUST.testCase({
   },
 
   testCheckConfigChanged: function(){
-    kcif.info_div = document.body;
-    kcif.renderFrame();
     resetConfig();
     refute(checkConfigChanged(), "nothing is changed");
 
     var elem = kcif.info_div.querySelector("#capture-save-dir");
     elem.value = "hoge";
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "capture-save-dir is changed");
 
     resetConfig();
     var elem = kcif.info_div.querySelector("#capture-save-base");
     elem.value = "hoge";
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "capture-save-base is changed");
 
     resetConfig();
     var elem = kcif.info_div.querySelector("#beep-url");
     elem.value = "hoge";
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "beep-url is changed");
 
     resetConfig();
     var elem = kcif.info_div.querySelector("#beep-volume");
     elem.value = 0;
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "beep-volume is changed");
 
     resetConfig();
     elem = kcif.info_div.querySelector("#beep-expedition");
     elem.checked = false;
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "beep-expedition is changed");
 
     resetConfig();
     elem = kcif.info_div.querySelector("#beep-dock");
     elem.checked = false;
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "beep-dock is changed");
 
     resetConfig();
     elem = kcif.info_div.querySelector("#beep-built");
     elem.checked = false;
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "beep-built is changed");
 
     resetConfig();
     elem = kcif.info_div.querySelector("#beep-repair");
     elem.checked = false;
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "beep-repair is changed");
 
     resetConfig();
     elem = kcif.info_div.querySelector("#show-battle");
     elem.checked = false;
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "show-battle is changed");
 
     resetConfig();
     elem = kcif.info_div.querySelector("#show-built");
     elem.checked = false;
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "show-built is changed");
 
     resetConfig();
     elem = kcif.info_div.querySelector("#hp-by-meter");
     elem.checked = false;
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "hp-by-meter is changed");
 
     resetConfig();
     elem = kcif.info_div.querySelector("#fuel-by-meter");
     elem.checked = false;
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "fuel-by-meter is changed");
 
     resetConfig();
     elem = kcif.info_div.querySelector("#search-formula");
     elem.selectedIndex = 0;
-    assert(checkConfigChanged(), "is changed");
+    assert(checkConfigChanged(), "search-formula is changed");
 
     resetConfig();
     refute(checkConfigChanged(), "nothing is changed");
-},
+  },
+
+  testKcifCallback: function(){
+    // TODO
+    kcifCallback(null, null, null);
+  },
+
+  testParseQuery: function(){
+    var result = parseQuery("a=1&b=2&c=3");
+    assertEqual(1, result["a"]);
+    assertEqual(2, result["b"]);
+    assertEqual(3, result["c"]);
+    refute(result["d"], "no such parameter");
+  },
+
+  testRenderInfo: function(){
+    // TODO
+    kcif.renderInfo(false);
+
+    kcif.renderInfo(true);
+  },
+
+  testOnLoad: function(){
+    // TODO
+    evt = {originalTarget: document};
+    kcif.onLoad(evt);
+  },
 });

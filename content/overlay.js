@@ -19,7 +19,7 @@ function log() {
 }
 
 function selectTab(evt) {
-  evt.preventDefault();
+  if (evt) evt.preventDefault();
 
   kcif.current_tab = this.parentNode.id.replace("-header", "");
 
@@ -35,7 +35,7 @@ function selectTab(evt) {
 }
 
 function selectFleet(evt) {
-  evt.preventDefault();
+  if (evt) evt.preventDefault();
 
   var elems = kcif.info_div.querySelectorAll("#tab-main .fleet table");
   for (var i = 0; i < elems.length; i++) {
@@ -52,7 +52,7 @@ function selectFleet(evt) {
 }
 
 function saveConfig(evt) {
-  evt.preventDefault();
+  if (evt) evt.preventDefault();
 
   var str = CCIN("@mozilla.org/supports-string;1", "nsISupportsString");
 
@@ -372,17 +372,17 @@ function getLogLevel() {
   return myPref().getIntPref("debug.loglevel");
 }
 
-function saveCheckboxes() {
+function saveCheckboxes(tab) {
   var checks = {};
-  var elems = kcif.info_div.querySelectorAll("#tab-main input.check-timer");
+  var elems = tab.querySelectorAll("input.check-timer");
   for (var i = 0; i < elems.length; i++) {
     checks[elems[i].id] = elems[i].checked;
   }
   return checks;
 }
 
-function restoreCheckboxes(checks) {
-  var elems = kcif.info_div.querySelectorAll("#tab-main input.check-timer");
+function restoreCheckboxes(tab, checks) {
+  var elems = tab.querySelectorAll("input.check-timer");
   for (var i = 0; i < elems.length; i++) {
     if (elems[i].className.indexOf("check-repair") >= 0) {
       elems[i].checked = getBeepRepair() && checks[elems[i].id] == null || checks[elems[i].id];
@@ -465,7 +465,7 @@ function getPathSeparator() {
 }
 
 function captureAndSave(evt) {
-  evt.preventDefault();
+  if (evt) evt.preventDefault();
 
   var rect = kcif.flash.getBoundingClientRect();
   var rect2 = kcif.game_frame.getBoundingClientRect();
@@ -1585,6 +1585,10 @@ function isPlane(type) {
   return (type >= 6 && type <= 11 || type == 41);
 }
 
+function isInDock(ship) {
+  return kcif.dock.filter(function(e){return e.api_ship_id == ship.api_id}).length != 0;
+}
+
 function calcSakuteki(item, type) {
   var co = 0;
   if (type == 1) { // 旧2-5式
@@ -1738,8 +1742,8 @@ function kcifCallback(request, content, query) {
   else if (url.indexOf("/ndock") != -1) {
     var dock_list = json.api_data;
     for (var i = 0, dock; dock = dock_list[i]; i++) {
-      kcif.repair[i] = dock;
-      log("ndock: " + kcif.repair[i].api_id + ": " + kcif.repair[i].api_complete_time);
+      kcif.dock[i] = dock;
+      log("ndock: " + kcif.dock[i].api_id + ": " + kcif.dock[i].api_complete_time);
     }
     update_all = false;
   }
@@ -1850,8 +1854,8 @@ function kcifCallback(request, content, query) {
   }
   else if (url.indexOf("/speedchange") != -1) {
     var dock_id = Number(query["api_ndock_id"]);
-    if (dock_id > 0 && kcif.repair[dock_id - 1]) {
-      var ship = kcif.ship_list[kcif.repair[dock_id - 1].api_ship_id];
+    if (dock_id > 0 && kcif.dock[dock_id - 1]) {
+      var ship = kcif.ship_list[kcif.dock[dock_id - 1].api_ship_id];
       if (ship) {
         ship.p_hp = ship.hp;
         ship.hp = ship.hp_max;
@@ -1861,8 +1865,8 @@ function kcifCallback(request, content, query) {
         }
       }
       kcif.material[5]--;
-      kcif.repair[dock_id - 1].api_ship_id = 0;
-      kcif.repair[dock_id - 1].api_complete_time = 0;
+      kcif.dock[dock_id - 1].api_ship_id = 0;
+      kcif.dock[dock_id - 1].api_complete_time = 0;
       log("nyukyo speedchange");
     }
   }
@@ -2226,7 +2230,7 @@ function kcifCallback(request, content, query) {
 
         var changed = false;
         for (var j = 0, ship; (ship = kcif.ship_list[deck.api_ship[j]]) && j < num; j++) {
-          if (kcif.repair.filter(function(e){return e.api_ship_id == ship.api_id}).length != 0) {
+          if (isInDock(ship)) {
             continue;
           }
           if (ship.hp != ship.p_hp) {
@@ -2242,7 +2246,7 @@ function kcifCallback(request, content, query) {
       // 入渠状況更新
       var dock_list = json.api_data.api_ndock;
       for (var i = 0, dock; dock = dock_list[i]; i++) {
-        kcif.repair[i] = dock;
+        kcif.dock[i] = dock;
       }
     }
 
@@ -2404,7 +2408,7 @@ var kcif = {
   ship_list: {},
   item_list: {},
   mission: [],
-  repair: [],
+  dock: [],
   build: [],
   deck_list: [],
   ship_num: 0,
@@ -2419,7 +2423,7 @@ var kcif = {
   enemy_formation: null,
   timer: null,
 
-  init: function(event) {
+  init: function(evt) {
     log("init");
 
     var url = "http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/";
@@ -2433,7 +2437,7 @@ var kcif = {
     Services.obs.addObserver(kcifHttpObserver, TOPIC, false);
   },
 
-  destroy: function(event) {
+  destroy: function(evt) {
     log("destroy");
     Services.obs.removeObserver(kcifHttpObserver, TOPIC);
     if (kcif.beep) {
@@ -2449,8 +2453,8 @@ var kcif = {
     return kcif.storage.getItem(key);
   },
 
-  onLoad: function(event) {
-    var doc = event.originalTarget;
+  onLoad: function(evt) {
+    var doc = evt.originalTarget;
     var url = doc.location.href;
     if (url.match(/osapi\.dmm\.com\//) && url.match(/aid=854854/)) {
       log("DOMloaded:", url);
@@ -2696,7 +2700,7 @@ var kcif = {
       var elem = kcif.info_div.querySelector("#reset-enemy-fleets");
       if (elem) {
         elem.addEventListener("click", function(evt){
-          evt.preventDefault();
+          if (evt) evt.preventDefault();
 
           if (window.confirm("敵艦隊編成情報をリセットします。\n本当によろしいですか？")) {
             kcif.enemy_fleets = {};
@@ -2725,7 +2729,7 @@ var kcif = {
       if (elem) {
         var beeptest = null;
         elem.addEventListener("click", function(evt) {
-          evt.preventDefault();
+          if (evt) evt.preventDefault();
           var url = kcif.info_div.querySelector("#beep-url").value;
           if (beeptest && beeptest.src != url) {
             log("beeptest: url=[" + url + "], src=[" + beeptest.src + "]");
@@ -2797,7 +2801,7 @@ var kcif = {
 
       // メイン
       var maintab = kcif.info_div.querySelector("#tab-main");
-      var checks = saveCheckboxes();
+      var checks = saveCheckboxes(maintab);
       html = "";
 
       html += '<div id="resource">';
@@ -2911,7 +2915,7 @@ var kcif = {
               lhtml += shipCond(ship);
               lhtml += shipFuelBull(ship);
               lhtml += shipExp(ship);
-              if (kcif.repair.filter(function(e){return e.api_ship_id == ship.api_id}).length != 0) {
+              if (isInDock(ship)) {
                 lhtml += '<td class="ship-desc color-red">入渠中</td>';
                 ndock.push(ship.name);
               }
@@ -2928,85 +2932,85 @@ var kcif = {
                 }
               }
               damage[j] = (ship.hp_max - ship.hp) / ship.hp_max;
-            }
 
-            level_sum += ship.level;
-            if (ship.fuel < ship.fuel_max || ship.bull < ship.bull_max) {
-              sup.push(ship.name);
-              var col1 = fuelBullColor(ship.fuel, ship.fuel_max);
-              var col2 = fuelBullColor(ship.bull, ship.bull_max);
-              if (/red/.test(col1)) {
-                sup_col = col1;
-              }
-              else if (/red/.test(col2)) {
-                sup_col = col2;
-              }
-              else if (!/red/.test(sup_col)) {
-                if (/orange/.test(col1)) {
+              level_sum += ship.level;
+              if (ship.fuel < ship.fuel_max || ship.bull < ship.bull_max) {
+                sup.push(ship.name);
+                var col1 = fuelBullColor(ship.fuel, ship.fuel_max);
+                var col2 = fuelBullColor(ship.bull, ship.bull_max);
+                if (/red/.test(col1)) {
                   sup_col = col1;
                 }
-                else if (/orange/.test(col2)) {
+                else if (/red/.test(col2)) {
                   sup_col = col2;
                 }
-                else if (!/orange/.test(sup_col)) {
-                  if (/yellow/.test(col1)) {
+                else if (!/red/.test(sup_col)) {
+                  if (/orange/.test(col1)) {
                     sup_col = col1;
                   }
-                  else if (/yellow/.test(col2)) {
+                  else if (/orange/.test(col2)) {
                     sup_col = col2;
+                  }
+                  else if (!/orange/.test(sup_col)) {
+                    if (/yellow/.test(col1)) {
+                      sup_col = col1;
+                    }
+                    else if (/yellow/.test(col2)) {
+                      sup_col = col2;
+                    }
                   }
                 }
               }
-            }
-            if (ship.cond >= 50) {
-              kira.push(ship.name);
-            }
-            var drum_p = false;
-            var dai_p = false;
-            var s_base = ship.sakuteki;
-            var s_sakuteki = 0;
-            var s_sakuteki1 = 0;
-            var s_sakuteki2 = 0;
-            for (var k = 0; ship.slot && k < 5; k++) {
-              if (ship.slot[k] < 0) {
-                break;
+              if (ship.cond >= 50) {
+                kira.push(ship.name);
               }
-              var item = kcif.item_list[ship.slot[k]];
-              if (item) {
-                if (item.item_id == 75) { // ドラム缶(輸送用)
-                  drum++;
-                  drum_p = true;
+              var drum_p = false;
+              var dai_p = false;
+              var s_base = ship.sakuteki;
+              var s_sakuteki = 0;
+              var s_sakuteki1 = 0;
+              var s_sakuteki2 = 0;
+              for (var k = 0; ship.slot && k < 5; k++) {
+                if (ship.slot[k] < 0) {
+                  break;
                 }
-                else if (item.item_id == 68) { // 大発動艇
-                  dai++;
-                  dai_p = true;
+                var item = kcif.item_list[ship.slot[k]];
+                if (item) {
+                  if (item.item_id == 75) { // ドラム缶(輸送用)
+                    drum++;
+                    drum_p = true;
+                  }
+                  else if (item.item_id == 68) { // 大発動艇
+                    dai++;
+                    dai_p = true;
+                  }
+                  else if (hasSeiku(item.type[2]) && ship.equip[k] > 0) {
+                    seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
+                  }
+                  s_base -= item.sakuteki;
+                  s_sakuteki += calcSakuteki(item);
+                  s_sakuteki1 += calcSakuteki(item, 1);
+                  s_sakuteki2 += calcSakuteki(item, 2);
                 }
-                else if (hasSeiku(item.type[2]) && ship.equip[k] > 0) {
-                  seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
-                }
-                s_base -= item.sakuteki;
-                s_sakuteki += calcSakuteki(item);
-                s_sakuteki1 += calcSakuteki(item, 1);
-                s_sakuteki2 += calcSakuteki(item, 2);
               }
+              if (drum_p) {
+                drum_ship.push(ship.name);
+              }
+              if (dai_p) {
+                dai_ship.push(ship.name);
+              }
+              s_sakuteki += Math.sqrt(s_base);
+              s_sakuteki2 += Math.sqrt(s_base) * 1.6841056;
+              sakuteki += Math.floor(s_sakuteki);
+              sakuteki0 += ship.sakuteki;
+              sakuteki1 += s_base;
+              sakuteki1i += s_sakuteki1;
+              sakuteki2 += s_sakuteki2;
             }
-            if (drum_p) {
-              drum_ship.push(ship.name);
-            }
-            if (dai_p) {
-              dai_ship.push(ship.name);
-            }
-            s_sakuteki += Math.sqrt(s_base);
-            s_sakuteki2 += Math.sqrt(s_base) * 1.6841056;
-            sakuteki += Math.floor(s_sakuteki);
-            sakuteki0 += ship.sakuteki;
-            sakuteki1 += s_base;
-            sakuteki1i += s_sakuteki1;
-            sakuteki2 += s_sakuteki2;
+            sakuteki -= Math.floor(0.4 * kcif.admiral_level);
+            sakuteki1 = Math.floor(Math.sqrt(sakuteki1)) + sakuteki1i;
+            sakuteki2 -= Math.ceil((kcif.admiral_level) / 5) * 5.0 * 0.6142467;
           }
-          sakuteki -= Math.floor(0.4 * kcif.admiral_level);
-          sakuteki1 = Math.floor(Math.sqrt(sakuteki1)) + sakuteki1i;
-          sakuteki2 -= Math.ceil((kcif.admiral_level) / 5) * 5.0 * 0.6142467;
 
           if (s) {
             s = ' <span class="' + col + '">' + s + '</span>';
@@ -3025,7 +3029,7 @@ var kcif = {
                 }
               }
               for (var j = 0; j < num; j++) {
-                if (damage[j] && damage[j] < 0.5 && kcif.repair.filter(function(e){ return e.api_ship_id == ships[j].api_id; }).length == 0) {
+                if (damage[j] && damage[j] < 0.5 && !isInDock(ships[j])) {
                   reparing = true;
                   break;
                 }
@@ -3107,20 +3111,20 @@ var kcif = {
       html += '<div id="ndock">';
       html += '<h2><span class="list-header">入渠</span></h2>';
       html += '<table>';
-      for (var i = 0; kcif.repair[i]; i++) {
-        if (kcif.repair[i].api_complete_time > 0) {
-          html += '<tr><td class="ship-no">' + kcif.repair[i].api_id + '</td>';
-          var ship = kcif.ship_list[kcif.repair[i].api_ship_id];
+      for (var i = 0; kcif.dock[i]; i++) {
+        if (kcif.dock[i].api_complete_time > 0) {
+          html += '<tr><td class="ship-no">' + kcif.dock[i].api_id + '</td>';
+          var ship = kcif.ship_list[kcif.dock[i].api_ship_id];
           html += shipType(ship);
           html += shipName(ship);
           html += shipLevel(ship);
           html += shipHp(ship);
           html += shipCond(ship);
-          var dt = new Date(kcif.repair[i].api_complete_time);
-          html += '<td class="ship-at ' + getTimeColor(dt) + '"><label>' + time2str(dt) + '<input id="check-dock' + kcif.repair[i].api_id + '" type="checkbox" class="check-timer check-dock"></label></td>';
+          var dt = new Date(kcif.dock[i].api_complete_time);
+          html += '<td class="ship-at ' + getTimeColor(dt) + '"><label>' + time2str(dt) + '<input id="check-dock' + kcif.dock[i].api_id + '" type="checkbox" class="check-timer check-dock"></label></td>';
         }
         else {
-          html += '<tr><td class="ship-no">' + kcif.repair[i].api_id + '</td><td colspan="6"></tr>';
+          html += '<tr><td class="ship-no">' + kcif.dock[i].api_id + '</td><td colspan="6"></tr>';
         }
       }
       html += '</table>';
@@ -3178,7 +3182,7 @@ var kcif = {
       }
 
       // メイン:チェックボックス復元
-      restoreCheckboxes(checks);
+      restoreCheckboxes(maintab, checks);
       beepOnOff();
 
       if (!all) {
@@ -3221,7 +3225,7 @@ var kcif = {
         if (fleet) {
           html += '<td class="ship-desc">第' + fleet + '艦隊<span class="color-gray">「' + kcif.deck_list[fleet - 1].api_name + '」</span></td>';
         }
-        else if (kcif.repair.filter(function(e){ return e.api_ship_id == ship.api_id; }).length != 0) {
+        else if (isInDock(ship)) {
           html += '<td class="ship-desc color-red">入渠中</td>';
         }
         else {
@@ -3239,7 +3243,7 @@ var kcif = {
       var elems = shipstab.querySelectorAll("th a");
       for (var i = 0; i < elems.length; i++) {
         elems[i].addEventListener("click", function(evt){
-          evt.preventDefault();
+          if (evt) evt.preventDefault();
           var sort = this.parentNode.className.replace(/ .*/, "").replace(/^.*-/, "");
           log("sort (ships) [" + kcif.sort_ships + "] -> [" + sort + "]");
           if (kcif.sort_ships.startsWith(sort)) {
@@ -3333,7 +3337,7 @@ var kcif = {
       var elems = itemstab.querySelectorAll("th a");
       for (var i = 0; i < elems.length; i++) {
         elems[i].addEventListener("click", function(evt){
-          evt.preventDefault();
+          if (evt) evt.preventDefault();
           var parentClass = this.parentNode.className;
           var sort = parentClass.replace(/ .*/, "").replace(/^.*-/, "");
           log("sort (items) [" + kcif.sort_items + "] -> [" + sort + "]");

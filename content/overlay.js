@@ -813,6 +813,9 @@ function shipName(ship) {
       if (ship.slot[i] >= 0 && kcif.item_list[ship.slot[i]]) {
         var item = kcif.item_list[ship.slot[i]]
         var name = String(i + 1) + ": " + item.name;
+        if (item.level > 0) {
+          name += "+" + item.level;
+        }
         if (item.type && isPlane(item.type[2])) {
           name += " [" + String(ship.equip[i]) + "/" + String(ship.equip_max[i]) + "]";
         }

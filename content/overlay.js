@@ -3010,10 +3010,10 @@ var kcif = {
               sakuteki1i += s_sakuteki1;
               sakuteki2 += s_sakuteki2;
             }
-            sakuteki -= Math.floor(0.4 * kcif.admiral_level);
-            sakuteki1 = Math.floor(Math.sqrt(sakuteki1)) + sakuteki1i;
-            sakuteki2 -= Math.ceil((kcif.admiral_level) / 5) * 5.0 * 0.6142467;
           }
+          sakuteki -= Math.floor(0.4 * kcif.admiral_level);
+          sakuteki1 = Math.floor(Math.sqrt(sakuteki1)) + sakuteki1i;
+          sakuteki2 -= Math.ceil((kcif.admiral_level) / 5) * 5.0 * 0.6142467;
 
           if (s) {
             s = ' <span class="' + col + '">' + s + '</span>';

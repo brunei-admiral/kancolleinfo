@@ -2570,7 +2570,7 @@ var kcif = {
         kcif.game_frame = game_frame;
       }
 
-      doc.body.setAttribute("onload", "if (typeof DMM != 'undefined' && DMM.netgame) DMM.netgame.reloadDialog = function(){};");
+      doc.body.setAttribute("onload", "if (typeof DMM != 'undefined' && DMM.netgame) DMM.netgame.reloadDialog = function(){}; history.pushState(null, null, null); window.addEventListener('popstate', function() { history.pushState(null, null, null); });");
 
       if (!kcif.enemy_fleets) {
         loadEnemyFleetsFromStorage();

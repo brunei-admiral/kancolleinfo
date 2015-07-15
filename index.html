@@ -198,7 +198,7 @@ span.bugfix:after {
 #kancolle-info .tab .ship-type { width: 2.7em; }
 #kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }
 #kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; padding-right: 15px; }
-#kancolle-info .tab .ship-hp-header { width: 70px; }
+#kancolle-info .tab .ship-header-hp { width: 70px; }
 #kancolle-info .tab .ship-hp { text-align: right; width: 70px; }
 #kancolle-info .tab .ship-hp-meter { padding-top: 4px; text-align: right; width: 70px; line-height: 0; font-size: 8pt; }
 #kancolle-info .tab .ship-hp-meter meter { width: 70px; height: 6px; margin-top: 5px; }
@@ -452,7 +452,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <div id="tab-ships" class="tab">
     <div class="table-outer"><div class="table-inner"><table>
       <thead>
-        <tr><th class="ship-no th-right"><a class="list-header" href="#">#</a></th><th class="ship-type"><a class="list-header" href="#">艦種</a></th><th class="ship-name"><a class="list-header" href="#">艦名</a></th><th class="ship-level th-right"><a class="list-header sort-current" href="#">LV</a></th><th class="ship-hp-header"><a class="list-header" href="#">耐久</a></th><th class="ship-cond th-right"><a class="list-header" href="#">疲労</a></th><th class="ship-fuel-bull-header">燃料弾薬</th><th class="ship-exp th-right">経験値</th><th class="ship-desc">所在</th></tr>
+        <tr><th class="ship-no th-right"><a class="list-header" href="#">#</a></th><th class="ship-type"><a class="list-header" href="#">艦種</a></th><th class="ship-name"><a class="list-header" href="#">艦名</a></th><th class="ship-level th-right"><a class="list-header sort-current" href="#">LV</a></th><th class="ship-header-hp"><a class="list-header" href="#">耐久</a></th><th class="ship-cond th-right"><a class="list-header" href="#">疲労</a></th><th class="ship-fuel-bull-header">燃料弾薬</th><th class="ship-exp th-right">経験値</th><th class="ship-desc">所在</th></tr>
       </thead>
       <tbody>
         <tr><td class="ship-no">1</td><td class="ship-type">正空</td><td class="ship-name" title="1: 応急修理女神">飛龍改二</td><td class="ship-level">150</td><script>document.write(hp2html(74, 74));</script><td class="ship-cond color-green blink">53</td><script>document.write(fuel2html(59, 59, 63, 63));</script><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
@@ -906,7 +906,7 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 <h2 id="histroy">履歴</h2>
 <dl>
   <dt>2015-??-??</dt>
-  <dd id="v183">ver 1.8.3<br><span class="feature"></span>ブラウザの「戻る」操作を無効化。<br><span class="update"></span>艦名ポップアップで表示される現在装備に改修レベルを表示するよう変更。</dd>
+  <dd id="v183">ver 1.8.3<br><span class="feature"></span>ブラウザの「戻る」操作を無効化。<br><span class="update"></span>艦名ポップアップで表示される現在装備に改修レベルを表示するよう変更。<br><span class="bugfix"></span>艦娘タブの耐久値でのソートができなくなっていた不具合の修正。</dd>
 
   <dt>2015-05-19</dt>
   <dd id="v182">ver 1.8.2<br><span class="bugfix"></span>設定の保存ができなくなっていた不具合を修正。</dd>

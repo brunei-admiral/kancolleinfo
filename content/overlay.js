@@ -660,17 +660,19 @@ function hash2str(obj) {
 
 function map2str(map) {
   var cell;
-  if (map.api_enemy) {
-    if (map.api_no == map.api_bosscell_no || map.api_event_id == 5) {
-      cell = "*";
-    }
-    else {
-      cell = "+";
-    }
-    kcif.enemy_id = map.api_enemy.api_enemy_id;
+  if (map.api_no == map.api_bosscell_no || map.api_event_id == 5) {
+    cell = "*";
+  }
+  else if (map.api_event_kind) {
+    cell = "+";
   }
   else {
     cell = "-";
+  }
+  if (map.api_enemy) {
+    kcif.enemy_id = map.api_enemy.api_enemy_id;
+  }
+  else {
     kcif.enemy_id = null;
   }
   return cell + " " + map.api_maparea_id + "-" + map.api_mapinfo_no + "-" + map.api_no;

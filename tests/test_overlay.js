@@ -512,14 +512,17 @@ JUST.testCase({
       api_mapinfo_no: 2,
       api_no: 3,
       api_bosscell_no: 5,
-      api_enemy: 1, // dummy
+      api_event_id: 4,
+      api_event_kind: 1,
     };
     assertEqual("+ 1-2-3", map2str(json));
     json.api_no = 4;
-    json.api_enemy = 0;
+    json.api_event_id = 3;
+    json.api_event_kind = 0;
     assertEqual("- 1-2-4", map2str(json));
     json.api_no = 5;
-    json.api_enemy = 1;
+    json.api_event_id = 5;
+    json.api_event_kind = 1;
     assertEqual("* 1-2-5", map2str(json));
   },
 

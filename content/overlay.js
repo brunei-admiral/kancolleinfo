@@ -1838,6 +1838,16 @@ function kcifCallback(request, content, query) {
         }
       }
     }
+    if (json.api_data.api_use_slot_id) {
+      for (var i = 0; i < json.api_data.api_use_slot_id.length; i++) {
+        var id = json.api_data.api_use_slot_id[i];
+        var item = kcif.item_list[id];
+        if (item) {
+          delete kcif.item_list[id];
+          kcif.item_num--;
+        }
+      }
+    }
     log("remodel_slot");
   }
   else if (url.indexOf("nyukyo/start") != -1) {

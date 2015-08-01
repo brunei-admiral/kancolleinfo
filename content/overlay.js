@@ -1701,6 +1701,23 @@ function compareShip(a, b) {
   return result;
 }
 
+function setupFleetStatus() {
+  kcif.battle_result = [[], []];
+  for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
+    for (var j = 0, id; (id = deck.api_ship[j]) && id >= 0; j++) {
+      var ship = kcif.ship_list[id];
+      if (ship && ship.hp <= 0) {
+        var k = j;
+        do {
+          deck.api_ship[k] = deck.api_ship[k + 1];
+          k++;
+        } while (deck.api_ship[k] && (deck.api_ship[k] >= 0));
+        j--;
+      }
+    }
+  }
+}
+
 function kcifCallback(request, content, query) {
   if (kcif.timer) {
     window.clearTimeout(kcif.timer);
@@ -2124,14 +2141,14 @@ function kcifCallback(request, content, query) {
       if (url.indexOf("practice") != -1 && (!kcif.mission[deck_id - 1] || kcif.mission[deck_id - 1].indexOf("演習") == -1)) {
         kcif.mission[deck_id - 1] = "演習";
         if (url.indexOf("midnight") == -1) {
-          kcif.battle_result = [[], []];
+          setupFleetStatus();
         }
       }
       battle(url, json);
     }
   }
   else if (url.indexOf("_map/start") != -1) {
-    kcif.battle_result = [[], []];
+    setupFleetStatus();
     var deck_id = Number(query["api_deck_id"]);
     if (deck_id > 0) {
       kcif.repair_start[deck_id - 1] = null;
@@ -2144,7 +2161,7 @@ function kcifCallback(request, content, query) {
     update_all = false;
   }
   else if (url.indexOf("_map/next") != -1) {
-    kcif.battle_result = [[], []];
+    setupFleetStatus();
     for (var i = 0; i < 4; i++) {
       var mission = kcif.mission[i]
       if (mission && !Array.isArray(mission)) {

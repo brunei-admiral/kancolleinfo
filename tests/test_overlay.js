@@ -61,9 +61,21 @@ JUST.testCase({
         level: 1,
         exp: [10, 100],
         slot: [-1, -1, -1, -1, -1],
+        hp: 39,
+      },
+      101: {
+        "name": "香取",
+        type: 21,
+        level: 1,
+        exp: [10, 100],
+        slot: [-1, -1, -1, -1, -1],
+        hp: 36,
       },
     };
-    kcif.ship_master = {100: {"name": "テスト100", type: 2}};
+    kcif.ship_master = {
+      100: {"name": "テスト100", type: 2},
+      101: {"name": "テスト101", type: 2},
+    };
     kcif.info_div = document.body;
     kcif.renderFrame();
   },
@@ -619,6 +631,19 @@ JUST.testCase({
 
     resetConfig();
     refute(checkConfigChanged(), "nothing is changed");
+  },
+
+  testSetupFleetStatus: function(){
+    kcif.deck_list[0] = {
+      api_ship: [100, 101, -1, -1, -1, -1, -1],
+    };
+    kcif.ship_list[100].hp = 0;
+    kcif.battle_result = [[0], [0]];
+    setupFleetStatus();
+    assertEqual([], kcif.battle_result[0]);
+    assertEqual([], kcif.battle_result[1]);
+    assertEqual(101, kcif.deck_list[0].api_ship[0]);
+    assertEqual(-1, kcif.deck_list[0].api_ship[1]);
   },
 
   testKcifCallback: function(){

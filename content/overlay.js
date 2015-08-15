@@ -744,6 +744,9 @@ function type2str(type) {
     case 21:
       s = "練巡";
       break;
+    case 22:
+      s = "補給";
+      break;
     default:
       log("艦種不明: " + type);
       s = "不明";

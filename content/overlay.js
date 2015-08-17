@@ -2013,7 +2013,7 @@ function kcifCallback(request, content, query) {
     kcif.ship_max = Number(json.api_data.api_max_chara);
     kcif.item_max = Number(json.api_data.api_max_slotitem) + 3;
     log("basic: ship_max=" + String(kcif.ship_max) + ", item_max=" + String(kcif.item_max));
-    return;
+    update_all = false;
   }
   else if (url.indexOf("/record") != -1) {
     kcif.ship_num = Number(json.api_data.api_ship[0]);
@@ -2030,7 +2030,7 @@ function kcifCallback(request, content, query) {
     }
     kcif.item_num = json.api_data.length;
     log("slot_item: " + String(kcif.item_num) + " items");
-    return;
+    update_all = false;
   }
   else if (url.indexOf("/charge") != -1) {
     for (var i = 0, data; data = json.api_data.api_ship[i]; i++) {

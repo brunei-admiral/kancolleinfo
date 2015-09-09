@@ -2030,7 +2030,6 @@ function kcifCallback(request, content, query) {
     }
     kcif.item_num = json.api_data.length;
     log("slot_item: " + String(kcif.item_num) + " items");
-    update_all = false;
   }
   else if (url.indexOf("/charge") != -1) {
     for (var i = 0, data; data = json.api_data.api_ship[i]; i++) {

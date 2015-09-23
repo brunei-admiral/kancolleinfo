@@ -2644,16 +2644,16 @@ var kcif = {
       html += '<tr><td class="config-header">タイマーサウンド</td><td></td></tr>';
       html += '<tr><td class="config-label">サウンドファイルURL</td><td class="config-input"><input id="beep-url" type="text" value="' + getBeepUrl() + '"></td></tr>';
       html += '<tr><td class="config-label">ボリューム(0～100)</td><td class="config-input"><input id="beep-volume" type="number" max="100" min="0" value="' + getBeepVolume() + '"> <button id="beep-test">テスト</button></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-expedition" type="checkbox"' + (getBeepExpedition() ? ' checked' : '') + '>遠征帰還時のサウンド再生を自動でONにする</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-dock" type="checkbox"' + (getBeepDock() ? ' checked' : '') + '>入渠終了時のサウンド再生を自動でONにする</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-built" type="checkbox"' + (getBeepBuilt() ? ' checked' : '') + '>建造終了時のサウンド再生を自動でONにする</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-repair" type="checkbox"' + (getBeepRepair() ? ' checked' : '') + '>泊地修理更新(予想)時のサウンド再生を自動でONにする</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-expedition" type="checkbox" value="x"' + (getBeepExpedition() ? ' checked' : '') + '>遠征帰還時のサウンド再生を自動でONにする</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-dock" type="checkbox" value="x"' + (getBeepDock() ? ' checked' : '') + '>入渠終了時のサウンド再生を自動でONにする</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-built" type="checkbox" value="x"' + (getBeepBuilt() ? ' checked' : '') + '>建造終了時のサウンド再生を自動でONにする</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-repair" type="checkbox" value="x"' + (getBeepRepair() ? ' checked' : '') + '>泊地修理更新(予想)時のサウンド再生を自動でONにする</label></td></tr>';
       html += '<tr><td class="config-header">情報表示</td><td></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-battle" type="checkbox"' + (getShowBattle() ? ' checked' : '') + '>戦闘結果を表示する</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-built" type="checkbox"' + (getShowBuilt() ? ' checked' : '') + '>建造結果を表示する</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-battle" type="checkbox" value="x"' + (getShowBattle() ? ' checked' : '') + '>戦闘結果を表示する</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-built" type="checkbox" value="x"' + (getShowBuilt() ? ' checked' : '') + '>建造結果を表示する</label></td></tr>';
       html += '<tr><td class="config-header">表示カスタマイズ</td><td></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="hp-by-meter" type="checkbox"' + (getHpByMeter() ? ' checked' : '') + '>耐久値をメーター表示する</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox"' + (getFuelByMeter() ? ' checked' : '') + '>燃料・弾薬をメーター表示する</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="hp-by-meter" type="checkbox" value="x"' + (getHpByMeter() ? ' checked' : '') + '>耐久値をメーター表示する</label></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox" value="x"' + (getFuelByMeter() ? ' checked' : '') + '>燃料・弾薬をメーター表示する</label></td></tr>';
       html += '<tr><td class="config-label">索敵値計算式</td><td class="config-input"><select id="search-formula"><option value="0"' + (getSearchFormula() == 0 ? ' selected' : '') + '>総計</option><option value="1"' + (getSearchFormula() == 1 ? ' selected' : '') + '>旧2-5式</option><option value="2"' + (getSearchFormula() == 2 ? ' selected' : '') + '>2-5秋式</option><option value="3"' + (getSearchFormula() == 3 ? ' selected' : '') + '>秋簡易式</option></select></td></tr>';
       html += '<tr><td class="config-header">敵艦隊編成情報</td><td></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><button id="load-enemy-fleets">ファイル読み込み</button> <button id="save-enemy-fleets">ファイル書き出し</button> <button id="reset-enemy-fleets">リセット</button></td></tr>';
@@ -2671,14 +2671,14 @@ var kcif = {
       // キャプチャボタン
       var elem = kcif.info_div.querySelector("#capture");
       if (elem) {
-        elem.addEventListener("click", captureAndSave, false, true);
+        elem.addEventListener("click", captureAndSave, false);
         document.addEventListener("keypress", function(evt){
           var url = content.document.URL;
           if (url.match(/\/app_id=854854\//) &&
               evt.keyCode == 113) { // F2
             captureAndSave(evt);
           }
-        }, false, true);
+        }, false);
       }
 
       // タブ
@@ -2721,13 +2721,13 @@ var kcif = {
       // 設定:敵艦隊編成情報ファイル読み込み
       var elem = kcif.info_div.querySelector("#load-enemy-fleets");
       if (elem) {
-        elem.addEventListener("click", loadEnemyFleetsFromFile, false, true);
+        elem.addEventListener("click", loadEnemyFleetsFromFile, false);
       }
 
       // 設定:敵艦隊編成情報ファイル書き出し
       var elem = kcif.info_div.querySelector("#save-enemy-fleets");
       if (elem) {
-        elem.addEventListener("click", saveEnemyFleetsToFile, false, true);
+        elem.addEventListener("click", saveEnemyFleetsToFile, false);
       }
 
       // 設定:敵艦隊編成情報リセット
@@ -2741,13 +2741,13 @@ var kcif = {
             kcif.putStorage("enemy_fleets", JSON.stringify(kcif.enemy_fleets));
             log("enemy fleets reset");
           }
-        }, false, true);
+        }, false);
       }
 
       // 設定:保存
       var elem = kcif.info_div.querySelector("#config-save");
       if (elem) {
-        elem.addEventListener("click", saveConfig, false, true);
+        elem.addEventListener("click", saveConfig, false);
         elem.disabled = true;
       }
 
@@ -2785,7 +2785,7 @@ var kcif = {
           else {
              beeptest.pause();
           }
-        }, false, true);
+        }, false);
       }
 
       // タイマーサウンド設定
@@ -2830,7 +2830,7 @@ var kcif = {
       // ベース:キャプチャボタン
       var elem = base.querySelector("#capture");
       if (elem) {
-        elem.addEventListener("click", captureAndSave, false, true);
+        elem.addEventListener("click", captureAndSave, false);
       }
 
       // メイン
@@ -2862,7 +2862,7 @@ var kcif = {
         var s = null;
         if (Array.isArray(t)) {
           var dt = new Date(t[2]);
-          s = "[<span title='" + t[1] + "'>遠征中</span> <label>" + time2str(dt) + "<input id='check-fleet" + (i + 1) + "' type='checkbox' class='check-timer check-expedition'></label>]";
+          s = "[<span title='" + t[1] + "'>遠征中</span> <label>" + time2str(dt) + "<input id='check-fleet" + (i + 1) + "' type='checkbox' value='x' class='check-timer check-expedition'></label>]";
           col = getTimeColor(dt);
         }
         else if (t) {
@@ -3079,7 +3079,7 @@ var kcif = {
               if (rt < now) {
                 rcol = "color-red";
               }
-              s = ' <span class="' + rcol + '" title="' + num + '隻修理可能">[修理中 <label>更新' + time2str(new Date(rt)) + "<input id='check-fleet" + (i + 1) + "' type='checkbox' class='check-timer check-repair'></label>]</span>";
+              s = ' <span class="' + rcol + '" title="' + num + '隻修理可能">[修理中 <label>更新' + time2str(new Date(rt)) + "<input id='check-fleet" + (i + 1) + "' type='checkbox' value='x' class='check-timer check-repair'></label>]</span>";
             }
             else {
               s = "";
@@ -3155,7 +3155,7 @@ var kcif = {
           html += shipHp(ship);
           html += shipCond(ship);
           var dt = new Date(kcif.dock[i].api_complete_time);
-          html += '<td class="ship-at ' + getTimeColor(dt) + '"><label>' + time2str(dt) + '<input id="check-dock' + kcif.dock[i].api_id + '" type="checkbox" class="check-timer check-dock"></label></td>';
+          html += '<td class="ship-at ' + getTimeColor(dt) + '"><label>' + time2str(dt) + '<input id="check-dock' + kcif.dock[i].api_id + '" type="checkbox" value="x" class="check-timer check-dock"></label></td>';
         }
         else {
           html += '<tr><td class="ship-no">' + kcif.dock[i].api_id + '</td><td colspan="6"></tr>';
@@ -3190,7 +3190,7 @@ var kcif = {
             s = "--:--";
             col = "color-red";
           }
-          html += '<td class="ship-at ' + col + '"><label>' + s + '<input id="check-built' + kcif.build[i].api_id + '" type="checkbox" class="check-timer check-built"></label></td>';
+          html += '<td class="ship-at ' + col + '"><label>' + s + '<input id="check-built' + kcif.build[i].api_id + '" type="checkbox" value="x" class="check-timer check-built"></label></td>';
         }
         else {
           html += '<tr><td class="ship-no">' + kcif.build[i].api_id + '</td><td colspan="4"></tr>';

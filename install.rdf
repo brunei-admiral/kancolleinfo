@@ -4,7 +4,8 @@
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>kancolleinfo@example.jp</em:id>
 		<em:name>kancolleinfo</em:name>
-		<em:version>1.9.1</em:version>
+		<em:version>1.9.2</em:version>
+		<em:type>2</em:type>
 		<em:description>KanColle Information Viewer</em:description>
 		<em:creator>@brunei_admiral</em:creator>
 		<em:homepageURL>http://kancollegadgets.web.fc2.com/</em:homepageURL>
@@ -13,7 +14,7 @@
 			<Description>
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 				<em:minVersion>3.0</em:minVersion>
-				<em:maxVersion>30.*</em:maxVersion>
+				<em:maxVersion>41.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 	</Description>

@@ -56,78 +56,84 @@ function saveConfig(evt) {
 
   var str = CCIN("@mozilla.org/supports-string;1", "nsISupportsString");
 
-  var elem = kcif.info_div.querySelector("#capture-save-dir");
+  var configtab = kcif.info_div.querySelector("#tab-config");
+  var elem = configtab.querySelector("#capture-save-dir");
   if (elem) {
     str.data = elem.value;
     myPref().setComplexValue("capture.directory", Ci.nsISupportsString, str);
   }
 
-  elem = kcif.info_div.querySelector("#capture-save-base");
+  elem = configtab.querySelector("#capture-save-base");
   if (elem) {
     str.data = elem.value;
     myPref().setComplexValue("capture.basename", Ci.nsISupportsString, str);
   }
 
-  elem = kcif.info_div.querySelector("#beep-url");
+  elem = configtab.querySelector("#beep-url");
   if (elem) {
     str.data = elem.value;
     myPref().setComplexValue("beep.url", Ci.nsISupportsString, str);
   }
 
-  elem = kcif.info_div.querySelector("#beep-volume");
+  elem = configtab.querySelector("#beep-volume");
   if (elem) {
     myPref().setIntPref("beep.volume", elem.value);
   }
 
-  elem = kcif.info_div.querySelector("#beep-expedition");
+  elem = configtab.querySelector("#beep-expedition");
   if (elem) {
     myPref().setBoolPref("beep.expedition", elem.checked);
   }
 
-  elem = kcif.info_div.querySelector("#beep-dock");
+  elem = configtab.querySelector("#beep-dock");
   if (elem) {
     myPref().setBoolPref("beep.dock", elem.checked);
   }
 
-  elem = kcif.info_div.querySelector("#beep-built");
+  elem = configtab.querySelector("#beep-built");
   if (elem) {
     myPref().setBoolPref("beep.built", elem.checked);
   }
 
-  elem = kcif.info_div.querySelector("#beep-repair");
+  elem = configtab.querySelector("#beep-repair");
   if (elem) {
     myPref().setBoolPref("beep.repair", elem.checked);
   }
 
-  elem = kcif.info_div.querySelector("#show-battle");
+  elem = configtab.querySelector("#show-battle");
   if (elem) {
     myPref().setBoolPref("show.battle", elem.checked);
   }
 
-  elem = kcif.info_div.querySelector("#show-built");
+  elem = configtab.querySelector("#show-built");
   if (elem) {
     myPref().setBoolPref("show.built", elem.checked);
   }
 
-  elem = kcif.info_div.querySelector("#hp-by-meter");
+  elem = configtab.querySelector("#hp-by-meter");
   if (elem) {
     myPref().setBoolPref("meter.hp", elem.checked);
   }
 
-  elem = kcif.info_div.querySelector("#fuel-by-meter");
+  elem = configtab.querySelector("#fuel-by-meter");
   if (elem) {
     myPref().setBoolPref("meter.fuel", elem.checked);
   }
 
-  elem = kcif.info_div.querySelector("#search-formula");
+  elem = configtab.querySelector("#search-formula");
   if (elem) {
     myPref().setIntPref("search.formula", elem.options[elem.selectedIndex].value);
   }
 
-  restoreCheckboxes(saveCheckboxes());
+  elem = configtab.querySelector("#aircover-alv");
+  if (elem) {
+    myPref().setBoolPref("aircover.alv", elem.checked);
+  }
+
+  restoreCheckboxes(configtab, saveCheckboxes(configtab));
   beepOnOff();
 
-  var elems = kcif.info_div.querySelectorAll("#tab-config div.config-buttons button");
+  var elems = configtab.querySelectorAll("div.config-buttons button");
   for (var i = 0; i < elems.length; i++) {
     elems[i].disabled = true;
   }
@@ -206,6 +212,11 @@ function resetConfig(evt) {
         break;
       }
     }
+  }
+
+  elem = kcif.info_div.querySelector("#aircover-alv");
+  if (elem) {
+    elem.checked = getAircoverAlv();
   }
 
   var elems = kcif.info_div.querySelectorAll("#tab-config div.config-buttons button");
@@ -309,6 +320,13 @@ function checkConfigChanged() {
     }
   }
 
+  elem = kcif.info_div.querySelector("#aircover-alv");
+  if (elem) {
+    if (elem.checked != getAircoverAlv()) {
+      changed = true;
+    }
+  }
+
   return changed;
 }
 
@@ -368,33 +386,41 @@ function getSearchFormula() {
   return myPref().getIntPref("search.formula");
 }
 
+function getAircoverAlv() {
+  return myPref().getBoolPref("aircover.alv");
+}
+
 function getLogLevel() {
   return myPref().getIntPref("debug.loglevel");
 }
 
 function saveCheckboxes(tab) {
   var checks = {};
-  var elems = tab.querySelectorAll("input.check-timer");
-  for (var i = 0; i < elems.length; i++) {
-    checks[elems[i].id] = elems[i].checked;
+  if (typeof tab != "undefined") {
+    var elems = tab.querySelectorAll("input.check-timer");
+    for (var i = 0; i < elems.length; i++) {
+      checks[elems[i].id] = elems[i].checked;
+    }
   }
   return checks;
 }
 
 function restoreCheckboxes(tab, checks) {
-  var elems = tab.querySelectorAll("input.check-timer");
-  for (var i = 0; i < elems.length; i++) {
-    if (elems[i].className.indexOf("check-repair") >= 0) {
-      elems[i].checked = getBeepRepair() && checks[elems[i].id] == null || checks[elems[i].id];
-    }
-    else if (elems[i].className.indexOf("check-expedition") >= 0) {
-      elems[i].checked = getBeepExpedition() && checks[elems[i].id] == null || checks[elems[i].id];
-    }
-    else if (elems[i].className.indexOf("check-dock") >= 0) {
-      elems[i].checked = getBeepDock() && checks[elems[i].id] == null || checks[elems[i].id];
-    }
-    else if (elems[i].className.indexOf("check-built") >= 0) {
-      elems[i].checked = getBeepBuilt() && checks[elems[i].id] == null || checks[elems[i].id];
+  if (typeof tab != "undefined") {
+    var elems = tab.querySelectorAll("input.check-timer");
+    for (var i = 0; i < elems.length; i++) {
+      if (elems[i].className.indexOf("check-repair") >= 0) {
+        elems[i].checked = getBeepRepair() && checks[elems[i].id] == null || checks[elems[i].id];
+      }
+      else if (elems[i].className.indexOf("check-expedition") >= 0) {
+        elems[i].checked = getBeepExpedition() && checks[elems[i].id] == null || checks[elems[i].id];
+      }
+      else if (elems[i].className.indexOf("check-dock") >= 0) {
+        elems[i].checked = getBeepDock() && checks[elems[i].id] == null || checks[elems[i].id];
+      }
+      else if (elems[i].className.indexOf("check-built") >= 0) {
+        elems[i].checked = getBeepBuilt() && checks[elems[i].id] == null || checks[elems[i].id];
+      }
     }
   }
 }
@@ -755,8 +781,12 @@ function type2str(type) {
   return s;
 }
 
-function seiku2str(seiku) {
-  var seikuText = "敵制空値:&#10; ";
+function seiku2str(seiku, seiku_alv) {
+  var seikuText = "";
+  if (seiku_alv) {
+    seikuText += "自制空値: " + seiku + " + " + seiku_alv + "(熟練度ボーナス)&#10;";
+  }
+  seikuText += "敵制空値:&#10; ";
   var tmp = Math.floor(seiku / 3);
   if (tmp < 1) {
     seikuText += "0: ";
@@ -820,6 +850,9 @@ function shipName(ship) {
         var name = String(i + 1) + ": " + item.name;
         if (item.level > 0) {
           name += "+" + item.level;
+        }
+        if (item.alv > 0) {
+          name += "+" + item.alv;
         }
         if (item.type && isPlane(item.type[2])) {
           name += " [" + String(ship.equip[i]) + "/" + String(ship.equip_max[i]) + "]";
@@ -1536,6 +1569,7 @@ function makeItem(data, ship_id) {
     api_id: data.api_id,
     item_id: data.api_slotitem_id,
     level: typeof data.api_level != "undefined" ? data.api_level : 0,
+    alv: typeof data.api_alv != "undefined" ? data.api_alv : 0,
     name: kcif.item_master[data.api_slotitem_id].name,
     type: kcif.item_master[data.api_slotitem_id].type,
     sort_no: kcif.item_master[data.api_slotitem_id].sort_no,
@@ -1848,6 +1882,7 @@ function kcifCallback(request, content, query) {
       if (item) {
         item.item_id = json.api_data.api_after_slot.api_slotitem_id;
         item.level = json.api_data.api_after_slot.api_level;
+        item.alv = json.api_data.api_after_slot.api_alv
         if (kcif.item_master[item.item_id]) {
           item.name = kcif.item_master[item.item_id].name;
           item.type = kcif.item_master[item.item_id].type;
@@ -2553,7 +2588,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-type { width: 8em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-name { font-weight: bold; width: 14em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .item-level { text-align: right; width: 2.2em; padding-right: 12px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .item-level, #kancolle-info .tab .item-alv { text-align: right; width: 2.2em; padding-right: 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .res-name { font-weight: bold; width: 6em; padding-left: 1.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .res-value { text-align: right; width: 4.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab a.sort-current { color: yellow; }', sheet.length);
@@ -2654,7 +2689,8 @@ var kcif = {
       html += '<tr><td class="config-header">表示カスタマイズ</td><td></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="hp-by-meter" type="checkbox" value="x"' + (getHpByMeter() ? ' checked' : '') + '>耐久値をメーター表示する</label></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox" value="x"' + (getFuelByMeter() ? ' checked' : '') + '>燃料・弾薬をメーター表示する</label></td></tr>';
-      html += '<tr><td class="config-label">索敵値計算式</td><td class="config-input"><select id="search-formula"><option value="0"' + (getSearchFormula() == 0 ? ' selected' : '') + '>総計</option><option value="1"' + (getSearchFormula() == 1 ? ' selected' : '') + '>旧2-5式</option><option value="2"' + (getSearchFormula() == 2 ? ' selected' : '') + '>2-5秋式</option><option value="3"' + (getSearchFormula() == 3 ? ' selected' : '') + '>秋簡易式</option></select></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input">索敵値算出式：<select id="search-formula"><option value="0"' + (getSearchFormula() == 0 ? ' selected' : '') + '>総計</option><option value="1"' + (getSearchFormula() == 1 ? ' selected' : '') + '>旧2-5式</option><option value="2"' + (getSearchFormula() == 2 ? ' selected' : '') + '>2-5秋式</option><option value="3"' + (getSearchFormula() == 3 ? ' selected' : '') + '>秋簡易式</option></select></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="aircover-alv" type="checkbox" value="x"' + (getAircoverAlv() ? ' checked' : '') + '>制空値に艦載機熟練度を加算する</label></td></tr>';
       html += '<tr><td class="config-header">敵艦隊編成情報</td><td></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><button id="load-enemy-fleets">ファイル読み込み</button> <button id="save-enemy-fleets">ファイル書き出し</button> <button id="reset-enemy-fleets">リセット</button></td></tr>';
       html += '</table></div>';
@@ -2909,6 +2945,7 @@ var kcif = {
           var dai = 0;
           var dai_ship = [];
           var seiku = 0;
+          var seiku_alv = 0;
           var sakuteki = 0;
           var sakuteki0 = 0;
           var sakuteki1 = 0;
@@ -3020,6 +3057,15 @@ var kcif = {
                   }
                   else if (hasSeiku(item.type[2]) && ship.equip[k] > 0) {
                     seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
+                    if (getAircoverAlv()) {
+                      if (item.type[2] == 6) { // 艦戦
+                        seiku_alv += [0, 0, 2, 5, 9, 14, 14, 22][item.alv];
+                      }
+                      else if (item.type[2] == 11) { // 水爆
+                        seiku_alv += [0, 0, 0, 1, 2, 4, 5, 6][item.alv];
+                      }
+                      seiku_alv += [0, 1, 2, 2, 2, 2, 2, 3][item.alv];
+                    }
                   }
                   s_base -= item.sakuteki;
                   s_sakuteki += calcSakuteki(item);
@@ -3094,7 +3140,7 @@ var kcif = {
 
           if (ships.length > 0) {
             s += ' <span class="color-gray" title="旗艦 ' + ships[0].name + '">LV:' + ships[0].level + '/' + level_sum + '</span>';
-            s += ' <span class="color-gray" title="' + seiku2str(seiku) + '">制空:' + seiku + '</span>';
+            s += ' <span class="color-gray" title="' + seiku2str(seiku, seiku_alv) + '">制空:' + (seiku + seiku_alv) + '</span>';
             s += ' <span class="color-gray" title="';
             var formula = getSearchFormula();
             if (formula != 0) {
@@ -3296,7 +3342,7 @@ var kcif = {
       pos = table ? table.scrollTop : 0;
       html = "";
       html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="item-no th-right"><a class="list-header' + (kcif.sort_items.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="item-type"><a class="list-header' + (kcif.sort_items.startsWith("type") ? ' sort-current' : '') + '" href="#">種別</a></th><th class="item-name"><a class="list-header' + (kcif.sort_items.startsWith("name") ? ' sort-current' : '') + '" href="#">名称</a></th><th class="item-level th-right"><a class="list-header' + (kcif.sort_items.startsWith("level") ? ' sort-current' : '') + '" href="#">改修</a></th><th class="ship-name"><a class="list-header' + (kcif.sort_items.startsWith("holder") ? ' sort-current' : '') + '" href="#">所在</a></th><th class="ship-level"></th></tr></thead>';
+      html += '<thead><tr><th class="item-no th-right"><a class="list-header' + (kcif.sort_items.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="item-type"><a class="list-header' + (kcif.sort_items.startsWith("type") ? ' sort-current' : '') + '" href="#">種別</a></th><th class="item-name"><a class="list-header' + (kcif.sort_items.startsWith("name") ? ' sort-current' : '') + '" href="#">名称</a></th><th class="item-level th-right"><a class="list-header' + (kcif.sort_items.startsWith("level") ? ' sort-current' : '') + '" href="#">改修</a></th><th class="item-alv th-right"><a class="list-header' + (kcif.sort_items.startsWith("alv") ? ' sort-current' : '') + '" href="#">熟練</a></th><th class="ship-name"><a class="list-header' + (kcif.sort_items.startsWith("holder") ? ' sort-current' : '') + '" href="#">所在</a></th><th class="ship-level"></th></tr></thead>';
       html += '<tbody>';
 
       var items = [];
@@ -3318,6 +3364,9 @@ var kcif = {
         }
         else if (kcif.sort_items.startsWith("level")) {
           result = a.level - b.level;
+        }
+        else if (kcif.sort_items.startsWith("alv")) {
+          result = a.alv - b.alv;
         }
         else if (kcif.sort_items.startsWith("holder")) {
           if (a.ship_id == null || a.ship_id < 0) {
@@ -3357,6 +3406,7 @@ var kcif = {
         html += '<td class="item-type">' + item.type_name + '</td>';
         html += '<td class="item-name">' + item.name + '</td>';
         html += '<td class="item-level">' + item.level + '</td>';
+        html += '<td class="item-alv">' + item.alv + '</td>';
         var ship = item.ship_id != null ? kcif.ship_list[item.ship_id] : null;
         html += shipName(ship);
         html += shipLevel(ship);
@@ -3382,7 +3432,7 @@ var kcif = {
             kcif.sort_items = sort + (kcif.sort_items.endsWith("+") ? "-" : "+");
           }
           else {
-            kcif.sort_items = sort + (sort == "no" || sort == "level" ? "-" : "+");
+            kcif.sort_items = sort + (sort == "no" || sort == "level" || sort == "alv" ? "-" : "+");
           }
           kcif.renderInfo(true);
         }, false);

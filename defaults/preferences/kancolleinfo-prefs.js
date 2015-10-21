@@ -11,4 +11,5 @@ pref("extensions.kancolleinfo.show.built", false);
 pref("extensions.kancolleinfo.meter.hp", true);
 pref("extensions.kancolleinfo.meter.fuel", true);
 pref("extensions.kancolleinfo.search.formula", 3);
+pref("extensions.kancolleinfo.aircover.alv", true);
 pref("extensions.kancolleinfo.debug.loglevel", 0);

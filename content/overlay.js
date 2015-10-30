@@ -1989,6 +1989,18 @@ function kcifCallback(request, content, query) {
       }
     }
   }
+  else if (url.indexOf("slot_exchange_index") != -1) {
+    var ship = kcif.ship_list[Number(query["api_id"])];
+    if (ship) {
+      for (var i = 0; i < 5; i++) {
+        var item_id = json.api_data.api_slot[i];
+        if (item_id >= 0 && kcif.item_list[item_id]) {
+          kcif.item_list[item_id].ship_id = ship.api_id;
+          ship.slot[i] = item_id;
+        }
+      }
+    }
+  }
   else if (url.indexOf("/api_start2") != -1) {
     var mst_ship = json.api_data.api_mst_ship;
     var master = {};
@@ -2081,7 +2093,7 @@ function kcifCallback(request, content, query) {
     }
     log("charged");
   }
-  else if (url.indexOf("/change") != -1) {
+  else if (url.indexOf("/api_req_hensei/change") != -1) {
     var deck_id = Number(query["api_id"]);
     var deck = kcif.deck_list[deck_id - 1];
     var idx = Number(query["api_ship_idx"]);
@@ -2128,6 +2140,12 @@ function kcifCallback(request, content, query) {
       }
       updateRepairStart(deck_id - 1);
     }
+  }
+  else if (url.indexOf("/preset_select") != -1) {
+    var deck_id = Number(query["api_deck_id"]);
+    var deck = kcif.deck_list[deck_id - 1];
+    deck.api_ship = json.api_data.api_ship;
+    updateRepairStart(deck_id - 1);
   }
   else if (url.indexOf("goback_port") != -1) {
     var ship1 = null, ship2 = null;
@@ -2448,7 +2466,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all)|api_req_hokyu\/charge|api_req_hensei\/change|api_req_sortie\/(air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all|slot_exchange_index)|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select)|api_req_sortie\/(air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);

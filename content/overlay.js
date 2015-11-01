@@ -2076,6 +2076,14 @@ function kcifCallback(request, content, query) {
       makeItem(data, null);
     }
     kcif.item_num = json.api_data.length;
+    for (var ship_id in kcif.ship_list) {
+      var ship = kcif.ship_list[ship_id];
+      for (var i = 0, slot; slot = ship.slot[i]; i++) {
+        if (slot >= 0 && kcif.item_list[slot]) {
+          kcif.item_list[slot].ship_id = ship.api_id;
+        }
+      }
+    }
     log("slot_item: " + String(kcif.item_num) + " items");
   }
   else if (url.indexOf("/charge") != -1) {

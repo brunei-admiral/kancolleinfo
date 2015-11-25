@@ -785,8 +785,8 @@ function seiku2str(seiku, seiku_alv) {
   var seikuText = "";
   if (seiku_alv) {
     seikuText += "自制空値: " + seiku + " + " + seiku_alv + "(熟練度ボーナス)&#10;";
+    seiku += seiku_alv;
   }
-  seiku += seiku_alv;
   seikuText += "敵制空値:&#10; ";
   var tmp = Math.floor(seiku / 3);
   if (tmp < 1) {

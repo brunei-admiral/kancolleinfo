@@ -786,6 +786,7 @@ function seiku2str(seiku, seiku_alv) {
   if (seiku_alv) {
     seikuText += "自制空値: " + seiku + " + " + seiku_alv + "(熟練度ボーナス)&#10;";
   }
+  seiku += seiku_alv;
   seikuText += "敵制空値:&#10; ";
   var tmp = Math.floor(seiku / 3);
   if (tmp < 1) {
@@ -2162,7 +2163,7 @@ function kcifCallback(request, content, query) {
         if (!ship1 && !ship.taihi && ship.hp <= ship.hp_max / 4) {
           ship1 = ship;
         }
-        else if (!ship2 && !ship.taihi && ship.type == 2 && ship.hp > ship.hp_max * 3 / 4) {
+        else if (i == 1 && !ship2 && !ship.taihi && ship.type == 2 && ship.hp > ship.hp_max * 3 / 4) {
           ship2 = ship;
         }
       }
@@ -3061,57 +3062,59 @@ var kcif = {
               if (ship.cond >= 50) {
                 kira.push(ship.name);
               }
-              var drum_p = false;
-              var dai_p = false;
-              var s_base = ship.sakuteki;
-              var s_sakuteki = 0;
-              var s_sakuteki1 = 0;
-              var s_sakuteki2 = 0;
-              for (var k = 0; ship.slot && k < 5; k++) {
-                if (ship.slot[k] < 0) {
-                  break;
-                }
-                var item = kcif.item_list[ship.slot[k]];
-                if (item) {
-                  if (item.item_id == 75) { // ドラム缶(輸送用)
-                    drum++;
-                    drum_p = true;
+              if (!ship.taihi) {
+                var drum_p = false;
+                var dai_p = false;
+                var s_base = ship.sakuteki;
+                var s_sakuteki = 0;
+                var s_sakuteki1 = 0;
+                var s_sakuteki2 = 0;
+                for (var k = 0; ship.slot && k < 5; k++) {
+                  if (ship.slot[k] < 0) {
+                    break;
                   }
-                  else if (item.item_id == 68) { // 大発動艇
-                    dai++;
-                    dai_p = true;
-                  }
-                  else if (hasSeiku(item.type[2]) && ship.equip[k] > 0) {
-                    seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
-                    if (getAircoverAlv()) {
-                      if (item.type[2] == 6) { // 艦戦
-                        seiku_alv += [0, 0, 2, 5, 9, 14, 14, 22][item.alv];
-                      }
-                      else if (item.type[2] == 11) { // 水爆
-                        seiku_alv += [0, 0, 0, 1, 2, 4, 5, 6][item.alv];
-                      }
-                      seiku_alv += [0, 1, 2, 2, 2, 2, 2, 3][item.alv];
+                  var item = kcif.item_list[ship.slot[k]];
+                  if (item) {
+                    if (item.item_id == 75) { // ドラム缶(輸送用)
+                      drum++;
+                      drum_p = true;
                     }
+                    else if (item.item_id == 68) { // 大発動艇
+                      dai++;
+                      dai_p = true;
+                    }
+                    else if (hasSeiku(item.type[2]) && ship.equip[k] > 0) {
+                      seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
+                      if (getAircoverAlv()) {
+                        if (item.type[2] == 6) { // 艦戦
+                          seiku_alv += [0, 0, 2, 5, 9, 14, 14, 22][item.alv];
+                        }
+                        else if (item.type[2] == 11) { // 水爆
+                          seiku_alv += [0, 0, 0, 1, 2, 4, 5, 6][item.alv];
+                        }
+                        seiku_alv += [0, 1, 2, 2, 2, 2, 2, 3][item.alv];
+                      }
+                    }
+                    s_base -= item.sakuteki;
+                    s_sakuteki += calcSakuteki(item);
+                    s_sakuteki1 += calcSakuteki(item, 1);
+                    s_sakuteki2 += calcSakuteki(item, 2);
                   }
-                  s_base -= item.sakuteki;
-                  s_sakuteki += calcSakuteki(item);
-                  s_sakuteki1 += calcSakuteki(item, 1);
-                  s_sakuteki2 += calcSakuteki(item, 2);
                 }
+                if (drum_p) {
+                  drum_ship.push(ship.name);
+                }
+                if (dai_p) {
+                  dai_ship.push(ship.name);
+                }
+                s_sakuteki += Math.sqrt(s_base);
+                s_sakuteki2 += Math.sqrt(s_base) * 1.6841056;
+                sakuteki += Math.floor(s_sakuteki);
+                sakuteki0 += ship.sakuteki;
+                sakuteki1 += s_base;
+                sakuteki1i += s_sakuteki1;
+                sakuteki2 += s_sakuteki2;
               }
-              if (drum_p) {
-                drum_ship.push(ship.name);
-              }
-              if (dai_p) {
-                dai_ship.push(ship.name);
-              }
-              s_sakuteki += Math.sqrt(s_base);
-              s_sakuteki2 += Math.sqrt(s_base) * 1.6841056;
-              sakuteki += Math.floor(s_sakuteki);
-              sakuteki0 += ship.sakuteki;
-              sakuteki1 += s_base;
-              sakuteki1i += s_sakuteki1;
-              sakuteki2 += s_sakuteki2;
             }
           }
           sakuteki -= Math.floor(0.4 * kcif.admiral_level);

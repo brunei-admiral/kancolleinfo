@@ -1016,8 +1016,12 @@ function shipFuelBull(ship) {
 }
 
 function shipExp(ship) {
-  var total = (ship.level == 99 || ship.level == 150) ? '' : ship.exp[0] + '/' + (ship.exp[0] + ship.exp[1]);
-  var need = (ship.level == 99 || ship.level == 150) ? '' : ship.exp[1];
+  var total = '';
+  var need = '';
+  if (ship.exp[1] > 0) {
+    total = ship.exp[0] + '/' + (ship.exp[0] + ship.exp[1]);
+    need = ship.exp[1];
+  }
   return '<td class="ship-exp" title="' + total + '">' + need + '</td>';
 }
 
@@ -2852,6 +2856,10 @@ var kcif = {
       }
 
       // タイマーサウンド設定
+      if (kcif.beep) {
+        kcif.beep.pause();
+        kcif.beep = null;
+      }
       kcif.beep = new Audio(getBeepUrl());
       if (kcif.beep) {
         kcif.beep.loop = true;

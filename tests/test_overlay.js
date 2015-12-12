@@ -429,6 +429,7 @@ JUST.testCase({
       hp: 10,
       hp_max: 20,
       slot: [-1, -1, -1, -1, -1],
+      slot_ex: -1,
     };
     buf = []
     reflectDamage(buf, 0, ship, 5);
@@ -445,14 +446,14 @@ JUST.testCase({
     ship.slot = [1, 3, 2, -1, -1]
     reflectDamage(buf, 1, ship, 3);
     assertEqual(4, ship.hp);
-    assertEqual([1, 2, -1, -1, -1], ship.slot);
+    assertEqual([1, 2, -1, -1, -1, -1], ship.slot);
     assertEqual(2, buf[1]);
 
     ship.hp = 2;
     ship.slot = [1, 4, 2, -1, -1]
     reflectDamage(buf, 2, ship, 3);
     assertEqual(20, ship.hp);
-    assertEqual([1, 2, -1, -1, -1], ship.slot);
+    assertEqual([1, 2, -1, -1, -1, -1], ship.slot);
     assertEqual(2, buf[2]);
 
     // enemy

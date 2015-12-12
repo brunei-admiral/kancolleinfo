@@ -837,6 +837,20 @@ function shipType(ship) {
   return '<td class="ship-type">' + s + '</td>';
 }
 
+function itemName(item, equip, equip_max) {
+  var name = item.name;
+  if (item.level > 0) {
+    name += "+" + item.level;
+  }
+  if (item.alv > 0) {
+    name += "+" + item.alv;
+  }
+  if (item.type && isPlane(item.type[2])) {
+    name += " [" + String(equip) + "/" + String(equip_max) + "]";
+  }
+  return name;
+}
+
 function shipName(ship) {
   var s;
   var items = [];
@@ -845,19 +859,17 @@ function shipName(ship) {
   }
   else {
     s = ship.name || "(" + ship.ship_id + ")";
-    for (var i = 0; ship.slot && i < 5; i++) {
+    for (var i = 0; ship.slot && (i < ship.slot.length); i++) {
       if (ship.slot[i] >= 0 && kcif.item_list[ship.slot[i]]) {
         var item = kcif.item_list[ship.slot[i]]
-        var name = String(i + 1) + ": " + item.name;
-        if (item.level > 0) {
-          name += "+" + item.level;
-        }
-        if (item.alv > 0) {
-          name += "+" + item.alv;
-        }
-        if (item.type && isPlane(item.type[2])) {
-          name += " [" + String(ship.equip[i]) + "/" + String(ship.equip_max[i]) + "]";
-        }
+        var name = String(i + 1) + ": " + itemName(item, ship.equip[i], ship.equip_max[i]);
+        items.push(name);
+      }
+    }
+    if (ship.slot_ex >= 0) {
+      var item = kcif.item_list[ship.slot_ex];
+      if (item) {
+        var name = "ex: " + itemName(item);
         items.push(name);
       }
     }
@@ -1092,8 +1104,12 @@ function reflectDamage(buf, idx, ship, damage) {
   if (ship.hp <= 0) {
     var found = false;
     if (ship.slot) {
-      for (var i = 0; i < ship.slot.length && ship.slot[i] >= 0 && !found; i++) {
-        var item = kcif.item_list[ship.slot[i]];
+      var slots = ship.slot.concat(ship.slot_ex);
+      for (var i = 0; i < slots.length && !found; i++) {
+        if (slots[i] < 0) {
+          continue;
+        }
+        var item = kcif.item_list[slots[i]];
         if (item) {
           if (item.item_id == 42) {      // 応急修理要員
             ship.hp = Math.floor(ship.hp_max / 5);
@@ -1104,10 +1120,15 @@ function reflectDamage(buf, idx, ship, damage) {
             found = true;
           }
           if (found) {
-            for (var j = i + 1; j < ship.slot.length - 1; j++) {
-              ship.slot[j - 1] = ship.slot[j];
+            if (i >= ship.slot.length) {
+              ship.slot_ex = -1;
             }
-            ship.slot[ship.slot.length - 1] = -1;
+            else {
+              for (var j = i + 1; j < ship.slot.length - 1; j++) {
+                ship.slot[j - 1] = ship.slot[j];
+              }
+              ship.slot[slots.length - 1] = -1;
+            }
           }
         }
       }
@@ -1604,6 +1625,7 @@ function makeShip(data, taihi) {
     p_bull: prev ? prev.bull : data.api_bull,
     bull: data.api_bull,
     slot: data.api_slot,
+    slot_ex: data.api_slot_ex,
     equip: data.api_onslot,
     ndock_item: data.api_ndock_item,
     sakuteki: data.api_sakuteki[0],
@@ -2291,6 +2313,9 @@ function kcifCallback(request, content, query) {
         if (slot >= 0 && kcif.item_list[slot]) {
           kcif.item_list[slot].ship_id = ship.api_id;
         }
+      }
+      if (data.api_slot_ex >= 0 && kcif.item_list[data.api_slot_ex]) {
+        kcif.item_list[data.api_slot_ex].ship_id = ship.api_id;
       }
     }
     if (port || ship2) {
@@ -2998,12 +3023,13 @@ var kcif = {
             if (ship != null) {
               ships.push(ship);
               var kit = null;
-              for (var k = 0; ship.slot && k < 5; k++) {
-                if (ship.slot[k] < 0) {
-                  break;
+              var slots = ship.slot.concat(ship.slot_ex);
+              for (var k = 0; k < slots.length; k++) {
+                if (slots[k] < 0) {
+                  continue;
                 }
-                var item = kcif.item_list[ship.slot[k]];
-                if (item && item.type[2] == 23) { // 応急修理要員
+                var item = kcif.item_list[slots[k]];
+                if (item && item.type[2] == 23) { // 応急修理要員・女神
                   kit = item.name;
                   break;
                 }

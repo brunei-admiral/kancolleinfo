@@ -330,68 +330,84 @@ function checkConfigChanged() {
   return changed;
 }
 
+function getTmpDir() {
+  return Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
+}
+
 function myPref() {
   return Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getBranch("extensions.kancolleinfo.");
 }
 
+function getStringPref(pref) {
+  return myPref().getComplexValue(pref, Ci.nsISupportsString).data;
+}
+
+function getIntPref(pref) {
+  return myPref().getIntPref(pref);
+}
+
+function getBoolPref(pref) {
+  return myPref().getBoolPref(pref);
+}
+
 function getCaptureSaveDir() {
-  return myPref().getComplexValue("capture.directory", Ci.nsISupportsString).data || Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
+  return getStringPref("capture.directory") || getTmpDir();
 }
 
 function getCaptureSaveBase() {
-  return myPref().getComplexValue("capture.basename", Ci.nsISupportsString).data || "kancolle-";
+  return getStringPref("capture.basename") || "kancolle-";
 }
 
 function getBeepUrl() {
-  return myPref().getComplexValue("beep.url", Ci.nsISupportsString).data || "file:///C:/Windows/Media/ringout.wav";
+  return getStringPref("beep.url") || "file:///C:/Windows/Media/ringout.wav";
 }
 
 function getBeepVolume() {
-  return myPref().getIntPref("beep.volume");
+  return getIntPref("beep.volume");
 }
 
 function getBeepExpedition() {
-  return myPref().getBoolPref("beep.expedition");
+  return getBoolPref("beep.expedition");
 }
 
 function getBeepDock() {
-  return myPref().getBoolPref("beep.dock");
+  return getBoolPref("beep.dock");
 }
 
 function getBeepBuilt() {
-  return myPref().getBoolPref("beep.built");
+  return getBoolPref("beep.built");
 }
 
 function getBeepRepair() {
-  return myPref().getBoolPref("beep.repair");
+  return getBoolPref("beep.repair");
 }
 
 function getShowBattle() {
-  return myPref().getBoolPref("show.battle");
+  return getBoolPref("show.battle");
 }
 
 function getShowBuilt() {
-  return myPref().getBoolPref("show.built");
+  return getBoolPref("show.built");
 }
 
 function getHpByMeter() {
-  return myPref().getBoolPref("meter.hp");
+  return getBoolPref("meter.hp");
 }
 
 function getFuelByMeter() {
-  return myPref().getBoolPref("meter.fuel");
+  return getBoolPref("meter.fuel");
 }
 
 function getSearchFormula() {
-  return myPref().getIntPref("search.formula");
+  return getIntPref("search.formula");
 }
 
 function getAircoverAlv() {
-  return myPref().getBoolPref("aircover.alv");
+  return getBoolPref("aircover.alv");
 }
 
 function getLogLevel() {
-  return myPref().getIntPref("debug.loglevel");
+  return getIntPref("debug.loglevel");
 }
 
 function saveCheckboxes(tab) {

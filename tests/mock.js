@@ -5,6 +5,9 @@ var XPCOMUtils = {
 
 var Services = {
   console: console,
+  obs: {
+    addObserver: function(){},
+  },
 }
 
 console.logStringMessage = console.log;
@@ -32,16 +35,40 @@ String.prototype.endsWith = function(str){
   return this.lastIndexOf(str) == this.length - str.length;
 };
 
+var dummyCc = {
+  getService: function(){
+    var obj = {
+      newURI: function(){},
+      getCodebasePrincipal: function(){},
+      getLocalStorageForPrincipal: function(){},
+    };
+    return obj;
+  },
+}
+
+const Cc = {
+  "@mozilla.org/network/io-service;1": dummyCc,
+  "@mozilla.org/scriptsecuritymanager;1": dummyCc,
+  "@mozilla.org/dom/storagemanager;1": dummyCc,
+}
+
 const Ci = {
+  nsIDOMStorageManager: null,
+  nsIIOService: null,
+  nsIScriptSecuirtyManager: null,
   nsISupportsString: null,
 };
 
 function Audio(){
-  obj = {
+  var obj = {
     load: function(){
     },
     pause: function(){
     },
   };
   return obj;
+}
+
+function sendSyncMessage(){
+  return [null];
 }

@@ -529,147 +529,6 @@ function captureAndSave(evt) {
   }, "image/png");
 }
 
-function loadEnemyFleetsFromStorage() {
-  var s = kcif.getStorage("enemy_fleets");
-  if (s) {
-    try {
-      kcif.enemy_fleets = JSON.parse(s);
-    }
-    catch (exc) {
-      log("  JSON.parse failed: " + String(exc));
-      kcif.enemy_fleets = null;
-    }
-  }
-  if (!kcif.enemy_fleets) {
-    kcif.enemy_fleets = {};
-  }
-}
-
-function saveEnemyFleetsToStorage() {
-  kcif.putStorage("enemy_fleets", JSON.stringify(kcif.enemy_fleets));
-}
-
-const CSV_HEADER = "敵編成ID,敵艦隊名,陣形,敵1番艦,敵2番艦,敵3番艦,敵4番艦,敵5番艦,敵6番艦";
-
-function loadEnemyFleetsFromFile(evt) {
-  log("loadEnemyFleetsFromFile");
-  if (evt) evt.preventDefault();
-
-  var picker = CCIN("@mozilla.org/filepicker;1", "nsIFilePicker");
-  picker.init(window, "", Ci.nsIFilePicker.modeOpen);
-  picker.defaultExtension = "csv";
-  picker.appendFilter("CSVファイル", "*.csv");
-  picker.appendFilters(Ci.nsIFilePicker.filterAll);
-  var ret = picker.show();
-  if (ret == Ci.nsIFilePicker.returnOK) {
-    try {
-      var stream = CCIN("@mozilla.org/network/file-input-stream;1", "nsIFileInputStream");
-      stream.init(picker.file, 0x01, 0x0444, 0);
-      var conv = CCIN("@mozilla.org/intl/scriptableunicodeconverter", "nsIScriptableUnicodeConverter");
-      conv.charset = "Windows-31J";
-      stream.QueryInterface(Ci.nsILineInputStream);
-      var line = {};
-      var hasmore = stream.readLine(line);
-      var needToConvert = false;
-      if (line.value == CSV_HEADER) {
-        log("UTF-8");
-      }
-      else if (line.value == "\xEF\xBB\xBF" + CSV_HEADER) {
-        log("UTF-8(BOM)");
-      }
-      else if (line.value == conv.ConvertFromUnicode(CSV_HEADER) + conv.Finish()) {
-        log("Windows-31J");
-        needToConvert = true;
-      }
-      else {
-        log("unknown: [" + line.value + "]");
-        throw "ファイルの形式が異なります。";
-      }
-
-      kcif.enemy_fleets = {};
-      var pos = 2;
-      while (hasmore) {
-        hasmore = stream.readLine(line);
-        var read = line.value;
-        if (needToConvert) {
-          read = conv.ConvertToUnicode(read);
-        }
-        data = read.split(",");
-        var ef = {};
-        if (data.length != 9) {
-          throw String(pos) + "行目が正しくありません。";
-        }
-        if (Number(data[0]) <= 0) {
-          throw String(pos) + "行目のIDが正しくありません。";
-        }
-        ef.enemy_id = Number(data[0]);
-        ef.name = data[1];
-        if (form2str(Number(data[2])) == "") {
-          throw String(pos) + "行目の陣形が正しくありません。";
-        }
-        ef.formation = Number(data[2]);
-        ef.id_list = [];
-        for (var i = 0; i < 6; i++) {
-          if (!Number(data[i + 3])) {
-            throw String(pos) + "行目の敵" + (i + 1) + "番艦が正しくありません。";
-          }
-          ef.id_list[i] = Number(data[i + 3]);
-        }
-        kcif.enemy_fleets[ef.enemy_id] = ef;
-        pos++;
-      }
-      stream.close();
-      saveEnemyFleetsToStorage();
-      alert("ファイルを読み込みました。");
-    }
-    catch (exc) {
-      log("cannot read: " + String(exc));
-      loadEnemyFleetsFromStorage(); // 復元
-      alert("ファイルを読み込めませんでした。\n" + String(exc));
-    }
-  }
-}
-
-function saveEnemyFleetsToFile() {
-  log("saveEnemyFleetsToFile");
-  if (evt) evt.preventDefault();
-
-  var picker = CCIN("@mozilla.org/filepicker;1", "nsIFilePicker");
-  picker.init(window, "", Ci.nsIFilePicker.modeSave);
-  picker.defaultExtension = "csv";
-  picker.defaultString = "EnemyFleetRecord.csv";
-  var ret = picker.show();
-  if (ret == Ci.nsIFilePicker.returnOK || ret == Ci.nsIFilePicker.returnReplace) {
-    try {
-      var stream = CCIN("@mozilla.org/network/safe-file-output-stream;1", "nsIFileOutputStream");
-      stream.init(picker.file, 0x04 | 0x08 | 0x20, 0644, 0);
-      var conv = CCIN("@mozilla.org/intl/scriptableunicodeconverter", "nsIScriptableUnicodeConverter");
-      conv.charset = "Windows-31J";
-      var data = conv.ConvertFromUnicode(CSV_HEADER + "\r\n");
-      if (kcif.enemy_fleets) {
-        for (var k in kcif.enemy_fleets) {
-          var v = kcif.enemy_fleets[k];
-          data += conv.ConvertFromUnicode(String(k) + "," + v.name + "," + v.formation + "," + v.id_list.join(",") + "\r\n");
-        }
-      }
-      data += conv.Finish();
-      stream.write(data, data.length);
-      if (stream instanceof Ci.nsISafeOutputStream) {
-        stream.finish();
-      }
-      else {
-        stream.close();
-      }
-      log("OK, file saved");
-      alert("ファイルを保存しました。");
-    }
-    catch (exc) {
-      log("cannot save: " + String(exc));
-      alert("ファイルを保存できませんでした。\n" + String(exc));
-    }
-  }
-}
-
 function time2str(dt) {
   return dt.toLocaleFormat(dt.getDate() != new Date().getDate() ? "%m/%d %H:%M" : "%H:%M");
 }
@@ -710,12 +569,6 @@ function map2str(map) {
   }
   else {
     cell = "-";
-  }
-  if (map.api_enemy) {
-    kcif.enemy_id = map.api_enemy.api_enemy_id;
-  }
-  else {
-    kcif.enemy_id = null;
   }
   return cell + " " + map.api_maparea_id + "-" + map.api_mapinfo_no + "-" + map.api_no;
 }
@@ -1339,7 +1192,6 @@ function battle(url, json) {
   try {
     var deck_id = json.api_data.api_dock_id || json.api_data.api_deck_id || 1;
     if (json.api_data.api_formation) {
-      kcif.enemy_formation = json.api_data.api_formation[1];
       var s = "<span title='" + form2str(json.api_data.api_formation[0], "自") + " " + form2str(json.api_data.api_formation[1], "敵");
       log("json.json.api_data.api_kouku = " + (json.api_data.api_kouku ? "exist" : "not exist"));
       if (json.api_data.api_kouku && json.api_data.api_kouku.api_stage1) {
@@ -2216,24 +2068,6 @@ function kcifCallback(request, content, query) {
     }
   }
   else if (url.indexOf("battleresult") != -1) {
-    if (kcif.enemy_id && kcif.enemy_fleets && json.api_data.api_ship_id) {
-      var ef = {
-        enemy_id: kcif.enemy_id,
-        name: json.api_data.api_enemy_info.api_deck_name,
-        formation: kcif.enemy_formation,
-        id_list: [],
-      };
-      for (var i = 0; i < 6; i++) {
-        ef.id_list[i] = json.api_data.api_ship_id[i + 1];
-        if (!ef.id_list[i]) {
-          ef.id_list[i] = -1;
-        }
-        log(" " + i + ": " + ef.id_list[i]);
-      }
-      kcif.enemy_fleets[kcif.enemy_id] = ef;
-      saveEnemyFleetsToStorage();
-      log("enemy: ID" + kcif.enemy_id + " saved (ef.id_list=" + (ef.id_list ? "exist" : "not exist") + ", fleets.id_list=" + (kcif.enemy_fleets[kcif.enemy_id].id_list ? "exist" : "not exist") + ")");
-    }
     if (json.api_data.api_get_ship && json.api_data.api_get_ship.api_ship_id) {
       kcif.ship_num++;
       log("drop: " + json.api_data.api_get_ship.api_ship_id);
@@ -2260,9 +2094,6 @@ function kcifCallback(request, content, query) {
       kcif.repair_start[deck_id - 1] = null;
       kcif.mission[deck_id - 1] = map2str(json.api_data);
       log("start: " + deck_id + ": " + kcif.mission[deck_id - 1]);
-      if (kcif.enemy_id) {
-        log("  enemy: ID" + kcif.enemy_id);
-      }
     }
     update_all = false;
   }
@@ -2273,9 +2104,6 @@ function kcifCallback(request, content, query) {
       if (mission && !Array.isArray(mission)) {
         kcif.mission[i] = map2str(json.api_data);
         log("next: " + (i + 1) + ": " + kcif.mission[i]);
-        if (kcif.enemy_id) {
-          log("  enemy: ID" + kcif.enemy_id);
-        }
         break;
       }
     }
@@ -2305,7 +2133,6 @@ function kcifCallback(request, content, query) {
       kcif.admiral_level = Number(json.api_data.api_basic.api_level);
       kcif.ship_max = Number(json.api_data.api_basic.api_max_chara);
       kcif.item_max = Number(json.api_data.api_basic.api_max_slotitem) + 3;
-      kcif.enemy_id = null;
     }
     if (deck_list.length >= kcif.deck_list.length) {
       kcif.deck_list = deck_list;
@@ -2542,7 +2369,6 @@ var kcif = {
   sort_ships: "level-",
   sort_items: "type+",
   repair_start: [null, null, null, null],
-  storage: null,
   ship_master: {},
   item_master: {},
   mission_master: {},
@@ -2559,22 +2385,10 @@ var kcif = {
   admiral_revel: 1,
   material: [0, 0, 0, 0, 0, 0, 0, 0],
   battle_result: [[], []],
-  enemy_fleets: null,
-  enemy_id: null,
-  enemy_formation: null,
   timer: null,
 
   init: function(evt) {
     log("init");
-
-    var url = "http://www.dmm.com/netgame/social/-/gadgets/=/app_id=854854/";
-    var ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-    var ssm = Cc["@mozilla.org/scriptsecuritymanager;1"].getService(Ci.nsIScriptSecurityManager);
-    var dsm = Cc["@mozilla.org/dom/storagemanager;1"].getService(Ci.nsIDOMStorageManager);
-    var uri = ios.newURI(url, "", null);
-    var principal = ssm.getCodebasePrincipal(uri);
-    kcif.storage = dsm.getLocalStorageForPrincipal(principal, "");
-
     Services.obs.addObserver(kcifHttpObserver, TOPIC, false);
   },
 
@@ -2584,14 +2398,6 @@ var kcif = {
     if (kcif.beep) {
       kcif.beep.pause();
     }
-  },
-
-  putStorage: function(key, s) {
-    kcif.storage.setItem(key, s);
-  },
-
-  getStorage: function(key) {
-    return kcif.storage.getItem(key);
   },
 
   onLoad: function(evt) {
@@ -2709,10 +2515,6 @@ var kcif = {
       }
 
       doc.body.setAttribute("onload", "if (typeof DMM != 'undefined' && DMM.netgame) DMM.netgame.reloadDialog = function(){}; history.pushState(null, null, null); window.addEventListener('popstate', function() { history.pushState(null, null, null); });");
-
-      if (!kcif.enemy_fleets) {
-        loadEnemyFleetsFromStorage();
-      }
     }
   },
 
@@ -2763,8 +2565,6 @@ var kcif = {
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox" value="x"' + (getFuelByMeter() ? ' checked' : '') + '>燃料・弾薬をメーター表示する</label></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input">索敵値算出式：<select id="search-formula"><option value="0"' + (getSearchFormula() == 0 ? ' selected' : '') + '>総計</option><option value="1"' + (getSearchFormula() == 1 ? ' selected' : '') + '>旧2-5式</option><option value="2"' + (getSearchFormula() == 2 ? ' selected' : '') + '>2-5秋式</option><option value="3"' + (getSearchFormula() == 3 ? ' selected' : '') + '>秋簡易式</option></select></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="aircover-alv" type="checkbox" value="x"' + (getAircoverAlv() ? ' checked' : '') + '>制空値に艦載機熟練度を加算する</label></td></tr>';
-      html += '<tr><td class="config-header">敵艦隊編成情報</td><td></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><button id="load-enemy-fleets">ファイル読み込み</button> <button id="save-enemy-fleets">ファイル書き出し</button> <button id="reset-enemy-fleets">リセット</button></td></tr>';
       html += '</table></div>';
       html += '<div class="config-buttons">';
       html += '<button id="config-save">保存</button>';
@@ -2823,32 +2623,6 @@ var kcif = {
         elems[i].addEventListener("change", function() {
           kcif.info_div.querySelector("#config-save").disabled = !checkConfigChanged();
           kcif.info_div.querySelector("#config-reset").disabled = !checkConfigChanged();
-        }, false);
-      }
-
-      // 設定:敵艦隊編成情報ファイル読み込み
-      var elem = kcif.info_div.querySelector("#load-enemy-fleets");
-      if (elem) {
-        elem.addEventListener("click", loadEnemyFleetsFromFile, false);
-      }
-
-      // 設定:敵艦隊編成情報ファイル書き出し
-      var elem = kcif.info_div.querySelector("#save-enemy-fleets");
-      if (elem) {
-        elem.addEventListener("click", saveEnemyFleetsToFile, false);
-      }
-
-      // 設定:敵艦隊編成情報リセット
-      var elem = kcif.info_div.querySelector("#reset-enemy-fleets");
-      if (elem) {
-        elem.addEventListener("click", function(evt){
-          if (evt) evt.preventDefault();
-
-          if (window.confirm("敵艦隊編成情報をリセットします。\n本当によろしいですか？")) {
-            kcif.enemy_fleets = {};
-            kcif.putStorage("enemy_fleets", JSON.stringify(kcif.enemy_fleets));
-            log("enemy fleets reset");
-          }
         }, false);
       }
 
@@ -2979,30 +2753,6 @@ var kcif = {
         }
         else if (t) {
           if (getShowBattle() || t == "(連合艦隊)") {
-            if (kcif.enemy_id) {
-              var efs = "";
-              var ef = kcif.enemy_fleets[kcif.enemy_id];
-              if (ef && ef.id_list) {
-                efs += ef.name + "(ID" + kcif.enemy_id + ") " + form2str(ef.formation);
-                for (var j = 0, id; (id = ef.id_list[j]) && id >= 0; j++) {
-                  efs += "&#10; " + (j + 1) + ": ";
-                  var mst = kcif.ship_master[id];
-                  if (mst) {
-                    efs += mst.name;
-                    if (mst.sort_no == 0 && mst.yomi != "-") {
-                      efs += mst.yomi;
-                    }
-                  }
-                  else {
-                    efs += "(不明:" + id + ")";
-                  }
-                }
-              }
-              else {
-                efs += "不明(ID" + kcif.enemy_id + ")";
-              }
-              t = t.replace(/^[\*\+] \d+-\d+-\d/, '<span title="' + efs + '">$&</span>');
-            }
             s = "[" + t + "]";
           }
           else {

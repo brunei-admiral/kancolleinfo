@@ -552,8 +552,6 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       <tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox" value="x" checked>燃料・弾薬をメーター表示する</label></td></tr>
       <tr><td class="config-label"></td><td class="config-input">索敵値算出式：<select id="search-formula"><option value="0">総計</option><option value="1">旧2-5式</option><option value="2">2-5秋式</option><option value="3" selected>秋簡易式</option></select></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="aircover-alv" type="checkbox" value="x" checked>制空値に艦載機熟練度を加算する</label></td></tr>
-      <tr><td class="config-header">敵艦隊編成情報</td><td></td></tr>
-      <tr><td class="config-label"></td><td class="config-input"><button>ファイル読み込み</button> <button>ファイル書き出し</button> <button>リセット</button></td></tr>
     </table></div>
     <div class="config-buttons">
       <button id="config-save">保存</button>
@@ -813,18 +811,8 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <dd>このチェックを入れると、艦隊の制空値を算出する際に艦載機の熟練度によるボーナスを加算します。熟練度によるボーナスについての具体的な計算式は<a href="http://jbbs.shitaraba.net/bbs/read.cgi/netgame/13745/1439793270/22-23">したらば艦これ攻略掲示板「検証スレッド いろはx2」22-23</a>で推測されたものに基き、内部熟練度は範囲内での最低値みなして算出しています。</dd>
 </dl>
 <p>
-<samp>敵艦隊編成情報</samp>では、敵艦隊編成情報をファイルから読み込んだり、ファイルに書き出したりすることができます。なお、敵艦隊編成情報は、新しい編成の敵艦隊に遭遇するたびに、自動的に記憶されていきます。
-</p>
-<dl>
-  <dt><samp>ファイル読み込み</samp></dt>
-  <dd>ファイルから敵艦隊編成情報を読み込みます。なおファイルのフォーマットは所定のCSV形式で、エンコーディングはいわゆるシフトJISまたはUTF-8である必要があります。どのようなCSVである必要があるかは、ファイルに書き出してみてご確認ください。もっとも、基本的に手で編集することは想定していません。ちなみに、「<a href="http://electronicobserver.blog.fc2.com/">七四式電子観測儀</a>」さんの当該データファイルの形式と互換性があるつもりです。なお、<a href="#kancolle-info">モック</a>ではクリックしても効果はありません。</dd>
-  <dt><samp>ファイル書き込み</samp></dt>
-  <dd>ファイルに敵艦隊編成情報を書き出します。エンコーディングはいわゆるシフトJISとなりますが、将来は変更するかもしれません。なお、<a href="#kancolle-info">モック</a>ではクリックしても効果はありません。</dd>
-  <dt><samp>リセット</samp></dt>
-  <dd>現在記憶している敵艦隊編成情報をクリアします。なお、<a href="#kancolle-info">モック</a>ではクリックしても効果はありません。</dd>
-</dl>
 <p>
-<samp>敵艦隊編成情報</samp>以外の各項目については、設定を変更しても、<samp>保存</samp>ボタンを押下しない限り反映はされません(<a href="#kancolle-info">モック</a>では<samp>情報表示</samp>の各項目のチェック状態を変更すると即時に反映されますが、これは実物の挙動とは異なります)。
+各設定項目を変更しても、<samp>保存</samp>ボタンを押下しない限り反映はされません(<a href="#kancolle-info">モック</a>では<samp>情報表示</samp>の各項目のチェック状態を変更すると即時に反映されますが、これは実物の挙動とは異なります)。
 また、<samp>クリア</samp>ボタンを押すと、書き換えた各設定項目の値が前回保存した状態に戻ります。
 前回の保存状態から何か変更しない限りは、<samp>保存</samp>ボタンも<samp>クリア</samp>ボタンも押せません(<a href="#kancolle-info">モック</a>ではいつでも押せますが、押しても意味はありません)。
 </p>
@@ -878,6 +866,9 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 
 <h2 id="histroy">履歴</h2>
 <dl>
+  <dt>2016-02-??</dt>
+  <dd id="v200">ver 2.0.0<br><span class="feature"></span>2016冬イベ対応：食う終戦に対応。<br><span class="update"></span>内部構造を変更し、不要となっていたコード(敵艦隊編成情報関連等)を削除。</dd>
+
   <dt>2015-12-13</dt>
   <dd id="v195">ver 1.9.5<br><span class="update"></span>2015-12-08アップデートで艦娘レベル上限が変更されたことに対応。<br><span class="update"></span>ずいぶん前のアップデートで追加された補強装備スロットに今更ながら対応。</dd>
 

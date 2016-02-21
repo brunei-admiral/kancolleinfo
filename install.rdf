@@ -4,7 +4,7 @@
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>kancolleinfo@example.jp</em:id>
 		<em:name>kancolleinfo</em:name>
-		<em:version>2.0.0</em:version>
+		<em:version>2.0.1</em:version>
 		<em:type>2</em:type>
 		<em:description>KanColle Information Viewer</em:description>
 		<em:creator>@brunei_admiral</em:creator>

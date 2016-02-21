@@ -3025,6 +3025,7 @@ var kcif = {
           ship.fuel = data.api_fuel;
           ship.p_bull = ship.bull;
           ship.bull = data.api_bull;
+          ship.equip = data.api_onslot;
         }
       }
       for (var i = 0; i < json.api_data.api_material.length; i++) {

@@ -671,7 +671,7 @@ var kcif = {
                     else if (kcif.hasSeiku(item.type[2]) && ship.equip[k] > 0) {
                       seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
                       if (kcif.getAircoverAlv()) {
-                        if (item.type[2] == 6) { // 艦戦
+                        if (item.type[2] == 6 || item.type[2] == 45) { // 艦戦 or 水戦(TODO)
                           seiku_alv += [0, 0, 2, 5, 9, 14, 14, 22][item.alv];
                         }
                         else if (item.type[2] == 11) { // 水爆
@@ -2048,11 +2048,11 @@ var kcif = {
   },
 
   hasSeiku: function(type) {
-    return (type >= 6 && type <= 8) || type == 11;
+    return (type >= 6 && type <= 8) || type == 11 || type == 45;
   },
 
   isPlane: function(type) {
-    return (type >= 6 && type <= 11 || type == 41);
+    return (type >= 6 && type <= 11 || type == 25 || type == 26 || type == 41 || type == 45 || type == 94);
   },
 
   isInDock: function(ship) {
@@ -2067,6 +2067,7 @@ var kcif = {
         case 10:// 水偵
         case 11:// 水爆
         case 41:// 大艇
+        case 94:// 艦偵(II) TODO
           co = 2.0;
           break;
         default:// その他
@@ -2083,6 +2084,7 @@ var kcif = {
           co = 1.3677954;
           break;
         case 9: // 艦偵
+        case 94:// 艦偵(II) TODO
           co = 1.6592780;
           break;
         case 10:// 水偵
@@ -2096,6 +2098,7 @@ var kcif = {
           co = 1.0045358;
           break;
         case 13:// 大型電探
+        case 93:// 大型電探(II) TODO
           co = 0.9906638;
           break;
         default:// その他
@@ -2112,6 +2115,7 @@ var kcif = {
           co = 0.8;
           break;
         case 9: // 艦偵
+        case 94:// 艦偵(II) TODO
           co = 1.0;
           break;
         case 10:// 水偵
@@ -2123,6 +2127,7 @@ var kcif = {
           break;
         case 12:// 小型電探
         case 13:// 大型電探
+        case 93:// 大型電探(II) TODO
           co = 0.6;
           break;
         default:// その他
@@ -2809,19 +2814,20 @@ var kcif = {
         }
       }
       if (json.api_data.api_after_slot) {
-        var item = kcif.item_list[json.api_data.api_after_slot.api_id];
+        var after_slot = json.api_data.api_after_slot;
+        var item = kcif.item_list[after_slot.api_id];
         if (item) {
-          item.item_id = json.api_data.api_after_slot.api_slotitem_id;
-          item.level = json.api_data.api_after_slot.api_level;
-          item.alv = json.api_data.api_after_slot.api_alv
-              if (kcif.item_master[item.item_id]) {
-                item.name = kcif.item_master[item.item_id].name;
-                item.type = kcif.item_master[item.item_id].type;
-                item.sort_no = kcif.item_master[item.item_id].sort_no;
-                item.taiku = kcif.item_master[item.item_id].taiku;
-                item.sakuteki = kcif.item_master[item.item_id].sakuteki;
-                item.type_name = kcif.item_master[item.item_id].type_name;
-              }
+          item.item_id = after_slot.api_slotitem_id;
+          item.level = typeof after_slot.api_level != "undefined" ? after_slot.api_level : 0;
+          item.alv = typeof after_slot.api_alv != "undefined" ? after_slot.api_alv : 0;
+          if (kcif.item_master[item.item_id]) {
+            item.name = kcif.item_master[item.item_id].name;
+            item.type = kcif.item_master[item.item_id].type;
+            item.sort_no = kcif.item_master[item.item_id].sort_no;
+            item.taiku = kcif.item_master[item.item_id].taiku;
+            item.sakuteki = kcif.item_master[item.item_id].sakuteki;
+            item.type_name = kcif.item_master[item.item_id].type_name;
+          }
         }
       }
       if (json.api_data.api_use_slot_id) {

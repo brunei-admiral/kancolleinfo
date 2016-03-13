@@ -18,6 +18,10 @@ function log() {
   logging(5, arguments); // Debug
 }
 
+function flog() {
+  Services.console.logStringMessage("[kcif DEBUG]: " + Array.join(arguments, " "));
+}
+
 // Helper function for XPCOM instanciation (from Firebug)
 function CCIN(cName, ifaceName) {
   return Cc[cName].createInstance(Ci[ifaceName]);
@@ -671,7 +675,7 @@ var kcif = {
                     else if (kcif.hasSeiku(item.type[2]) && ship.equip[k] > 0) {
                       seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
                       if (kcif.getAircoverAlv()) {
-                        if (item.type[2] == 6 || item.type[2] == 45) { // 艦戦 or 水戦(TODO)
+                        if (item.type[2] == 6) { // 艦戦
                           seiku_alv += [0, 0, 2, 5, 9, 14, 14, 22][item.alv];
                         }
                         else if (item.type[2] == 11) { // 水爆
@@ -1371,7 +1375,7 @@ var kcif = {
   },
 
   myPref: function() {
-    return Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getBranch("extensions.kancolleinfo.");
+    return Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService).getBranch("extensions.kancolleinfo.");
   },
 
   getStringPref: function(pref) {

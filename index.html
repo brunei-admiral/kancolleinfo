@@ -194,7 +194,8 @@ span.bugfix:after {
 #kancolle-info .tab .table-outer .table-inner table thead { position: absolute; top: 0px; left: 0px; }
 #kancolle-info .tab .table-outer .table-inner table thead th { text-align: left; font-weight: bold; }
 #kancolle-info .tab .table-outer .table-inner table thead th.th-right { text-align: right; }
-#kancolle-info .tab .ship-no, #kancolle-info .tab .item-no, #kancolle-info .tab .item-num { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }
+#kancolle-info .tab .ship-no { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }
+#kancolle-info .tab .item-no { text-align: right; padding: 0 6px 0 4px; width: 2.4em; }
 #kancolle-info .tab .ship-type { width: 2.7em; }
 #kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }
 #kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; padding-right: 15px; }
@@ -209,8 +210,8 @@ span.bugfix:after {
 #kancolle-info .tab .ship-fuel-bull meter { width: 4.2em; height: 5px; margin-bottom: 1px; }
 #kancolle-info .tab .ship-exp { text-align: right; width: 5.0em; }
 #kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }
-#kancolle-info .tab .item-type { width: 8em; }
-#kancolle-info .tab .item-name { font-weight: bold; width: 14em; }
+#kancolle-info .tab .item-type { width: 8.5em; }
+#kancolle-info .tab .item-name { font-weight: bold; width: 15em; }
 #kancolle-info .tab .item-level, #kancolle-info .tab .item-alv { text-align: right; width: 2.2em; padding-right: 12px; }
 #kancolle-info .tab .res-name { font-weight: bold; width: 6em; padding-left: 1.5em; }
 #kancolle-info .tab .res-value { text-align: right; width: 4.5em; }
@@ -392,7 +393,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
     <div id="fleet4" class="fleet">
       <h2><a class="list-header" href="#" title="第4艦隊">第4艦隊</a> <span class="color-yellow blink" title="大鯨">未補給艦あり</span> <span class="color-red" title="千歳甲">入渠艦あり</span> <span class="color-gray" title="旗艦 千歳甲">LV:12/63</span> <span class="color-gray" title="敵制空値:&#10; 0: 制空権確保&#10; 1～: 制空権喪失">制空:0</span> <span class="color-gray">索敵:0</span> <span class="color-gray">キラ:0/2</span> <span class="color-gray" title="千歳甲">大発:1</span></h2>
       <table>
-        <tr><td class="ship-no">1</td><td class="ship-type">水母</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 甲標的&#10;3: 大発動艇">千歳甲</td><td class="ship-level" title="LV15 千歳航(軽空)">12</td><td class="ship-hp-meter" data-now="40" data-max="42"></td><td class="ship-cond">49</td><td class="ship-fuel-bull" data-fuelnow="35" data-fuelmax="35" data-bullnow="45" data-bullmax="45"></td><td class="ship-exp" title="6726/7800">1074</td><td class="ship-desc color-red">入渠中</td></tr>
+        <tr><td class="ship-no">1</td><td class="ship-type">水母</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 大発動艇(八九式中戦車&陸戦隊)&#10;3: 大発動艇">千歳甲</td><td class="ship-level" title="LV15 千歳航(軽空)">12</td><td class="ship-hp-meter" data-now="40" data-max="42"></td><td class="ship-cond">49</td><td class="ship-fuel-bull" data-fuelnow="35" data-fuelmax="35" data-bullnow="45" data-bullmax="45"></td><td class="ship-exp" title="6726/7800">1074</td><td class="ship-desc color-red">入渠中</td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">潜母</td><td class="ship-name" title="1: 15.5cm三連装副砲&#10;2: 15.5cm三連装副砲&#10;3: 新型高温高圧缶">大鯨</td><td class="ship-level color-green" title="改造後 龍鳳(軽空)">52</td><td class="ship-hp-meter" data-now="39" data-max="39"></td><td class="ship-cond">49</td><td class="ship-fuel-bull" data-fuelnow="28" data-fuelmax="35" data-bullnow="8" data-bullmax="10"></td><td class="ship-exp" title="132638/132700">62</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">3</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">4</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
@@ -404,7 +405,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       <h2><span class="list-header">入渠</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-at"></td></tr>
-        <tr><td class="ship-no">2</td><td class="ship-type">水母</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 甲標的&#10;3: 大発動艇">千歳甲</td><td class="ship-level" title="LV15 千歳航(軽空)">12</td><td class="ship-hp-meter" data-now="40" data-max="42"></td><td class="ship-cond">49</td><td class="ship-at color-orange"><label>20:36<input class="check-timer" type="checkbox" value="x"></label></td></tr>
+        <tr><td class="ship-no">2</td><td class="ship-type">水母</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 大発動艇(八九式中戦車&陸戦隊)&#10;3: 大発動艇">千歳甲</td><td class="ship-level" title="LV15 千歳航(軽空)">12</td><td class="ship-hp-meter" data-now="40" data-max="42"></td><td class="ship-cond">49</td><td class="ship-at color-orange"><label>20:36<input class="check-timer" type="checkbox" value="x"></label></td></tr>
         <tr><td class="ship-no">3</td><td class="ship-type">航戦</td><td class="ship-name" title="1: 41cm連装砲&#10;2: 41cm連装砲&#10;3: 瑞雲(六三四空)+4 [11/11]&#10;4: 瑞雲 [14/14]">伊勢改</td><td class="ship-level">83</td><td class="ship-hp-meter" data-now="2" data-max="77"></td><td class="ship-cond color-yellow blink">30</td><td class="ship-at"><label>10/09 02:34<input class="check-timer" type="checkbox" value="x"></label></td></tr>
         <tr><td class="ship-no">4</td><td class="ship-type">潜空</td><td class="ship-name" title="1: 61cm四連装(酸素)魚雷&#10;2: 61cm四連装(酸素)魚雷">伊58改</td><td class="ship-level">51</td><td class="ship-hp-meter" data-now="8" data-max="18"></td><td class="ship-cond color-orange blink">20</td><td class="ship-at color-red"><label>20:34<input class="check-timer" type="checkbox" value="x"></label></td></tr>
       </table>
@@ -441,7 +442,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
         <tr><td class="ship-no">14</td><td class="ship-type">揚陸</td><td class="ship-name" title="1: 三式指揮連絡機(対潜) [8/8]&#10;2: カ号観測機 [8/8]&#10;3: 紫電改二 [8/8]">あきつ丸改</td><td class="ship-level">33</td><td class="ship-hp-meter" data-now="40" data-max="40"></td><td class="ship-cond color-default">49</td><td class="ship-fuel-bull" data-fuelnow="45" data-fuelmax="45" data-bullnow="25" data-bullmax="25"></td><td class="ship-exp" title="53514/56100">2586</td><td class="ship-desc">第2艦隊<span class="color-gray">「第2艦隊」</span></td></tr>
         <tr><td class="ship-no">15</td><td class="ship-type">航巡</td><td class="ship-name" title="1: 瑞雲 [5/5]&#10;2: 瑞雲(六三四空)+6 [6/6]&#10;3: 瑞雲 [5/5]&#10;4: 零式水上偵察機 [3/3]">最上改</td><td class="ship-level">27</td><td class="ship-hp-meter" data-now="50" data-max="50"></td><td class="ship-cond color-default">49</td><td class="ship-fuel-bull" data-fuelnow="50" data-fuelmax="50" data-bullnow="55" data-bullmax="55"></td><td class="ship-exp" title="36465/37800">1335</td><td class="ship-desc">第2艦隊<span class="color-gray">「第2艦隊」</span></td></tr>
         <tr><td class="ship-no">16</td><td class="ship-type">駆逐</td><td class="ship-name" title="1: 12.7cm連装砲&#10;2: 三式水中探信儀&#10;3: 九四式爆雷投射機">天津風改</td><td class="ship-level">24</td><td class="ship-hp-meter" data-now="34" data-max="34"></td><td class="ship-cond color-default">49</td><td class="ship-fuel-bull" data-fuelnow="20" data-fuelmax="20" data-bullnow="20" data-bullmax="20"></td><td class="ship-exp" title="28135/30000">1865</td><td class="ship-desc">第3艦隊<span class="color-gray">「第3艦隊」</span></td></tr>
-        <tr><td class="ship-no">17</td><td class="ship-type">水母</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 甲標的&#10;3: 大発動艇">千歳甲</td><td class="ship-level" title="LV15 千歳航(軽空)">12</td><td class="ship-hp-meter" data-now="40" data-max="42"></td><td class="ship-cond">49</td><td class="ship-fuel-bull" data-fuelnow="35" data-fuelmax="35" data-bullnow="45" data-bullmax="45"></td><td class="ship-exp" title="6726/7800">1074</td><td class="ship-desc">第4艦隊<span class="color-gray">「第4艦隊」</span></td></tr>
+        <tr><td class="ship-no">17</td><td class="ship-type">水母</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 大発動艇(八九式中戦車&陸戦隊)&#10;3: 大発動艇">千歳甲</td><td class="ship-level" title="LV15 千歳航(軽空)">12</td><td class="ship-hp-meter" data-now="40" data-max="42"></td><td class="ship-cond">49</td><td class="ship-fuel-bull" data-fuelnow="35" data-fuelmax="35" data-bullnow="45" data-bullmax="45"></td><td class="ship-exp" title="6726/7800">1074</td><td class="ship-desc">第4艦隊<span class="color-gray">「第4艦隊」</span></td></tr>
         <tr><td class="ship-no">18</td><td class="ship-type">重巡</td><td class="ship-name" title="1: 20.3cm連装砲&#10;2: 20.3cm連装砲&#10;3: 61cm四連装魚雷">羽黒</td><td class="ship-level" title="LV25 羽黒改(重巡)">3</td><td class="ship-hp-meter" data-now="44" data-max="44"></td><td class="ship-cond color-default">49</td><td class="ship-fuel-bull" data-fuelnow="40" data-fuelmax="40" data-bullnow="65" data-bullmax="65"></td><td class="ship-exp" title="465/600">135</td><td class="ship-desc">第2艦隊<span class="color-gray">「第2艦隊」</span></td></tr>
         <tr><td class="ship-no">19</td><td class="ship-type">駆逐</td><td class="ship-name" title="1: 12.7cm連装砲&#10;2: 61cm三連装魚雷">綾波</td><td class="ship-level" title="LV20 綾波改(駆逐)">1</td><td class="ship-hp-meter" data-now="15" data-max="15"></td><td class="ship-cond color-default">49</td><td class="ship-fuel-bull" data-fuelnow="15" data-fuelmax="15" data-bullnow="20" data-bullmax="20"></td><td class="ship-exp" title="0/100">100</td><td class="ship-desc"></td></tr>
       </tbody>
@@ -502,7 +503,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
         <tr><td class="item-no">47</td><td class="item-type">水上爆撃機</td><td class="item-name">瑞雲</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 41cm連装砲&#10;2: 41cm連装砲&#10;3: 瑞雲(六三四空)+4 [11/11]&#10;4: 瑞雲 [14/14]">伊勢改</td><td class="ship-level">83</td></tr>
         <tr><td class="item-no">48</td><td class="item-type">水上爆撃機</td><td class="item-name">瑞雲</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 瑞雲 [5/5]&#10;2: 瑞雲(六三四空)+6 [6/6]&#10;3: 瑞雲 [5/5]&#10;4: 零式水上偵察機 [3/3]">最上改</td><td class="ship-level">27</td></tr>
         <tr><td class="item-no">49</td><td class="item-type">水上爆撃機</td><td class="item-name">瑞雲</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 瑞雲 [5/5]&#10;2: 瑞雲(六三四空)+6 [6/6]&#10;3: 瑞雲 [5/5]&#10;4: 零式水上偵察機 [3/3]">最上改</td><td class="ship-level">27</td></tr>
-        <tr><td class="item-no">50</td><td class="item-type">水上爆撃機</td><td class="item-name">試製晴嵐</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 甲標的&#10;3: 大発動艇">千歳甲</td><td class="ship-level">12</td></tr>
+        <tr><td class="item-no">50</td><td class="item-type">水上爆撃機</td><td class="item-name">試製晴嵐</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 大発動艇(八九式中戦車&陸戦隊)&#10;3: 大発動艇">千歳甲</td><td class="ship-level">12</td></tr>
         <tr><td class="item-no">51</td><td class="item-type">水上爆撃機</td><td class="item-name">瑞雲(六三四空)</td><td class="item-level">0</td><td class="item-alv">4</td><td class="ship-name" title="1: 41cm連装砲&#10;2: 41cm連装砲&#10;3: 瑞雲(六三四空)+4 [11/11]&#10;4: 瑞雲 [14/14]">伊勢改</td><td class="ship-level">83</td></tr>
         <tr><td class="item-no">52</td><td class="item-type">水上爆撃機</td><td class="item-name">瑞雲(六三四空)</td><td class="item-level">0</td><td class="item-alv">6</td><td class="ship-name" title="1: 瑞雲 [5/5]&#10;2: 瑞雲(六三四空)+6 [6/6]&#10;3: 瑞雲 [5/5]&#10;4: 零式水上偵察機 [3/3]">最上改</td><td class="ship-level">27</td></tr>
         <tr><td class="item-no">53</td><td class="item-type">小型電探</td><td class="item-name">13号対空電探</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 12.7cm連装砲&#10;2: 12.7cm連装砲&#10;3: 13号対空電探">吹雪改</td><td class="ship-level" title="LV70 吹雪改二(駆逐)">55</td></tr>
@@ -518,11 +519,11 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
         <tr><td class="item-no">63</td><td class="item-type">対空機銃</td><td class="item-name">12cm30連装噴進砲</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name"></td><td class="ship-level"></td></tr>
         <tr><td class="item-no">64</td><td class="item-type">対空機銃</td><td class="item-name">2cm 四連装FlaK 38</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 12.7cm単装砲&#10;2: 2cm 四連装FlaK 38&#10;3: 61cm三連装魚雷">Z1 zwei</td><td class="ship-level">73</td></tr>
         <tr><td class="item-no">65</td><td class="item-type">特殊潜航艇</td><td class="item-name">甲標的</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 61cm五連装(酸素)魚雷&#10;2: 61cm五連装(酸素)魚雷&#10;3: 甲標的">北上改二</td><td class="ship-level">92</td></tr>
-        <tr><td class="item-no">66</td><td class="item-type">特殊潜航艇</td><td class="item-name">甲標的</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 甲標的&#10;3: 大発動艇">千歳甲</td><td class="ship-level">12</td></tr>
-        <tr><td class="item-no">67</td><td class="item-type">応急修理要員</td><td class="item-name">応急修理要員</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 38cm連装砲改&#10;2: 38cm連装砲改&#10;3: 61cm四連装(酸素)魚雷&#10;4: 応急修理要員">Bismarck drei</td><td class="ship-level">105</td></tr>
-        <tr><td class="item-no">68</td><td class="item-type">応急修理要員</td><td class="item-name">応急修理要員</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name"></td><td class="ship-level"></td></tr>
-        <tr><td class="item-no">69</td><td class="item-type">応急修理要員</td><td class="item-name">応急修理女神</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 応急修理女神">飛龍改二</td><td class="ship-level">150</td></tr>
-        <tr><td class="item-no">70</td><td class="item-type">上陸用舟艇</td><td class="item-name">大発動艇</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 甲標的&#10;3: 大発動艇">千歳甲</td><td class="ship-level">12</td></tr>
+        <tr><td class="item-no">66</td><td class="item-type">応急修理要員</td><td class="item-name">応急修理要員</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 38cm連装砲改&#10;2: 38cm連装砲改&#10;3: 61cm四連装(酸素)魚雷&#10;4: 応急修理要員">Bismarck drei</td><td class="ship-level">105</td></tr>
+        <tr><td class="item-no">67</td><td class="item-type">応急修理要員</td><td class="item-name">応急修理要員</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name"></td><td class="ship-level"></td></tr>
+        <tr><td class="item-no">68</td><td class="item-type">応急修理要員</td><td class="item-name">応急修理女神</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 応急修理女神">飛龍改二</td><td class="ship-level">150</td></tr>
+        <tr><td class="item-no">69</td><td class="item-type">上陸用舟艇</td><td class="item-name">大発動艇</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 大発動艇(八九式中戦車&陸戦隊)&#10;3: 大発動艇">千歳甲</td><td class="ship-level">12</td></tr>
+        <tr><td class="item-no">70</td><td class="item-type">上陸用舟艇</td><td class="item-name">大発動艇(八九式中戦車&陸戦隊)</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 試製晴嵐 [12/12]&#10;2: 大発動艇(八九式中戦車&陸戦隊)&#10;3: 大発動艇">千歳甲</td><td class="ship-level">12</td></tr>
         <tr><td class="item-no">71</td><td class="item-type">オートジャイロ</td><td class="item-name">カ号観測機</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 三式指揮連絡機(対潜) [8/8]&#10;2: カ号観測機 [8/8]&#10;3: 紫電改二 [8/8]">あきつ丸改</td><td class="ship-level">33</td></tr>
         <tr><td class="item-no">72</td><td class="item-type">対潜哨戒機</td><td class="item-name">三式指揮連絡機(対潜)</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name" title="1: 三式指揮連絡機(対潜) [8/8]&#10;2: カ号観測機 [8/8]&#10;3: 紫電改二 [8/8]">あきつ丸改</td><td class="ship-level">33</td></tr>
         <tr><td class="item-no">73</td><td class="item-type">探照灯</td><td class="item-name">探照灯</td><td class="item-level">0</td><td class="item-alv">0</td><td class="ship-name"></td><td class="ship-level"></td></tr>
@@ -622,7 +623,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <dt><samp>ドラム:</samp></dt>
   <dd>ドラム缶装備総数/ドラム缶装備艦数 ※<em>ドラム缶(輸送用)</em>を装備している艦が存在する場合のみ表示</dd>
   <dt><samp>大発:</samp></dt>
-  <dd>大発動艇装備総数 ※<em>大発動艇</em>を装備している艦が存在する場合のみ表示</dd>
+  <dd>大発動艇装備総数 ※<em>大発動艇</em>を装備している艦が存在する場合のみ表示 ※<em>大発動艇(八九式中戦車&陸戦隊)</em>は含まない</dd>
 </dl>
 <p>
 艦隊が母港にいる場合(<a href="#kancolle-info">モック</a>の第4艦隊を参照)、未補給の艦が存在する場合および入渠中の艦が存在する場合はその旨が表示されます。
@@ -868,6 +869,9 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 
 <h2 id="histroy">履歴</h2>
 <dl>
+  <dt>2016-??-??</dt>
+  <dd id="v202">ver 2.0.2<br><span class="bugfix"></span>とても長い名前の装備があると装備タブの表示が乱れていた不具合を修正。</dd>
+
   <dt>2016-03-14</dt>
   <dd id="v201">ver 2.0.1<br><span class="update"></span>2016-02-28アップデートで水上戦闘機カテゴリが実装されたことに対応(制空値、索敵値等)。<br><span class="bugfix"></span>補給時に艦載機の補充を制空値等に即座に反映されるように修正。<br><span class="bugfix"></span>装備を改修すると装備タブでその装備の熟練度がundefinedと表示されていた不具合を修正。<br><span class="bugfix"></span>Firefox側の仕様変更によりFirefox 45で動作しなくなっていた不具合を修正。</dd>
 

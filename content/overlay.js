@@ -238,7 +238,8 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .table-outer .table-inner table thead { position: absolute; top: 0px; left: 0px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .table-outer .table-inner table thead th { text-align: left; font-weight: bold; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .table-outer .table-inner table thead th.th-right { text-align: right; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-no, #kancolle-info .tab .item-no, #kancolle-info .tab .item-num { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-no { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .item-no { text-align: right; padding: 0 6px 0 4px; width: 2.4em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-type { width: 2.7em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; padding-right: 15px; }', sheet.length);
@@ -253,8 +254,8 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .ship-fuel-bull meter { width: 4.2em; height: 5px; margin-bottom: 1px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-exp { text-align: right; width: 5.0em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .item-type { width: 8em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .item-name { font-weight: bold; width: 14em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .item-type { width: 8.5em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .item-name { font-weight: bold; width: 15em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-level, #kancolle-info .tab .item-alv { text-align: right; width: 2.2em; padding-right: 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .res-name { font-weight: bold; width: 6em; padding-left: 1.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .res-value { text-align: right; width: 4.5em; }', sheet.length);

@@ -136,7 +136,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset|unsetslot_all|slot_exchange_index)|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select)|api_req_sortie\/((ld_)?air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/(((ld_)?air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material|require_info)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset(_ex)?|unsetslot_all|slot_exchange_index)|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select)|api_req_sortie\/((ld_)?air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/(((ld_)?air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);
@@ -353,7 +353,7 @@ var kcif = {
       html += '<tr><td class="config-header">表示カスタマイズ</td><td></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="hp-by-meter" type="checkbox" value="x"' + (kcif.getHpByMeter() ? ' checked' : '') + '>耐久値をメーター表示する</label></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox" value="x"' + (kcif.getFuelByMeter() ? ' checked' : '') + '>燃料・弾薬をメーター表示する</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input">索敵値算出式：<select id="search-formula"><option value="0"' + (kcif.getSearchFormula() == 0 ? ' selected' : '') + '>総計</option><option value="1"' + (kcif.getSearchFormula() == 1 ? ' selected' : '') + '>旧2-5式</option><option value="2"' + (kcif.getSearchFormula() == 2 ? ' selected' : '') + '>2-5秋式</option><option value="3"' + (kcif.getSearchFormula() == 3 ? ' selected' : '') + '>秋簡易式</option></select></td></tr>';
+      html += '<tr><td class="config-label"></td><td class="config-input">索敵値算出式：<select id="search-formula"><option value="0"' + (kcif.getSearchFormula() == 0 ? ' selected' : '') + '>総計</option><option value="1"' + (kcif.getSearchFormula() == 1 ? ' selected' : '') + '>旧2-5式</option><option value="2"' + (kcif.getSearchFormula() == 2 ? ' selected' : '') + '>2-5秋式</option><option value="3"' + (kcif.getSearchFormula() == 3 ? ' selected' : '') + '>秋簡易式</option><option value="4"' + (kcif.getSearchFormula() == 4 ? ' selected' : '') + '>判定式(33)</option></select></td></tr>';
       html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="aircover-alv" type="checkbox" value="x"' + (kcif.getAircoverAlv() ? ' checked' : '') + '>制空値に艦載機熟練度を加算する</label></td></tr>';
       html += '</table></div>';
       html += '<div class="config-buttons">';
@@ -567,6 +567,7 @@ var kcif = {
           var sakuteki1 = 0;
           var sakuteki1i = 0;
           var sakuteki2 = 0;
+          var sakuteki3 = 0;
           var ndock = [];
           var damage = [];
           for (var j = 0; j < 6; j++) {
@@ -659,6 +660,7 @@ var kcif = {
                 var s_sakuteki = 0;
                 var s_sakuteki1 = 0;
                 var s_sakuteki2 = 0;
+                var s_sakuteki3 = 0;
                 for (var k = 0; ship.slot && k < 5; k++) {
                   if (ship.slot[k] < 0) {
                     break;
@@ -686,9 +688,10 @@ var kcif = {
                       }
                     }
                     s_base -= item.sakuteki;
-                    s_sakuteki += kcif.calcSakuteki(item);
+                    s_sakuteki += kcif.calcSakuteki(item, 3);
                     s_sakuteki1 += kcif.calcSakuteki(item, 1);
                     s_sakuteki2 += kcif.calcSakuteki(item, 2);
+                    s_sakuteki3 += kcif.calcSakuteki(item, 4);
                   }
                 }
                 if (drum_p) {
@@ -699,17 +702,21 @@ var kcif = {
                 }
                 s_sakuteki += Math.sqrt(s_base);
                 s_sakuteki2 += Math.sqrt(s_base) * 1.6841056;
+                s_sakuteki3 += Math.sqrt(s_base);
                 sakuteki += Math.floor(s_sakuteki);
                 sakuteki0 += ship.sakuteki;
                 sakuteki1 += s_base;
                 sakuteki1i += s_sakuteki1;
                 sakuteki2 += s_sakuteki2;
+                sakuteki3 += s_sakuteki3;
               }
             }
           }
           sakuteki -= Math.floor(0.4 * kcif.admiral_level);
           sakuteki1 = Math.floor(Math.sqrt(sakuteki1)) + sakuteki1i;
           sakuteki2 -= Math.ceil((kcif.admiral_level) / 5) * 5.0 * 0.6142467;
+          sakuteki3 -= Math.ceil(0.4 * kcif.admiral_level);
+          sakuteki3 += 2 * (6 - ships.length);
 
           if (s) {
             s = ' <span class="' + col + '">' + s + '</span>';
@@ -774,6 +781,9 @@ var kcif = {
             if (formula != 3) {
               s += '秋簡易式:' + sakuteki + '&#10;';
             }
+            if (formula != 4) {
+              s += '判定式(33):' + sakuteki3.toFixed(2) + '&#10;';
+            }
             s += '">索敵:';
             if (formula == 0) {
               s += sakuteki0;
@@ -784,8 +794,11 @@ var kcif = {
             else if (formula == 2) {
               s += sakuteki2.toFixed(1);
             }
-            else {
+            else if (formula == 3) {
               s += sakuteki;
+            }
+            else {
+              s += sakuteki3.toFixed(2);
             }
             s += '</span>';
             s += ' <span class="color-gray" title="' + kira.join(', ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
@@ -2066,12 +2079,12 @@ var kcif = {
 
   calcSakuteki: function(item, type) {
     var co = 0;
+    var add = 0;
     if (type == 1) { // 旧2-5式
       switch (item.type[2]) {
         case 9: // 艦偵
         case 10:// 水偵
         case 11:// 水爆
-        case 41:// 大艇
         case 94:// 艦偵(II) TODO
           co = 2.0;
           break;
@@ -2093,7 +2106,6 @@ var kcif = {
           co = 1.6592780;
           break;
         case 10:// 水偵
-        case 41:// 大艇
           co = 2.0000000;
           break;
         case 11:// 水爆
@@ -2111,7 +2123,7 @@ var kcif = {
           break;
       }
     }
-    else { // 2-5秋簡易式
+    else if (type == 3) { // 2-5秋簡易式
       switch (item.type[2]) {
         case 7: // 艦爆
           co = 0.6;
@@ -2124,7 +2136,6 @@ var kcif = {
           co = 1.0;
           break;
         case 10:// 水偵
-        case 41:// 大艇
           co = 1.2;
           break;
         case 11:// 水爆
@@ -2140,7 +2151,34 @@ var kcif = {
           break;
       }
     }
-    return co * item.sakuteki;
+    else { // 33判定式
+      switch (item.type[2]) {
+        case 8: // 艦攻
+          co = 0.8;
+          break;
+        case 9: // 艦偵
+        case 94:// 艦偵(II) TODO
+          co = 1.0;
+          break;
+        case 10:// 水偵
+          co = 1.2;
+          add = 1.2 * Math.sqrt(item.level);
+          break;
+        case 11:// 水爆
+          co = 1.1;
+          break;
+        case 12:// 小型電探
+        case 13:// 大型電探
+        case 93:// 大型電探(II) TODO
+          co = 0.6;
+          add = 1.25 * Math.sqrt(item.level);
+          break;
+        default:// その他
+          co = 0.6;
+          break;
+      }
+    }
+    return co * (item.sakuteki + add);
   },
 
   compareShip: function(a, b) {
@@ -2696,6 +2734,37 @@ var kcif = {
     }
   },
 
+  basic: function(data) {
+    kcif.admiral_level = Number(data.api_level);
+    kcif.ship_max = Number(data.api_max_chara);
+    kcif.item_max = Number(data.api_max_slotitem) + 3;
+    log("basic: ship_max=" + String(kcif.ship_max) + ", item_max=" + String(kcif.item_max));
+  },
+
+  slot_item: function(data) {
+    kcif.item_list = {};
+    for (var i = 0, item; item = data[i]; i++) {
+      kcif.makeItem(item, null);
+    }
+    kcif.item_num = data.length;
+    for (var ship_id in kcif.ship_list) {
+      var ship = kcif.ship_list[ship_id];
+      for (var i = 0, slot; slot = ship.slot[i]; i++) {
+        if (slot >= 0 && kcif.item_list[slot]) {
+          kcif.item_list[slot].ship_id = ship.api_id;
+        }
+      }
+    }
+    log("slot_item: " + String(kcif.item_num) + " items");
+  },
+
+  kdock: function(dock_list) {
+    for (var i = 0, dock; dock = dock_list[i]; i++) {
+      kcif.build[i] = dock;
+      log("kdock: " + kcif.build[i].api_id + ": " + kcif.build[i].api_complete_time);
+    }
+  },
+
   main: function(request, content, query) {
     if (kcif.timer) {
       window.clearTimeout(kcif.timer);
@@ -2722,10 +2791,7 @@ var kcif = {
     }
     else if (url.indexOf("/kdock") != -1 || url.indexOf("/getship") != -1) {
       var dock_list = url.indexOf("/kdock") != -1 ? json.api_data : json.api_data.api_kdock;
-      for (var i = 0, dock; dock = dock_list[i]; i++) {
-        kcif.build[i] = dock;
-        log("kdock: " + kcif.build[i].api_id + ": " + kcif.build[i].api_complete_time);
-      }
+      kcif.kdock(dock_list);
       if (url.indexOf("/getship") != -1) {
         kcif.makeShip(json.api_data.api_ship);
         kcif.ship_num++;
@@ -2900,6 +2966,13 @@ var kcif = {
       kcif.ship_num -= id_list.length;
       log("powerup: " + String(kcif.ship_num) + " ships, " + String(kcif.item_num) + " items");
     }
+    else if (url.indexOf("slotset_ex") != -1) {
+      var ship = kcif.ship_list[Number(query["api_id"])];
+      if (ship) {
+        var item_id = Number(query["api_item_id"]);
+        ship.slot_ex[idx] = item_id;
+      }
+    }
     else if (url.indexOf("slotset") != -1) {
       var ship = kcif.ship_list[Number(query["api_id"])];
       if (ship) {
@@ -2999,9 +3072,7 @@ var kcif = {
       return;
     }
     else if (url.indexOf("/basic") != -1) {
-      kcif.ship_max = Number(json.api_data.api_max_chara);
-      kcif.item_max = Number(json.api_data.api_max_slotitem) + 3;
-      log("basic: ship_max=" + String(kcif.ship_max) + ", item_max=" + String(kcif.item_max));
+      kcif.basic(api_data);
       update_all = false;
     }
     else if (url.indexOf("/record") != -1) {
@@ -3013,20 +3084,11 @@ var kcif = {
       update_all = false;
     }
     else if (url.indexOf("/slot_item") != -1) {
-      kcif.item_list = {};
-      for (var i = 0, data; data = json.api_data[i]; i++) {
-        kcif.makeItem(data, null);
-      }
-      kcif.item_num = json.api_data.length;
-      for (var ship_id in kcif.ship_list) {
-        var ship = kcif.ship_list[ship_id];
-        for (var i = 0, slot; slot = ship.slot[i]; i++) {
-          if (slot >= 0 && kcif.item_list[slot]) {
-            kcif.item_list[slot].ship_id = ship.api_id;
-          }
-        }
-      }
-      log("slot_item: " + String(kcif.item_num) + " items");
+      kcif.slot_item(json.api_data);
+    }
+    else if (url.indexOf("/require_info") != -1) {
+      kcif.slot_item(json.api_data.api_slot_item);
+      kcif.kdock(json.api_data.api_kdock);
     }
     else if (url.indexOf("/charge") != -1) {
       for (var i = 0, data; data = json.api_data.api_ship[i]; i++) {
@@ -3178,9 +3240,7 @@ var kcif = {
           }
         }
 
-        kcif.admiral_level = Number(json.api_data.api_basic.api_level);
-        kcif.ship_max = Number(json.api_data.api_basic.api_max_chara);
-        kcif.item_max = Number(json.api_data.api_basic.api_max_slotitem) + 3;
+        kcif.basic(json.api_data.api_basic);
       }
       if (deck_list.length >= kcif.deck_list.length) {
         kcif.deck_list = deck_list;

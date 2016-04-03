@@ -553,7 +553,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       <tr><td class="config-header">表示カスタマイズ</td><td></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="hp-by-meter" type="checkbox" value="x" checked>耐久値をメーター表示する</label></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox" value="x" checked>燃料・弾薬をメーター表示する</label></td></tr>
-      <tr><td class="config-label"></td><td class="config-input">索敵値算出式：<select id="search-formula"><option value="0">総計</option><option value="1">旧2-5式</option><option value="2">2-5秋式</option><option value="3" selected>秋簡易式</option></select></td></tr>
+      <tr><td class="config-label"></td><td class="config-input">索敵値算出式：<select id="search-formula"><option value="0">総計</option><option value="1">旧2-5式</option><option value="2">2-5秋式</option><option value="3" selected>秋簡易式</option><option value="4" selected>33判定式</option></select></td></tr>
       <tr><td class="config-label"></td><td class="config-input"><label><input id="aircover-alv" type="checkbox" value="x" checked>制空値に艦載機熟練度を加算する</label></td></tr>
     </table></div>
     <div class="config-buttons">
@@ -617,7 +617,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <dt><samp>制空:</samp></dt>
   <dd>いわゆる制空値の合計。艦載機熟練度によるボーナスを加算しているが、<samp>設定</samp>タブでこれを除くことも可能(<a href="#desc-config">後述</a>)</dd>
   <dt><samp>索敵:</samp></dt>
-  <dd>こしあん氏による<a href="http://nekokan333.blog.fc2.com/blog-entry-345.html" target="_blank">2-5新秋簡易式モデルA</a>と呼ばれる値。<samp>設定</samp>タブで表示する値を変更することも可能(<a href="#desc-config">後述</a>)</dd>
+  <dd><a href="http://ja.kancolle.wikia.com/wiki/%E3%83%9E%E3%83%83%E3%83%97%E7%B4%A2%E6%95%B5" target="_blank">判定式(33)</a>と呼ばれる値。<samp>設定</samp>タブで表示する値を変更することも可能(<a href="#desc-config">後述</a>)</dd>
   <dt><samp>キラ:</samp></dt>
   <dd>いわゆる「キラキラ状態」の艦数/艦隊所属艦数</dd>
   <dt><samp>ドラム:</samp></dt>
@@ -809,7 +809,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <dt><samp>燃料・弾薬を～</samp></dt>
   <dd>このチェックを入れると艦の燃料・弾薬がメーター表示されます。チェックを外すと総量に対する残量が%で表示されます。初期状態ではチェックが入っています。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd>
   <dt><samp>索敵値算出式</samp></dt>
-  <dd>艦隊の索敵値算出式をデフォルトの2-5秋簡易式から変更します。総計、旧2-5式、2-5秋式、秋簡易式、から選択できます。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd>
+  <dd>艦隊の索敵値算出式をデフォルトの判定式(33)から変更します。総計、旧2-5式、2-5秋式、秋簡易式、判定式(33)、から選択できます。なお、<a href="#kancolle-info">モック</a>では変更しても効果はありません。</dd>
   <dt><samp>制空値に艦載機～</samp></dt>
   <dd>このチェックを入れると、艦隊の制空値を算出する際に艦載機の熟練度によるボーナスを加算します。熟練度によるボーナスについての具体的な計算式は<a href="http://jbbs.shitaraba.net/bbs/read.cgi/netgame/13745/1439793270/22-23">したらば艦これ攻略掲示板「検証スレッド いろはx2」22-23</a>で推測されたものに基き、内部熟練度は範囲内での最低値みなして算出しています。</dd>
 </dl>
@@ -870,7 +870,7 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 <h2 id="histroy">履歴</h2>
 <dl>
   <dt>2016-??-??</dt>
-  <dd id="v202">ver 2.0.2<br><span class="bugfix"></span>とても長い名前の装備があると装備タブの表示が乱れていた不具合を修正。</dd>
+  <dd id="v202">ver 2.0.2<br><span class="update"></span>2016-04-01アップデートでAPIが変更されたことに対応。<span class="update"></span>索敵値を判定式(33)に対応。<span class="bugfix"></span>とても長い名前の装備があると装備タブの表示が乱れていた不具合を修正。</dd>
 
   <dt>2016-03-14</dt>
   <dd id="v201">ver 2.0.1<br><span class="update"></span>2016-02-28アップデートで水上戦闘機カテゴリが実装されたことに対応(制空値、索敵値等)。<br><span class="bugfix"></span>補給時に艦載機の補充を制空値等に即座に反映されるように修正。<br><span class="bugfix"></span>装備を改修すると装備タブでその装備の熟練度がundefinedと表示されていた不具合を修正。<br><span class="bugfix"></span>Firefox側の仕様変更によりFirefox 45で動作しなくなっていた不具合を修正。</dd>

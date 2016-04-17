@@ -624,7 +624,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
   <dt><samp>ドラム:</samp></dt>
   <dd>ドラム缶装備総数/ドラム缶装備艦数 ※<em>ドラム缶(輸送用)</em>を装備している艦が存在する場合のみ表示</dd>
   <dt><samp>大発:</samp></dt>
-  <dd>大発動艇装備総数 ※<em>大発動艇</em>を装備している艦が存在する場合のみ表示 ※<em>大発動艇(八九式中戦車&陸戦隊)</em>は含まない</dd>
+  <dd>大発動艇装備総数 ※<em>大発動艇</em>を装備している艦が存在する場合のみ表示 ※<em>大発動艇(八九式中戦車&陸戦隊)</em>も含む</dd>
 </dl>
 <p>
 艦隊が母港にいる場合(<a href="#kancolle-info">モック</a>の第4艦隊を参照)、未補給の艦が存在する場合および入渠中の艦が存在する場合はその旨が表示されます。
@@ -870,6 +870,9 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 
 <h2 id="histroy">履歴</h2>
 <dl>
+  <dt>2016-??-??</dt>
+  <dd id="v203">ver 2.0.3<br><span class="update"></span>やっぱり「大発動艇(八九式中戦車&陸戦隊)」も大発の数に含めるように変更。<br><span class="update"></span>空襲戦の結果ランク予想を現時点での推定仕様で算出するよう変更。</dd>
+
   <dt>2016-04-05</dt>
   <dd id="v202">ver 2.0.2<br><span class="update"></span>2016-04-01アップデートでAPIが変更されたことに対応。<span class="update"></span>索敵値を判定式(33)に対応。<span class="bugfix"></span>とても長い名前の装備があると装備タブの表示が乱れていた不具合を修正。</dd>
 

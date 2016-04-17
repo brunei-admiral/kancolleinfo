@@ -671,7 +671,7 @@ var kcif = {
                       drum++;
                       drum_p = true;
                     }
-                    else if (item.item_id == 68) { // 大発動艇
+                    else if (item.item_id == 68 || item.item_id == 166) { // 大発動艇
                       dai++;
                       dai_p = true;
                     }
@@ -2484,6 +2484,38 @@ var kcif = {
     return "D";
   },
 
+  judgeLdBattleResult: function(friends, myresult) {
+    var fall = 0;
+    var fdmg = 0;
+    for (var i = 0; i < 12; i++) {
+      if (!friends[i] || friends[i].taihi) {
+        continue;
+      }
+      if (!myresult[i]) myresult[i] = 0;
+      log("friend " + i + ": hp=" + friends[i].hp + ", damage=" + myresult[i]);
+      fall += friends[i].hp + myresult[i];
+      fdmg += myresult[i];
+    }
+    var frate = fdmg / fall;
+    log("fdmg=" + fdmg + ", fall=" + fall + ", frate=" + frate);
+
+    if (frate <= 0.0) {
+      return "SS";
+    }
+    else if (frate < 0.1) {
+      return "A";
+    }
+    else if (frate < 0.2) {
+      return "B";
+    }
+    else if (frate < 0.5) {
+      return "C";
+    }
+    else {
+      return "D";
+    }
+  },
+
   deck2ships: function(deck, deck2) {
     var ships = [];
     var id_list = deck.api_ship;
@@ -2680,7 +2712,12 @@ var kcif = {
           else {
             ships = kcif.deck2ships(deck);
           }
-          rank = kcif.judgeBattleResult(ships, enemies, kcif.battle_result[0], kcif.battle_result[1]);
+          if (url.indexOf("ld_airbattle") != -1) { // air raid battle
+            rank = kcif.judgeLdBattleResult(ships, kcif.battle_result[0]);
+          }
+          else {
+            rank = kcif.judgeBattleResult(ships, enemies, kcif.battle_result[0], kcif.battle_result[1]);
+          }
           break;
         }
       }

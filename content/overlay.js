@@ -757,10 +757,10 @@ var kcif = {
               s = "";
             }
             if (sup.length > 0) {
-              s += ' <span class="' + sup_col + ' blink" title="' + sup.join(', ') + '">未補給艦あり</span>';
+              s += ' <span class="' + sup_col + ' blink" title="' + sup.join(', ') + '">未補給</span>';
             }
             if (ndock.length > 0) {
-              s += ' <span class="color-red" title="' + ndock.join(', ') + '">入渠艦あり</span>';
+              s += ' <span class="color-red" title="' + ndock.join(', ') + '">入渠中</span>';
             }
           }
 

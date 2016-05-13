@@ -2421,7 +2421,7 @@ var kcif = {
         fsunks++;
       }
       fcount++;
-      log("friend " + i + ": hp=" + friends[i].hp + ", damage=" + myresult[i]);
+      log("friend " + (i+1) + ": hp=" + friends[i].hp + ", damage=" + myresult[i]);
       fall += friends[i].hp + myresult[i];
       fdmg += myresult[i];
     }
@@ -2438,7 +2438,7 @@ var kcif = {
         break;
       }
       ecount++;
-      log("enemy " + i + ": hp=" + enemies[i].hp + ", damage=" + eresult[i]);
+      log("enemy " + (i+1) + ": hp=" + enemies[i].hp + ", damage=" + eresult[i]);
       eall += enemies[i].hp + eresult[i];
       edmg += eresult[i];
     }
@@ -2511,8 +2511,11 @@ var kcif = {
     else if (frate < 0.5) {
       return "C";
     }
-    else {
+    else if (frate < 0.8) {
       return "D";
+    }
+    else {
+      return "E";
     }
   },
 
@@ -2629,12 +2632,7 @@ var kcif = {
             var support = json.api_data.api_support_info;
             if (support.api_support_airatack) {
               log("  support (airatack)");
-              var damage = support.api_support_airatack.api_damage;
-              for (var i = 0; i < 6; i++) {
-                if (damage[i + 1] > 0 && enemies[i]) {
-                  kcif.reflectDamage(kcif.battle_result[1], i, enemies[i], Math.floor(damage[i + 1]));
-                }
-              }
+              kcif.damageKouku(deck, enemies, support.api_support_airatack.api_stage3);
             }
             else if (support.api_support_hourai) {
               log("  support (hourai)");

@@ -2610,6 +2610,12 @@ var kcif = {
       var rank = "";
       for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
         if (deck.api_id == deck_id) {
+          if (json.api_data.api_air_base_attack) { // air base attack
+            for (var j = 0, kouku; kouku = json.api_data.api_air_base_attack[j]; j++) {
+              log("  air base attack " + (j+1));
+              kcif.damageKouku(deck, enemies, kouku.api_stage3);
+            }
+          }
           if (json.api_data.api_kouku) {
             log("  kouku");
             kcif.damageKouku(deck, enemies, json.api_data.api_kouku.api_stage3);

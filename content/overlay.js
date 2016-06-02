@@ -136,7 +136,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material|require_info)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset(_ex)?|unsetslot_all|slot_exchange_index)|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select)|api_req_sortie\/((ld_)?air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/(((ld_)?air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material|require_info)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset(_ex)?|unsetslot_all|slot_(exchange_index|deprive))|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select)|api_req_sortie\/((ld_)?air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/(((ld_)?air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Ci.nsITraceableChannel);
@@ -678,7 +678,7 @@ var kcif = {
                     else if (kcif.hasSeiku(item.type[2]) && ship.equip[k] > 0) {
                       seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
                       if (kcif.getAircoverAlv()) {
-                        if (item.type[2] == 6) { // 艦戦
+                        if (item.type[2] == 6 || item.type[2] == 45) { // 艦戦・水戦
                           seiku_alv += [0, 0, 2, 5, 9, 14, 14, 22][item.alv];
                         }
                         else if (item.type[2] == 11) { // 水爆
@@ -3020,7 +3020,7 @@ var kcif = {
         var item_id = Number(query["api_item_id"]);
         var idx = Number(query["api_slot_idx"]);
         if (ship.slot[idx] >= 0 && kcif.item_list[ship.slot[idx]]) {
-          kcif.item_list[ship.slot[idx]].ship_id = null;
+          kcif.item_list[ship.slot[idx]].ship_id = -1;
         }
         ship.slot[idx] = item_id;
         if (item_id >= 0 && kcif.item_list[ship.slot[item_id]]) {
@@ -3055,6 +3055,25 @@ var kcif = {
             ship.slot[i] = item_id;
           }
         }
+      }
+    }
+    else if (url.indexOf("slot_deprive") != -1) {
+      var setShip = kcif.ship_list[Number(query["api_set_ship"])];
+      var unsetShip = kcif.ship_list[Number(query["api_unset_ship"])];
+      if (setShip && unsetShip) {
+        var unset = Number(query["api_unset_idx"]);
+        var item_id = unsetShip.slot[unset];
+        for (var i = unset; i < 4; i++) {
+          unsetShip.slot[i] = unsetShip.slot[i + 1];
+        }
+        unsetShip.slot[4] = -1;
+
+        var set = Number(query["api_set_idx"]);
+        if (setShip.slot[set] >= 0) {
+          kcif.item_list[setShip.slot[set]].ship_id = -1;
+        }
+        setShip.slot[set] = item_id;
+        kcif.item_list[item_id].ship_id = setShip.ship_id;
       }
     }
     else if (url.indexOf("/api_start2") != -1) {

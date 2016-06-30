@@ -2407,6 +2407,30 @@ var kcif = {
     }
   },
 
+  damageTaisen: function(deck, enemies, taisen, offset) {
+    if (!offset) {
+      offset = 0;
+    }
+
+    for (var i = 1, t_list; t_list = taisen.api_df_list[i]; i++) {
+      for (var j = 0, target; target = t_list[j]; j++) {
+        var damage = Math.floor(taisen.api_damage[i][j]);
+        if (target >= 1 && target <= 6) {
+          var id = deck.api_ship[target - 1];
+          log("    fleet " + deck.api_id + " ship " + target + "(" + String(id) + ") damaged " + damage);
+          var ship = kcif.ship_list[id];
+          kcif.reflectDamage(kcif.battle_result[0], target - 1 + offset, ship, damage);
+        }
+        else if (target >= 7 && target <= 12) {
+          if (enemies[target - 7]) {
+            log("    enemy " + (target - 6) + " damaged " + damage);
+            kcif.reflectDamage(kcif.battle_result[1], target - 7, enemies[target - 7], damage);
+          }
+        }
+      }
+    }
+  },
+
   judgeBattleResult: function(friends, enemies, myresult, eresult) {
     var fcount = 0;
     var fsunks = 0;
@@ -2648,6 +2672,16 @@ var kcif = {
                   kcif.reflectDamage(kcif.battle_result[1], i, enemies[i], Math.floor(damage[i + 1]));
                 }
               }
+            }
+          }
+          if (json.api_data.api_opening_taisen) {
+            log("  opening taisen");
+            if (url.indexOf("combined") != -1 && url.indexOf("water") == -1) {
+              // must be 2nd fleet
+              kcif.damageTaisen(kcif.deck_list[1], enemies, json.api_data.api_opening_taisen, 6);
+            }
+            else {
+              kcif.damageTaisen(deck, enemies, json.api_data.api_opening_taisen);
             }
           }
           if (json.api_data.api_opening_atack) {

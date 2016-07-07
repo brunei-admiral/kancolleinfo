@@ -30,6 +30,7 @@ kcif.getHpByMeter = function(){
 kcif.getFuelByMeter = function(){
   return meter;
 };
+kcif.document = document;
 
 JUST.testCase({
   setup: function(){
@@ -62,6 +63,11 @@ JUST.testCase({
         exp: [10, 100],
         slot: [-1, -1, -1, -1, -1],
         hp: 39,
+        hp_max: 39,
+        fuel: 55,
+        fuel_max: 55,
+        bull: 15,
+        bull_max: 15,
       },
       101: {
         "name": "香取",
@@ -70,6 +76,11 @@ JUST.testCase({
         exp: [10, 100],
         slot: [-1, -1, -1, -1, -1],
         hp: 36,
+        hp_max: 36,
+        fuel: 35,
+        fuel_max: 35,
+        bull: 25,
+        bull_max: 25,
       },
     };
     kcif.ship_master = {
@@ -119,7 +130,7 @@ JUST.testCase({
     var ship = {
       type: 0
     };
-    assertMatch(/^<td class="ship-type">.*?<\/td>$/, kcif.shipType(ship));
+    assertMatch(/^<td class="ship-type">.*?<\/td>$/, kcif.shipType(ship).outerHTML);
   },
 
   testShipName: function(){
@@ -130,11 +141,11 @@ JUST.testCase({
       equip: [0, 0, 0, 0],
       equip_max: [2, 2, 2, 2],
     };
-    assertMatch(/^<td class="ship-name">テスト1<\/td>$/, kcif.shipName(ship));
+    assertMatch(/^<td class="ship-name">テスト1<\/td>$/, kcif.shipName(ship).outerHTML);
     ship.slot = [1];
-    assertMatch(/^<td class="ship-name" title="1: アイテム1">テスト1<\/td>$/, kcif.shipName(ship));
+    assertMatch(/^<td class="ship-name" title="1: アイテム1">テスト1<\/td>$/, kcif.shipName(ship).outerHTML);
     ship.slot = [2, 1];
-    assertMatch(/^<td class="ship-name" title="1: アイテム2 \[0\/2\]&#10;2: アイテム1">テスト1<\/td>$/, kcif.shipName(ship));
+    assertMatch(/^<td class="ship-name" title="1: アイテム2 \[0\/2\]\u000a2: アイテム1">テスト1<\/td>$/, kcif.shipName(ship).outerHTML);
   },
 
   testShipLevel: function(){
@@ -144,12 +155,12 @@ JUST.testCase({
       afterlv: 3,
       aftershipid: 100,
     };
-    assertMatch(/^<td class="ship-level(?: color-default)?" title="LV3 .*?">1<\/td>$/, kcif.shipLevel(ship));
+    assertMatch(/^<td class="ship-level(?: color-default)?" title="LV3 .*?">1<\/td>$/, kcif.shipLevel(ship).outerHTML);
     ship.level = 2;
-    assertMatch(/^<td class="ship-level(?: color-default)? blink" title="LV3 .*?">2<\/td>$/, kcif.shipLevel(ship));
+    assertMatch(/^<td class="ship-level(?: color-default)? blink" title="LV3 .*?">2<\/td>$/, kcif.shipLevel(ship).outerHTML);
     ship.p_level = 3;
     ship.level = 3;
-    assertMatch(/^<td class="ship-level color-green" title="改造後 テスト100\(駆逐\)">3<\/td>$/, kcif.shipLevel(ship));
+    assertMatch(/^<td class="ship-level color-green" title="改造後 テスト100\(駆逐\)">3<\/td>$/, kcif.shipLevel(ship).outerHTML);
   },
 
   testShipHp: function(){
@@ -158,45 +169,45 @@ JUST.testCase({
       hp: 10,
       hp_max: 10,
     };
-    assertMatch(/^<td class="ship-hp-meter color-green">10\/10</, kcif.shipHp(ship));
-    assertMatch(/class="full"/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-green">10\/10</, kcif.shipHp(ship).outerHTML);
+    assertMatch(/class="full"/, kcif.shipHp(ship).outerHTML);
     ship.hp = 9;
-    assertMatch(/^<td class="ship-hp-meter(?: color-default)? blink" title="直前:10">9\/10</, kcif.shipHp(ship));
-    assertMatch(/class="little"/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter(?: color-default)? blink" title="直前:10">9\/10</, kcif.shipHp(ship).outerHTML);
+    assertMatch(/class="little"/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
-    assertMatch(/^<td class="ship-hp-meter(?: color-default)?">9\/10</, kcif.shipHp(ship));
-    assertMatch(/class="little"/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter(?: color-default)?">9\/10</, kcif.shipHp(ship).outerHTML);
+    assertMatch(/class="little"/, kcif.shipHp(ship).outerHTML);
     ship.hp = 8;
-    assertMatch(/^<td class="ship-hp-meter(?: color-default)? blink" title="直前:9">8\/10</, kcif.shipHp(ship));
-    assertMatch(/class="little"/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter(?: color-default)? blink" title="直前:9">8\/10</, kcif.shipHp(ship).outerHTML);
+    assertMatch(/class="little"/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 7;
-    assertMatch(/^<td class="ship-hp-meter color-yellow blink" title="直前:8">7\/10</, kcif.shipHp(ship));
-    assertMatch(/class="slight"/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-yellow blink" title="直前:8">7\/10</, kcif.shipHp(ship).outerHTML);
+    assertMatch(/class="slight"/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 6;
-    assertMatch(/^<td class="ship-hp-meter color-yellow blink" title="直前:7">6\/10</, kcif.shipHp(ship));
-    assertMatch(/class="slight"/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-yellow blink" title="直前:7">6\/10</, kcif.shipHp(ship).outerHTML);
+    assertMatch(/class="slight"/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 5;
-    assertMatch(/^<td class="ship-hp-meter color-orange blink" title="直前:6">5\/10</, kcif.shipHp(ship));
-    assertMatch(/class="half"/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-orange blink" title="直前:6">5\/10</, kcif.shipHp(ship).outerHTML);
+    assertMatch(/class="half"/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 3;
-    assertMatch(/^<td class="ship-hp-meter color-orange blink" title="直前:5">3\/10</, kcif.shipHp(ship));
-    assertMatch(/class="half"/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-orange blink" title="直前:5">3\/10</, kcif.shipHp(ship).outerHTML);
+    assertMatch(/class="half"/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 2;
-    assertMatch(/^<td class="ship-hp-meter color-red blink" title="直前:3">2\/10</, kcif.shipHp(ship));
-    assertMatch(/class="serious"/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-red blink" title="直前:3">2\/10</, kcif.shipHp(ship).outerHTML);
+    assertMatch(/class="serious"/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 0;
-    assertMatch(/^<td class="ship-hp-meter color-gray blink" title="直前:2">0\/10</, kcif.shipHp(ship));
-    assertMatch(/class="empty"/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-gray blink" title="直前:2">0\/10</, kcif.shipHp(ship).outerHTML);
+    assertMatch(/class="empty"/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = -1;
-    assertMatch(/^<td class="ship-hp-meter color-gray">0\/10</, kcif.shipHp(ship));
-    assertMatch(/class="empty"/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp-meter color-gray">0\/10</, kcif.shipHp(ship).outerHTML);
+    assertMatch(/class="empty"/, kcif.shipHp(ship).outerHTML);
   },
 
   testShipHpOld: function(){
@@ -206,34 +217,34 @@ JUST.testCase({
       hp: 10,
       hp_max: 10,
     };
-    assertMatch(/^<td class="ship-hp color-green">10\/10<\/td>$/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-green">10\/10<\/td>$/, kcif.shipHp(ship).outerHTML);
     ship.hp = 9;
-    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:10">9\/10<\/td>$/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:10">9\/10<\/td>$/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
-    assertMatch(/^<td class="ship-hp(?: color-default)?">9\/10<\/td>$/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp(?: color-default)?">9\/10<\/td>$/, kcif.shipHp(ship).outerHTML);
     ship.hp = 8;
-    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:9">8\/10<\/td>$/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp(?: color-default)? blink" title="直前:9">8\/10<\/td>$/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 7;
-    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:8">7\/10<\/td>$/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:8">7\/10<\/td>$/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 6;
-    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:7">6\/10<\/td>$/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-yellow blink" title="直前:7">6\/10<\/td>$/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 5;
-    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:6">5\/10<\/td>$/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:6">5\/10<\/td>$/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 3;
-    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:5">3\/10<\/td>$/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-orange blink" title="直前:5">3\/10<\/td>$/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 2;
-    assertMatch(/^<td class="ship-hp color-red blink" title="直前:3">2\/10<\/td>$/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-red blink" title="直前:3">2\/10<\/td>$/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = 0;
-    assertMatch(/^<td class="ship-hp color-gray blink" title="直前:2">0\/10<\/td>$/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-gray blink" title="直前:2">0\/10<\/td>$/, kcif.shipHp(ship).outerHTML);
     ship.p_hp = ship.hp;
     ship.hp = -1;
-    assertMatch(/^<td class="ship-hp color-gray">0\/10<\/td>$/, kcif.shipHp(ship));
+    assertMatch(/^<td class="ship-hp color-gray">0\/10<\/td>$/, kcif.shipHp(ship).outerHTML);
   },
 
   testShipCond: function(){
@@ -241,27 +252,27 @@ JUST.testCase({
       p_cond: 49,
       cond: 49,
     };
-    assertMatch(/^<td class="ship-cond(?: color-default)?">49<\/td>$/, kcif.shipCond(ship));
+    assertMatch(/^<td class="ship-cond(?: color-default)?">49<\/td>$/, kcif.shipCond(ship).outerHTML);
     ship.cond = 50;
-    assertMatch(/^<td class="ship-cond color-green blink">50<\/td>$/, kcif.shipCond(ship));
+    assertMatch(/^<td class="ship-cond color-green blink">50<\/td>$/, kcif.shipCond(ship).outerHTML);
     ship.p_cond = ship.cond;
-    assertMatch(/^<td class="ship-cond color-green">50<\/td>$/, kcif.shipCond(ship));
+    assertMatch(/^<td class="ship-cond color-green">50<\/td>$/, kcif.shipCond(ship).outerHTML);
     ship.cond = 100;
-    assertMatch(/^<td class="ship-cond color-green blink">100<\/td>$/, kcif.shipCond(ship));
+    assertMatch(/^<td class="ship-cond color-green blink">100<\/td>$/, kcif.shipCond(ship).outerHTML);
     ship.cond = 40;
-    assertMatch(/^<td class="ship-cond(?: color-default)? blink">40<\/td>$/, kcif.shipCond(ship));
+    assertMatch(/^<td class="ship-cond(?: color-default)? blink">40<\/td>$/, kcif.shipCond(ship).outerHTML);
     ship.cond = 39;
-    assertMatch(/^<td class="ship-cond color-yellow blink">39<\/td>$/, kcif.shipCond(ship));
+    assertMatch(/^<td class="ship-cond color-yellow blink">39<\/td>$/, kcif.shipCond(ship).outerHTML);
     ship.cond = 30;
-    assertMatch(/^<td class="ship-cond color-yellow blink">30<\/td>$/, kcif.shipCond(ship));
+    assertMatch(/^<td class="ship-cond color-yellow blink">30<\/td>$/, kcif.shipCond(ship).outerHTML);
     ship.cond = 29;
-    assertMatch(/^<td class="ship-cond color-orange blink">29<\/td>$/, kcif.shipCond(ship));
+    assertMatch(/^<td class="ship-cond color-orange blink">29<\/td>$/, kcif.shipCond(ship).outerHTML);
     ship.cond = 20;
-    assertMatch(/^<td class="ship-cond color-orange blink">20<\/td>$/, kcif.shipCond(ship));
+    assertMatch(/^<td class="ship-cond color-orange blink">20<\/td>$/, kcif.shipCond(ship).outerHTML);
     ship.cond = 19;
-    assertMatch(/^<td class="ship-cond color-red blink">19<\/td>$/, kcif.shipCond(ship));
+    assertMatch(/^<td class="ship-cond color-red blink">19<\/td>$/, kcif.shipCond(ship).outerHTML);
     ship.cond = 0;
-    assertMatch(/^<td class="ship-cond color-red blink">0<\/td>$/, kcif.shipCond(ship));
+    assertMatch(/^<td class="ship-cond color-red blink">0<\/td>$/, kcif.shipCond(ship).outerHTML);
   },
 
   testShipFuelBull: function(){
@@ -273,47 +284,47 @@ JUST.testCase({
       bull: 100,
       bull_max: 100,
     };
-    assertMatch(/"full"><\/meter><meter /, kcif.shipFuelBull(ship));
+    assertMatch(/class="full"[^>]*><\/meter><meter /, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 99;
-    assertMatch(/"slight"><\/meter><meter /, kcif.shipFuelBull(ship));
+    assertMatch(/class="slight"[^>]*><\/meter><meter /, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 51;
-    assertMatch(/"slight"><\/meter><meter /, kcif.shipFuelBull(ship));
+    assertMatch(/class="slight"[^>]*><\/meter><meter /, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 50;
-    assertMatch(/"half"><\/meter><meter /, kcif.shipFuelBull(ship));
+    assertMatch(/class="half"[^>]*><\/meter><meter /, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 21;
-    assertMatch(/"half"><\/meter><meter /, kcif.shipFuelBull(ship));
+    assertMatch(/class="half"[^>]*><\/meter><meter /, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 20;
-    assertMatch(/"serious"><\/meter><meter /, kcif.shipFuelBull(ship));
+    assertMatch(/class="serious"[^>]*><\/meter><meter /, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 1;
-    assertMatch(/"serious"><\/meter><meter /, kcif.shipFuelBull(ship));
+    assertMatch(/class="serious"[^>]*><\/meter><meter /, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 0;
-    assertMatch(/"empty"><\/meter><meter /, kcif.shipFuelBull(ship));
+    assertMatch(/class="empty"[^>]*><\/meter><meter /, kcif.shipFuel(ship).outerHTML);
     ship.fuel = ship.p_fuel = 50;
     ship.fuel_max = 99;
-    assertMatch(/"slight"><\/meter><meter /, kcif.shipFuelBull(ship));
+    assertMatch(/class="slight"[^>]*><\/meter><meter /, kcif.shipFuel(ship).outerHTML);
     ship.fuel = ship.p_fuel = 49;
-    assertMatch(/"half"><\/meter><meter /, kcif.shipFuelBull(ship));
+    assertMatch(/class="half"[^>]*><\/meter><meter /, kcif.shipFuel(ship).outerHTML);
 
-    assertMatch(/"full"><\/meter><\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/class="full"[^>]*><\/meter><\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.bull = 99;
-    assertMatch(/"slight"><\/meter><\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/class="slight"[^>]*><\/meter><\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.bull = 51;
-    assertMatch(/"slight"><\/meter><\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/class="slight"[^>]*><\/meter><\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.bull = 50;
-    assertMatch(/"half"><\/meter><\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/class="half"[^>]*><\/meter><\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.bull = 21;
-    assertMatch(/"half"><\/meter><\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/class="half"[^>]*><\/meter><\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.bull = 20;
-    assertMatch(/"serious"><\/meter><\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/class="serious"[^>]*><\/meter><\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.bull = 1;
-    assertMatch(/"serious"><\/meter><\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/class="serious"[^>]*><\/meter><\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.bull = 0;
-    assertMatch(/"empty"><\/meter><\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/class="empty"[^>]*><\/meter><\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.bull = ship.p_bull = 50;
     ship.bull_max = 99;
-    assertMatch(/"slight"><\/meter><\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/class="slight"[^>]*><\/meter><\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.bull = ship.p_bull = 49;
-    assertMatch(/"half"><\/meter><\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/class="half"[^>]*><\/meter><\/td>/, kcif.shipFuel(ship).outerHTML);
   },
 
   testShipFuelBullOld: function(){
@@ -326,45 +337,45 @@ JUST.testCase({
       bull: 100,
       bull_max: 100,
     };
-    assertMatch(/^<td class="ship-fuel color-green" title="100\/100">100%<\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/^<td class="ship-fuel color-green" title="100\/100">100%<\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 99;
-    assertMatch(/^<td class="ship-fuel color-yellow blink" title="99\/100">99%<\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/^<td class="ship-fuel color-yellow blink" title="99\/100">99%<\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.p_fuel = ship.fuel;
-    assertMatch(/^<td class="ship-fuel color-yellow" title="99\/100">99%<\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/^<td class="ship-fuel color-yellow" title="99\/100">99%<\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 50;
-    assertMatch(/^<td class="ship-fuel color-yellow blink" title="50\/100">50%<\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/^<td class="ship-fuel color-yellow blink" title="50\/100">50%<\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 49;
-    assertMatch(/^<td class="ship-fuel color-orange blink" title="49\/100">49%<\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/^<td class="ship-fuel color-orange blink" title="49\/100">49%<\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 1;
-    assertMatch(/^<td class="ship-fuel color-orange blink" title="1\/100">1%<\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/^<td class="ship-fuel color-orange blink" title="1\/100">1%<\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.fuel = 0;
-    assertMatch(/^<td class="ship-fuel color-red blink" title="0\/100">0%<\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/^<td class="ship-fuel color-red blink" title="0\/100">0%<\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.fuel = ship.p_fuel = 50;
     ship.fuel_max = 99;
-    assertMatch(/^<td class="ship-fuel color-yellow" title="50\/99">50%<\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/^<td class="ship-fuel color-yellow" title="50\/99">50%<\/td>/, kcif.shipFuel(ship).outerHTML);
     ship.fuel = ship.p_fuel = 49;
     ship.fuel_max = 99;
-    assertMatch(/^<td class="ship-fuel color-orange" title="49\/99">49%<\/td>/, kcif.shipFuelBull(ship));
+    assertMatch(/^<td class="ship-fuel color-orange" title="49\/99">49%<\/td>/, kcif.shipFuel(ship).outerHTML);
 
-    assertMatch(/<td class="ship-bull color-green" title="100\/100">100%<\/td>$/, kcif.shipFuelBull(ship));
+    assertMatch(/<td class="ship-bull color-green" title="100\/100">100%<\/td>$/, kcif.shipBull(ship).outerHTML);
     ship.bull = 99;
-    assertMatch(/<td class="ship-bull color-yellow blink" title="99\/100">99%<\/td>$/, kcif.shipFuelBull(ship));
+    assertMatch(/<td class="ship-bull color-yellow blink" title="99\/100">99%<\/td>$/, kcif.shipBull(ship).outerHTML);
     ship.p_bull = ship.bull;
-    assertMatch(/<td class="ship-bull color-yellow" title="99\/100">99%<\/td>$/, kcif.shipFuelBull(ship));
+    assertMatch(/<td class="ship-bull color-yellow" title="99\/100">99%<\/td>$/, kcif.shipBull(ship).outerHTML);
     ship.bull = 50;
-    assertMatch(/<td class="ship-bull color-yellow blink" title="50\/100">50%<\/td>$/, kcif.shipFuelBull(ship));
+    assertMatch(/<td class="ship-bull color-yellow blink" title="50\/100">50%<\/td>$/, kcif.shipBull(ship).outerHTML);
     ship.bull = 49;
-    assertMatch(/<td class="ship-bull color-orange blink" title="49\/100">49%<\/td>$/, kcif.shipFuelBull(ship));
+    assertMatch(/<td class="ship-bull color-orange blink" title="49\/100">49%<\/td>$/, kcif.shipBull(ship).outerHTML);
     ship.bull = 1;
-    assertMatch(/<td class="ship-bull color-orange blink" title="1\/100">1%<\/td>$/, kcif.shipFuelBull(ship));
+    assertMatch(/<td class="ship-bull color-orange blink" title="1\/100">1%<\/td>$/, kcif.shipBull(ship).outerHTML);
     ship.bull = 0;
-    assertMatch(/<td class="ship-bull color-red blink" title="0\/100">0%<\/td>$/, kcif.shipFuelBull(ship));
+    assertMatch(/<td class="ship-bull color-red blink" title="0\/100">0%<\/td>$/, kcif.shipBull(ship).outerHTML);
     ship.bull = ship.p_bull = 50;
     ship.bull_max = 99;
-    assertMatch(/<td class="ship-bull color-yellow" title="50\/99">50%<\/td>$/, kcif.shipFuelBull(ship));
+    assertMatch(/<td class="ship-bull color-yellow" title="50\/99">50%<\/td>$/, kcif.shipBull(ship).outerHTML);
     ship.bull = ship.p_bull = 49;
     ship.bull_max = 99;
-    assertMatch(/<td class="ship-bull color-orange" title="49\/99">49%<\/td>$/, kcif.shipFuelBull(ship));
+    assertMatch(/<td class="ship-bull color-orange" title="49\/99">49%<\/td>$/, kcif.shipBull(ship).outerHTML);
   },
 
   testCompareShip: function(){
@@ -540,26 +551,26 @@ JUST.testCase({
   },
 
   testFormatMaterial: function(){
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">0</td></tr>', kcif.formatMaterial("test", 0, 1));
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">999</td></tr>', kcif.formatMaterial("test", 999, 1));
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">1000</td></tr>', kcif.formatMaterial("test", 1000, 1));
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">299999</td></tr>', kcif.formatMaterial("test", 299999, 1));
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-red">300000</td></tr>', kcif.formatMaterial("test", 300000, 1));
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">1000</td></tr>', kcif.formatMaterial("test", 1000, 2));
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">1249</td></tr>', kcif.formatMaterial("test", 1249, 2));
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">1250</td></tr>', kcif.formatMaterial("test", 1250, 2));
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">0</td></tr>', kcif.formatMaterial("test", 0, 1).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">999</td></tr>', kcif.formatMaterial("test", 999, 1).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">1000</td></tr>', kcif.formatMaterial("test", 1000, 1).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">299999</td></tr>', kcif.formatMaterial("test", 299999, 1).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-red">300000</td></tr>', kcif.formatMaterial("test", 300000, 1).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">1000</td></tr>', kcif.formatMaterial("test", 1000, 2).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">1249</td></tr>', kcif.formatMaterial("test", 1249, 2).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">1250</td></tr>', kcif.formatMaterial("test", 1250, 2).outerHTML);
 
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">0</td></tr>', kcif.formatMaterial("test", 0));
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">2999</td></tr>', kcif.formatMaterial("test", 2999));
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-red">3000</td></tr>', kcif.formatMaterial("test", 3000));
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">0</td></tr>', kcif.formatMaterial("test", 0).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">2999</td></tr>', kcif.formatMaterial("test", 2999).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-red">3000</td></tr>', kcif.formatMaterial("test", 3000).outerHTML);
   },
 
   testSeiku2str: function(){
-    assertEqual("敵制空値:&#10; 0: 制空権確保&#10; 1～: 制空権喪失", kcif.seiku2str(0));
-    assertEqual("敵制空値:&#10; 0: 制空権確保&#10; 1: 航空均衡&#10; 2～3: 航空劣勢&#10; 4～: 制空権喪失", kcif.seiku2str(1));
-    assertEqual("敵制空値:&#10; 0: 制空権確保&#10; 1: 航空優勢&#10; 2～3: 航空均衡&#10; 4～6: 航空劣勢&#10; 7～: 制空権喪失", kcif.seiku2str(2));
-    assertEqual("敵制空値:&#10; 0～1: 制空権確保&#10; 2: 航空優勢&#10; 3～4: 航空均衡&#10; 5～9: 航空劣勢&#10; 10～: 制空権喪失", kcif.seiku2str(3));
-    assertEqual("敵制空値:&#10; 0～1: 制空権確保&#10; 2～3: 航空優勢&#10; 4～7: 航空均衡&#10; 8～15: 航空劣勢&#10; 16～: 制空権喪失", kcif.seiku2str(5));
+    assertEqual("敵制空値:\u000a 0: 制空権確保\u000a 1～: 制空権喪失", kcif.seiku2str(0));
+    assertEqual("敵制空値:\u000a 0: 制空権確保\u000a 1: 航空均衡\u000a 2～3: 航空劣勢\u000a 4～: 制空権喪失", kcif.seiku2str(1));
+    assertEqual("敵制空値:\u000a 0: 制空権確保\u000a 1: 航空優勢\u000a 2～3: 航空均衡\u000a 4～6: 航空劣勢\u000a 7～: 制空権喪失", kcif.seiku2str(2));
+    assertEqual("敵制空値:\u000a 0～1: 制空権確保\u000a 2: 航空優勢\u000a 3～4: 航空均衡\u000a 5～9: 航空劣勢\u000a 10～: 制空権喪失", kcif.seiku2str(3));
+    assertEqual("敵制空値:\u000a 0～1: 制空権確保\u000a 2～3: 航空優勢\u000a 4～7: 航空均衡\u000a 8～15: 航空劣勢\u000a 16～: 制空権喪失", kcif.seiku2str(5));
   },
 
   testCheckConfigChanged: function(){

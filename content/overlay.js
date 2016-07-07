@@ -22,6 +22,30 @@ function flog() {
   Services.console.logStringMessage("[kcif DEBUG]: " + Array.join(arguments, " "));
 }
 
+function makeElement(tag, id, className, text) {
+  var elem = kcif.document.createElement(tag);
+  if (id) {
+    elem.id = id;
+  }
+  if (className) {
+    elem.className = className;
+  }
+  if (text != null) {
+    elem.textContent = String(text);
+  }
+  return elem;
+}
+
+function makeText(text) {
+  return kcif.document.createTextNode(String(text));
+}
+
+function clearChildElements(elem) {
+  while (elem.lastChild) {
+    elem.removeChild(elem.lastChild);
+  }
+}
+
 // Helper function for XPCOM instanciation (from Firebug)
 function CCIN(cName, ifaceName) {
   return Cc[cName].createInstance(Ci[ifaceName]);
@@ -195,20 +219,21 @@ var kcif = {
     if (url.match(/osapi\.dmm\.com\//) && url.match(/aid=854854/)) {
       log("DOMloaded:", url);
 
-      var div = doc.createElement("div");
-      var elem = doc.querySelector("#sectionWrap");
+      kcif.document = doc;
+      var div = makeElement("div");
+      var elem = kcif.document.querySelector("#sectionWrap");
       if (elem) {
         elem.parentNode.insertBefore(div, elem);
       }
       else {
-        doc.body.appendChild(div);
+        kcif.document.body.appendChild(div);
       }
       kcif.info_div = div;
 
       // スタイルシート
       var sheet = (function(){
-        var style = doc.createElement("style");
-        doc.head.appendChild(style);
+        var style = makeElement("style");
+        kcif.document.head.appendChild(style);
         return style.sheet;
       })();
       sheet.insertRule('#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; text-align: left; }', sheet.length);
@@ -225,11 +250,11 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab meter.half::-moz-meter-bar { background: -moz-linear-gradient(top, #f93, #fdb 20%, #f93 30%, #b72 60%, #861); }', sheet.length);
       sheet.insertRule('#kancolle-info .tab meter.serious::-moz-meter-bar { background: -moz-linear-gradient(top, #f55, #faa 20%, #f55 30%, #d44 60%, #a33); }', sheet.length);
       sheet.insertRule('#kancolle-info .tab-header a { color: inherit; text-decoration: none; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab-header a:hover { color: yellow; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab-header a:hover { color: yellow; cursor: pointer; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab { padding: 2px 8px 2px 8px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .list-header { color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab a.list-header:hover { color: yellow !important; dext-decoration: none !important; font-weight: bold !important; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab a.list-header:hover { color: yellow !important; dext-decoration: none !important; font-weight: bold !important; cursor: pointer; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab table tr { padding: 0; margin: 0; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab table th, #kancolle-info .tab table td { padding: 0; margin: 0; line-height: 1.2; }', sheet.length);
@@ -286,11 +311,11 @@ var kcif = {
       sheet.insertRule('@-moz-keyframes blink { 0% {background-color: rgba(240,208,0,0.5);} 60% {background-color: inherit;} 100% {background-color: inherit;} }', sheet.length);
 
       log("create div");
-      kcif.flash = doc.querySelector("#flashWrap");
+      kcif.flash = kcif.document.querySelector("#flashWrap");
 
       kcif.renderFrame();
 
-      doc.body.setAttribute("onload", "function setHeight(){if (typeof ConstGadgetInfo != 'undefined') ConstGadgetInfo.height = 920; else window.setTimer(setHeight, 100);} setHeight();");
+      kcif.document.body.setAttribute("onload", "function setHeight(){if (typeof ConstGadgetInfo != 'undefined') ConstGadgetInfo.height = 920; else window.setTimer(setHeight, 100);} setHeight();");
     }
     else if (url.match(/\/app_id=854854\//)) {
       log("DOMloaded:", url);
@@ -313,58 +338,312 @@ var kcif = {
         kcif.area_game.style.height = '920px';
     }
     if (kcif.info_div) {
-      var html = "";
-      html += '<div id="kancolle-info">';
-      html += '<div id="tab-headers">';
-      html += '<div id="tab-header-main" class="tab-header"><a href="#">メイン</a></div>';
-      html += '<div id="tab-header-ships" class="tab-header"><a href="#">艦娘</a></div>';
-      html += '<div id="tab-header-items" class="tab-header"><a href="#">装備</a></div>';
-      html += '<div id="tab-header-config" class="tab-header"><a href="#">設定</a></div>';
-      html += '<div id="base-info"><button id="capture">画面キャプチャ</button></div>';
-      html += '</div>';
+      var base = makeElement("div", "kancolle-info");
 
-      html += '<div id="tab-main" class="tab">';
-      html += '<span class="color-yellow blink">Loading...</span>';
-      html += '</div>';
+      var tabs = makeElement("div", "tab-headers");
 
-      html += '<div id="tab-ships" class="tab">';
-      html += '<span class="color-yellow blink">Loading...</span>';
-      html += '</div>';
+      var tab = makeElement("div", "tab-header-main", "tab-header");
+      var elem = makeElement("a", null, null, "メイン");
+      elem.setAttribute("href", "#");
+      tab.appendChild(elem);
+      tabs.appendChild(tab);
 
-      html += '<div id="tab-items" class="tab">';
-      html += '<span class="color-yellow blink">Loading...</span>';
-      html += '</div>';
+      tab = makeElement("div", "tab-header-ships", "tab-header");
+      elem = makeElement("a", null, null, "艦娘");
+      elem.setAttribute("href", "#");
+      tab.appendChild(elem);
+      tabs.appendChild(tab);
 
-      html += '<div id="tab-config" class="tab">';
-      html += '<div class="table-inner"><table>';
-      html += '<tr><td class="config-header">画面キャプチャ</td><td></td></tr>';
-      html += '<tr><td class="config-label">保存先</td><td class="config-input"><input id="capture-save-dir" type="text" value="' + kcif.getCaptureSaveDir() + '"></td></tr>';
-      html += '<tr><td class="config-label">ベース名</td><td class="config-input"><input id="capture-save-base" type="text" value="' + kcif.getCaptureSaveBase() + '"></td></tr>';
-      html += '<tr><td class="config-header">タイマーサウンド</td><td></td></tr>';
-      html += '<tr><td class="config-label">サウンドファイルURL</td><td class="config-input"><input id="beep-url" type="text" value="' + kcif.getBeepUrl() + '"></td></tr>';
-      html += '<tr><td class="config-label">ボリューム(0～100)</td><td class="config-input"><input id="beep-volume" type="number" max="100" min="0" value="' + kcif.getBeepVolume() + '"> <button id="beep-test">テスト</button></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-expedition" type="checkbox" value="x"' + (kcif.getBeepExpedition() ? ' checked' : '') + '>遠征帰還時のサウンド再生を自動でONにする</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-dock" type="checkbox" value="x"' + (kcif.getBeepDock() ? ' checked' : '') + '>入渠終了時のサウンド再生を自動でONにする</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-built" type="checkbox" value="x"' + (kcif.getBeepBuilt() ? ' checked' : '') + '>建造終了時のサウンド再生を自動でONにする</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="beep-repair" type="checkbox" value="x"' + (kcif.getBeepRepair() ? ' checked' : '') + '>泊地修理更新(予想)時のサウンド再生を自動でONにする</label></td></tr>';
-      html += '<tr><td class="config-header">情報表示</td><td></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-battle" type="checkbox" value="x"' + (kcif.getShowBattle() ? ' checked' : '') + '>戦闘結果を表示する</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="show-built" type="checkbox" value="x"' + (kcif.getShowBuilt() ? ' checked' : '') + '>建造結果を表示する</label></td></tr>';
-      html += '<tr><td class="config-header">表示カスタマイズ</td><td></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="hp-by-meter" type="checkbox" value="x"' + (kcif.getHpByMeter() ? ' checked' : '') + '>耐久値をメーター表示する</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="fuel-by-meter" type="checkbox" value="x"' + (kcif.getFuelByMeter() ? ' checked' : '') + '>燃料・弾薬をメーター表示する</label></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input">索敵値算出式：<select id="search-formula"><option value="0"' + (kcif.getSearchFormula() == 0 ? ' selected' : '') + '>総計</option><option value="1"' + (kcif.getSearchFormula() == 1 ? ' selected' : '') + '>旧2-5式</option><option value="2"' + (kcif.getSearchFormula() == 2 ? ' selected' : '') + '>2-5秋式</option><option value="3"' + (kcif.getSearchFormula() == 3 ? ' selected' : '') + '>秋簡易式</option><option value="4"' + (kcif.getSearchFormula() == 4 ? ' selected' : '') + '>判定式(33)</option></select></td></tr>';
-      html += '<tr><td class="config-label"></td><td class="config-input"><label><input id="aircover-alv" type="checkbox" value="x"' + (kcif.getAircoverAlv() ? ' checked' : '') + '>制空値に艦載機熟練度を加算する</label></td></tr>';
-      html += '</table></div>';
-      html += '<div class="config-buttons">';
-      html += '<button id="config-save">保存</button>';
-      html += '<button id="config-reset">クリア</button>';
-      html += '</div>';
-      html += '</div>';
+      tab = makeElement("div", "tab-header-items", "tab-header");
+      elem = makeElement("a", null, null, "装備");
+      elem.setAttribute("href", "#");
+      tab.appendChild(elem);
+      tabs.appendChild(tab);
 
-      html += '</div>';
+      tab = makeElement("div", "tab-header-config", "tab-header");
+      elem = makeElement("a", null, null, "設定");
+      elem.setAttribute("href", "#");
+      tab.appendChild(elem);
+      tabs.appendChild(tab);
 
-      kcif.info_div.innerHTML = html;
+      tab = makeElement("div", "base-info");
+      elem = makeElement("button", "capture", null, "画面キャプチャ");
+      tab.appendChild(elem);
+      tabs.appendChild(tab);
+
+      base.appendChild(tabs);
+
+      tab = makeElement("div", "tab-main", "tab");
+      elem = makeElement("span", null, "color-yelow blink", "Loading...");
+      tab.appendChild(elem);
+      base.appendChild(tab);
+
+      tab = makeElement("div", "tab-ships", "tab");
+      elem = makeElement("span", null, "color-yelow blink", "Loading...");
+      tab.appendChild(elem);
+      base.appendChild(tab);
+
+      tab = makeElement("div", "tab-items", "tab");
+      elem = makeElement("span", null, "color-yelow blink", "Loading...");
+      tab.appendChild(elem);
+      base.appendChild(tab);
+
+      // 設定
+      tab = makeElement("div", "tab-config", "tab");
+      var inner = makeElement("div", null, "table-inner");
+      var table = makeElement("table");
+
+      var tr = makeElement("tr");
+      var td = makeElement("td", null, "config-header", "画面キャプチャ");
+      tr.appendChild(td);
+      td = makeElement("td");
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label", "保存先");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      elem = makeElement("input", "capture-save-dir");
+      elem.setAttribute("type", "text");
+      elem.value = kcif.getCaptureSaveDir();
+      td.appendChild(elem);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label", "ベース名");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      elem = makeElement("input", "capture-save-base");
+      elem.setAttribute("type", "text");
+      elem.value = kcif.getCaptureSaveBase();
+      td.appendChild(elem);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      var tr = makeElement("tr");
+      var td = makeElement("td", null, "config-header", "タイマーサウンド");
+      tr.appendChild(td);
+      td = makeElement("td");
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label", "サウンドファイルURL");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      elem = makeElement("input", "beep-url");
+      elem.setAttribute("type", "text");
+      elem.value = kcif.getBeepUrl();
+      td.appendChild(elem);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label", "ボリューム(0～100)");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      elem = makeElement("input", "beep-volume");
+      elem.setAttribute("type", "number");
+      elem.setAttribute("max", "100");
+      elem.setAttribute("min", "0");
+      elem.value = kcif.getBeepVolume();
+      td.appendChild(elem);
+      elem = makeText(" ");
+      td.appendChild(elem);
+      elem = makeElement("button", "beep-test", null, "テスト");
+      td.appendChild(elem);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      var label = makeElement("label");
+      elem = makeElement("input", "beep-expedition");
+      elem.setAttribute("type", "checkbox");
+      elem.value = "x";
+      elem.checked = kcif.getBeepExpedition();
+      label.appendChild(elem);
+      label.appendChild(makeText("遠征帰還時のサウンド再生を自動でONにする"));
+      td.appendChild(label);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      label = makeElement("label");
+      elem = makeElement("input", "beep-dock");
+      elem.setAttribute("type", "checkbox");
+      elem.value = "x";
+      elem.checked = kcif.getBeepDock();
+      label.appendChild(elem);
+      label.appendChild(makeText("入渠終了時のサウンド再生を自動でONにする"));
+      td.appendChild(label);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      label = makeElement("label");
+      elem = makeElement("input", "beep-built");
+      elem.setAttribute("type", "checkbox");
+      elem.value = "x";
+      elem.checked = kcif.getBeepBuilt();
+      label.appendChild(elem);
+      label.appendChild(makeText("建造終了時のサウンド再生を自動でONにする"));
+      td.appendChild(label);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      label = makeElement("label");
+      elem = makeElement("input", "beep-repair");
+      elem.setAttribute("type", "checkbox");
+      elem.value = "x";
+      elem.checked = kcif.getBeepRepair();
+      label.appendChild(elem);
+      label.appendChild(makeText("泊地修理更新(予想)時のサウンド再生を自動でONにする"));
+      td.appendChild(label);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      var tr = makeElement("tr");
+      var td = makeElement("td", null, "config-header", "情報表示");
+      tr.appendChild(td);
+      td = makeElement("td");
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      label = makeElement("label");
+      elem = makeElement("input", "show-battle");
+      elem.setAttribute("type", "checkbox");
+      elem.value = "x";
+      elem.checked = kcif.getShowBattle();
+      label.appendChild(elem);
+      label.appendChild(makeText("戦闘結果を表示する"));
+      td.appendChild(label);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      label = makeElement("label");
+      elem = makeElement("input", "show-built");
+      elem.setAttribute("type", "checkbox");
+      elem.value = "x";
+      elem.checked = kcif.getShowBuilt();
+      label.appendChild(elem);
+      label.appendChild(makeText("建造結果を表示する"));
+      td.appendChild(label);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      var tr = makeElement("tr");
+      var td = makeElement("td", null, "config-header", "情報カスタマイズ");
+      tr.appendChild(td);
+      td = makeElement("td");
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      label = makeElement("label");
+      elem = makeElement("input", "hp-by-meter");
+      elem.setAttribute("type", "checkbox");
+      elem.value = "x";
+      elem.checked = kcif.getHpByMeter();
+      label.appendChild(elem);
+      label.appendChild(makeText("耐久値をメーター表示する"));
+      td.appendChild(label);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      label = makeElement("label");
+      elem = makeElement("input", "fuel-by-meter");
+      elem.setAttribute("type", "checkbox");
+      elem.value = "x";
+      elem.checked = kcif.getFuelByMeter();
+      label.appendChild(elem);
+      label.appendChild(makeText("燃料・弾薬をメーター表示する"));
+      td.appendChild(label);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input", "索敵値算出式：");
+      var select = makeElement("select", "search-formula");
+      elem = makeElement("option", null, null, "総計");
+      elem.value = "0";
+      select.appendChild(elem);
+      elem = makeElement("option", null, null, "旧2-5式");
+      elem.value = "1";
+      select.appendChild(elem);
+      elem = makeElement("option", null, null, "2-5秋式");
+      elem.value = "2";
+      select.appendChild(elem);
+      elem = makeElement("option", null, null, "秋簡易式");
+      elem.value = "3";
+      select.appendChild(elem);
+      elem = makeElement("option", null, null, "判定式(33)");
+      elem.value = "4";
+      select.appendChild(elem);
+      select.selectedIndex = kcif.getSearchFormula();
+      td.appendChild(select);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      tr = makeElement("tr");
+      td = makeElement("td", null, "config-label");
+      tr.appendChild(td);
+      td = makeElement("td", null, "config-input");
+      label = makeElement("label");
+      elem = makeElement("input", "aircover-alv");
+      elem.setAttribute("type", "checkbox");
+      elem.value = "x";
+      elem.checked = kcif.getAircoverAlv();
+      label.appendChild(elem);
+      label.appendChild(makeText("制空値に艦載機熟練度を加算する"));
+      td.appendChild(label);
+      tr.appendChild(td);
+      table.appendChild(tr);
+
+      inner.appendChild(table);
+      tab.appendChild(inner);
+
+      var div = makeElement("div", null, "config-buttons");
+      var button = makeElement("button", "config-save", null, "保存");
+      div.appendChild(button);
+      button = makeElement("button", "config-reset", null, "クリア");
+      div.appendChild(button);
+      tab.appendChild(div);
+
+      base.appendChild(tab);
+
+      kcif.info_div.appendChild(base);
 
       // キャプチャボタン
       var elem = kcif.info_div.querySelector("#capture");
@@ -476,10 +755,9 @@ var kcif = {
 
   renderInfo: function(all) {
     if (kcif.info_div) {
-      var html = "";
-
       // ベース
       var base = kcif.info_div.querySelector("#base-info");
+      clearChildElements(base);
       var ship_col = 'color-default';
       if (kcif.ship_num >= kcif.ship_max) {
         ship_col = 'color-red';
@@ -500,8 +778,20 @@ var kcif = {
       else if (kcif.item_num >= kcif.item_max - 8 * 4 - 3) {
         item_col = 'color-yellow';
       }
-      html += '<span class="' + ship_col + '">' + kcif.ship_num + '</span>/' + kcif.ship_max + ' ships; <span class="' + item_col + '">' + kcif.item_num + '</span>/' + kcif.item_max + ' items <span id="updated">' + (new Date()).toLocaleFormat("%H:%M") + '更新</span> <button id="capture">画面キャプチャ</button>';
-      base.innerHTML = html;
+      var elem = makeElement("span", null, ship_col, kcif.ship_num);
+      base.appendChild(elem);
+      elem = makeText("/" + kcif.ship_max + " ships; ");
+      base.appendChild(elem);
+      elem = makeElement("span", null, item_col, kcif.item_num);
+      base.appendChild(elem);
+      elem = makeText("/" + kcif.item_max + " items ");
+      base.appendChild(elem);
+      elem = makeElement("span", "updated", null, (new Date()).toLocaleFormat("%H:%M") + "更新");
+      base.appendChild(elem);
+      elem = makeText(" ");
+      base.appendChild(elem);
+      elem = makeElement("button", "capture", null, "画面キャプチャ");
+      base.appendChild(elem);
 
       // ベース:キャプチャボタン
       var elem = base.querySelector("#capture");
@@ -510,565 +800,826 @@ var kcif = {
       }
 
       // メイン
-      var maintab = kcif.info_div.querySelector("#tab-main");
-      var checks = kcif.saveCheckboxes(maintab);
-      html = "";
-
-      html += '<div id="resource">';
-      html += '<h2><span class="list-header">資源等</span></h2>';
-      html += '<table>';
-      html += kcif.formatMaterial("燃料", kcif.material[0], kcif.admiral_level);
-      html += kcif.formatMaterial("弾薬", kcif.material[1], kcif.admiral_level);
-      html += kcif.formatMaterial("鋼材", kcif.material[2], kcif.admiral_level);
-      html += kcif.formatMaterial("ボーキサイト", kcif.material[3], kcif.admiral_level);
-      html += '<tr><th class="res-name">&nbsp;</th><td class="res-value">&nbsp;</td></tr>';
-      html += kcif.formatMaterial("高速修復材", kcif.material[5]);
-      html += kcif.formatMaterial("開発資材", kcif.material[6]);
-      html += kcif.formatMaterial("高速建造材", kcif.material[4]);
-      html += kcif.formatMaterial("改修資材", kcif.material[7]);
-      html += '</table>';
-      html += '</div>';
-
-      for (var i = 0; i < 4; i++) {
-        var deck = kcif.deck_list[i];
-        var lhtml = "";
-        html += '<div id="fleet' + (i + 1) + '" class="fleet">';
-        var col = "color-default";
-        var t = kcif.mission[i];
-        var s = null;
-        if (Array.isArray(t)) {
-          var dt = new Date(t[2]);
-          s = "[<span title='" + t[1] + "'>遠征中</span> <label>" + kcif.time2str(dt) + "<input id='check-fleet" + (i + 1) + "' type='checkbox' value='x' class='check-timer check-expedition'></label>]";
-          col = kcif.getTimeColor(dt);
-        }
-        else if (t) {
-          if (kcif.getShowBattle() || t == "(連合艦隊)") {
-            s = "[" + t + "]";
-          }
-          else {
-            s = "[出撃中]";
-          }
-          col = "color-green";
-        }
-        if (deck || i == 0) {
-          var ships = [];
-          var level_sum = 0;
-          var sup = [];
-          var sup_col = "";
-          var kira = [];
-          var drum = 0;
-          var drum_ship = [];
-          var dai = 0;
-          var dai_ship = [];
-          var seiku = 0;
-          var seiku_alv = 0;
-          var sakuteki = 0;
-          var sakuteki0 = 0;
-          var sakuteki1 = 0;
-          var sakuteki1i = 0;
-          var sakuteki2 = 0;
-          var sakuteki3 = 0;
-          var ndock = [];
-          var damage = [];
-          for (var j = 0; j < 6; j++) {
-            var id = deck ? deck.api_ship[j] : -1
-            if (id === -1 || id == null) {
-              lhtml += '<tr><td class="ship-no">' + (j + 1) + '</td><td colspan="9"></td></tr>';
-              continue;
-            }
-            var ship = kcif.ship_list[id];
-            if (ship != null) {
-              ships.push(ship);
-              var kit = null;
-              var slots = ship.slot.concat(ship.slot_ex);
-              for (var k = 0; k < slots.length; k++) {
-                if (slots[k] < 0) {
-                  continue;
-                }
-                var item = kcif.item_list[slots[k]];
-                if (item && item.type[2] == 23) { // 応急修理要員・女神
-                  kit = item.name;
-                  break;
-                }
-              }
-              if (kit) {
-                lhtml += '<tr><td class="ship-no color-red" title="' + kit + '">' + (j + 1) + '</td>';
-              }
-              else {
-                lhtml += '<tr><td class="ship-no">' + (j + 1) + '</td>';
-              }
-              lhtml += kcif.shipType(ship);
-              lhtml += kcif.shipName(ship);
-              lhtml += kcif.shipLevel(ship);
-              lhtml += kcif.shipHp(ship);
-              lhtml += kcif.shipCond(ship);
-              lhtml += kcif.shipFuelBull(ship);
-              lhtml += kcif.shipExp(ship);
-              if (kcif.isInDock(ship)) {
-                lhtml += '<td class="ship-desc color-red">入渠中</td>';
-                ndock.push(ship.name);
-              }
-              else {
-                lhtml += '<td class="ship-desc"></td>';
-              }
-              lhtml += '</tr>';
-              if (t && isNaN(Number(t))) {
-                if (!ship.taihi && ship.hp <= ship.hp_max / 4) {
-                  col = "color-red";
-                }
-                else if (!ship.taihi && ship.hp <= ship.hp_max / 2 && col != "color-red") {
-                  col = "color-orange";
-                }
-              }
-              damage[j] = (ship.hp_max - ship.hp) / ship.hp_max;
-
-              level_sum += ship.level;
-              if (ship.fuel < ship.fuel_max || ship.bull < ship.bull_max) {
-                sup.push(ship.name);
-                var col1 = kcif.fuelBullColor(ship.fuel, ship.fuel_max);
-                var col2 = kcif.fuelBullColor(ship.bull, ship.bull_max);
-                if (/red/.test(col1)) {
-                  sup_col = col1;
-                }
-                else if (/red/.test(col2)) {
-                  sup_col = col2;
-                }
-                else if (!/red/.test(sup_col)) {
-                  if (/orange/.test(col1)) {
-                    sup_col = col1;
-                  }
-                  else if (/orange/.test(col2)) {
-                    sup_col = col2;
-                  }
-                  else if (!/orange/.test(sup_col)) {
-                    if (/yellow/.test(col1)) {
-                      sup_col = col1;
-                    }
-                    else if (/yellow/.test(col2)) {
-                      sup_col = col2;
-                    }
-                  }
-                }
-              }
-              if (ship.cond >= 50) {
-                kira.push(ship.name);
-              }
-              if (!ship.taihi) {
-                var drum_p = false;
-                var dai_p = false;
-                var s_base = ship.sakuteki;
-                var s_sakuteki = 0;
-                var s_sakuteki1 = 0;
-                var s_sakuteki2 = 0;
-                var s_sakuteki3 = 0;
-                for (var k = 0; ship.slot && k < 5; k++) {
-                  if (ship.slot[k] < 0) {
-                    break;
-                  }
-                  var item = kcif.item_list[ship.slot[k]];
-                  if (item) {
-                    if (item.item_id == 75) { // ドラム缶(輸送用)
-                      drum++;
-                      drum_p = true;
-                    }
-                    else if (item.item_id == 68 || item.item_id == 166) { // 大発動艇
-                      dai++;
-                      dai_p = true;
-                    }
-                    else if (kcif.hasSeiku(item.type[2]) && ship.equip[k] > 0) {
-                      seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
-                      if (kcif.getAircoverAlv()) {
-                        if (item.type[2] == 6 || item.type[2] == 45) { // 艦戦・水戦
-                          seiku_alv += [0, 0, 2, 5, 9, 14, 14, 22][item.alv];
-                        }
-                        else if (item.type[2] == 11) { // 水爆
-                          seiku_alv += [0, 0, 0, 1, 2, 4, 5, 6][item.alv];
-                        }
-                        seiku_alv += [0, 1, 2, 2, 2, 2, 2, 3][item.alv];
-                      }
-                    }
-                    s_base -= item.sakuteki;
-                    s_sakuteki += kcif.calcSakuteki(item, 3);
-                    s_sakuteki1 += kcif.calcSakuteki(item, 1);
-                    s_sakuteki2 += kcif.calcSakuteki(item, 2);
-                    s_sakuteki3 += kcif.calcSakuteki(item, 4);
-                  }
-                }
-                if (drum_p) {
-                  drum_ship.push(ship.name);
-                }
-                if (dai_p) {
-                  dai_ship.push(ship.name);
-                }
-                s_sakuteki += Math.sqrt(s_base);
-                s_sakuteki2 += Math.sqrt(s_base) * 1.6841056;
-                s_sakuteki3 += Math.sqrt(s_base);
-                sakuteki += Math.floor(s_sakuteki);
-                sakuteki0 += ship.sakuteki;
-                sakuteki1 += s_base;
-                sakuteki1i += s_sakuteki1;
-                sakuteki2 += s_sakuteki2;
-                sakuteki3 += s_sakuteki3;
-              }
-            }
-          }
-          sakuteki -= Math.floor(0.4 * kcif.admiral_level);
-          sakuteki1 = Math.floor(Math.sqrt(sakuteki1)) + sakuteki1i;
-          sakuteki2 -= Math.ceil((kcif.admiral_level) / 5) * 5.0 * 0.6142467;
-          sakuteki3 -= Math.ceil(0.4 * kcif.admiral_level);
-          sakuteki3 += 2 * (6 - ships.length);
-
-          if (s) {
-            s = ' <span class="' + col + '">' + s + '</span>';
-          }
-          else {
-            var reparing = false;
-            var num = 1;
-            if (ships.length > 0 && ships[0].type == 19) { // 工作艦
-              if (ships[0].name.indexOf("改") != -1) {
-                num++;
-              }
-              for (var j = 0, slot; j < 5 && (slot = ships[0].slot[j]) >= 0; j++) {
-                var item = kcif.item_list[slot];
-                  if (item && item.type[2] == 31) { // 艦艇修理施設
-                  num++;
-                }
-              }
-              for (var j = 0; j < num; j++) {
-                if (damage[j] && damage[j] < 0.5 && !kcif.isInDock(ships[j])) {
-                  reparing = true;
-                  break;
-                }
-              }
-            }
-            if (reparing) {
-              var rcol = "color-yellow";
-              if (!kcif.repair_start[i]) {
-                kcif.repair_start[i] = new Date().getTime();
-              }
-              var now = new Date().getTime();
-              var rt = kcif.repair_start[i] + 20 * 60 * 1000;
-              if (rt < now) {
-                rcol = "color-red";
-              }
-              s = ' <span class="' + rcol + '" title="' + num + '隻修理可能">[修理中 <label>更新' + kcif.time2str(new Date(rt)) + "<input id='check-fleet" + (i + 1) + "' type='checkbox' value='x' class='check-timer check-repair'></label>]</span>";
-            }
-            else {
-              s = "";
-            }
-            if (sup.length > 0) {
-              s += ' <span class="' + sup_col + ' blink" title="' + sup.join(', ') + '">未補給</span>';
-            }
-            if (ndock.length > 0) {
-              s += ' <span class="color-red" title="' + ndock.join(', ') + '">入渠中</span>';
-            }
-          }
-
-          if (ships.length > 0) {
-            s += ' <span class="color-gray" title="旗艦 ' + ships[0].name + '">LV:' + ships[0].level + '/' + level_sum + '</span>';
-            s += ' <span class="color-gray" title="' + kcif.seiku2str(seiku, seiku_alv) + '">制空:' + (seiku + seiku_alv) + '</span>';
-            s += ' <span class="color-gray" title="';
-            var formula = kcif.getSearchFormula();
-            if (formula != 0) {
-              s += '総計:' + sakuteki0 + '&#10;';
-            }
-            if (formula != 1) {
-              s += '旧2-5式:' + Math.floor(sakuteki1) + '&#10;';
-            }
-            if (formula != 2) {
-              s += '2-5秋式:' + sakuteki2.toFixed(1) + '&#10;';
-            }
-            if (formula != 3) {
-              s += '秋簡易式:' + sakuteki + '&#10;';
-            }
-            if (formula != 4) {
-              s += '判定式(33):' + sakuteki3.toFixed(2) + '&#10;';
-            }
-            s += '">索敵:';
-            if (formula == 0) {
-              s += sakuteki0;
-            }
-            else if (formula == 1) {
-              s += Math.floor(sakuteki1);
-            }
-            else if (formula == 2) {
-              s += sakuteki2.toFixed(1);
-            }
-            else if (formula == 3) {
-              s += sakuteki;
-            }
-            else {
-              s += sakuteki3.toFixed(2);
-            }
-            s += '</span>';
-            s += ' <span class="color-gray" title="' + kira.join(', ') + '">キラ:' + kira.length + '/' + ships.length + '</span>';
-            if (drum > 0) {
-              s += ' <span class="color-gray" title="' + drum_ship.join(', ') + '">ドラム:' + drum + '/' + drum_ship.length + '</span>';
-            }
-            if (dai > 0) {
-              s += ' <span class="color-gray" title="' + dai_ship.join(', ') + '">大発:' + dai + '</span>';
-            }
-          }
-
-          html += '<h2><a class="list-header" href="#" title="' + (deck ? deck.api_name : "") + '">第' + (i + 1) + '艦隊</a>' + s + '</h2>';
-        }
-        else {
-          html += '<h2><span class="list-header" href="#">第' + (i + 1) + '艦隊</span> <span class="color-gray">[未開放]</span></h2>';
-        }
-
-        html += '<table>' + lhtml + '</table>';
-        html += '</div>';
-      }
-
-      html += '<div id="ndock">';
-      html += '<h2><span class="list-header">入渠</span></h2>';
-      html += '<table>';
-      for (var i = 0; kcif.dock[i]; i++) {
-        if (kcif.dock[i].api_complete_time > 0) {
-          html += '<tr><td class="ship-no">' + kcif.dock[i].api_id + '</td>';
-          var ship = kcif.ship_list[kcif.dock[i].api_ship_id];
-          html += kcif.shipType(ship);
-          html += kcif.shipName(ship);
-          html += kcif.shipLevel(ship);
-          html += kcif.shipHp(ship);
-          html += kcif.shipCond(ship);
-          var dt = new Date(kcif.dock[i].api_complete_time);
-          html += '<td class="ship-at ' + kcif.getTimeColor(dt) + '"><label>' + kcif.time2str(dt) + '<input id="check-dock' + kcif.dock[i].api_id + '" type="checkbox" value="x" class="check-timer check-dock"></label></td>';
-        }
-        else {
-          html += '<tr><td class="ship-no">' + kcif.dock[i].api_id + '</td><td colspan="6"></tr>';
-        }
-      }
-      html += '</table>';
-      html += '</div>';
-
-      html += '<div id="kdock">';
-      html += '<h2><span class="list-header">建造</span></h2>';
-      html += '<table>';
-      for (var i = 0; kcif.build[i]; i++) {
-        if (kcif.build[i].api_complete_time > 0 || kcif.build[i].api_state == 3) {
-          html += '<tr><td class="ship-no">' + kcif.build[i].api_id + '</td>';
-          var ship = kcif.ship_master[kcif.build[i].api_created_ship_id];
-          if (kcif.getShowBuilt()) {
-            html += kcif.shipType(ship);
-            html += kcif.shipName(ship);
-          }
-          else {
-            html += '<td class="ship-type">???</td>';
-            html += '<td class="ship-name">???</td>';
-          }
-          var col;
-          var s;
-          if (kcif.build[i].api_complete_time > 0) {
-            var dt = new Date(kcif.build[i].api_complete_time);
-            s = kcif.time2str(dt);
-            col = kcif.getTimeColor(dt, true);
-          }
-          else {
-            s = "--:--";
-            col = "color-red";
-          }
-          html += '<td class="ship-at ' + col + '"><label>' + s + '<input id="check-built' + kcif.build[i].api_id + '" type="checkbox" value="x" class="check-timer check-built"></label></td>';
-        }
-        else {
-          html += '<tr><td class="ship-no">' + kcif.build[i].api_id + '</td><td colspan="4"></tr>';
-        }
-      }
-      html += '</table>';
-      maintab.innerHTML = html;
-
-      // メイン:艦隊
-      elems = maintab.querySelectorAll(".fleet h2 a");
-      for (var i = 0; i < elems.length; i++) {
-        elems[i].addEventListener("click", kcif.selectFleet, false);
-      }
-      var elem = maintab.querySelector("#" + kcif.current_fleet + " h2 a");
-      if (elem) {
-        elem.click();
-      }
-
-      // メイン:タイマーチェックボックス
-      elems = maintab.querySelectorAll("input.check-timer");
-      for (var i = 0; i < elems.length; i++) {
-        elems[i].addEventListener("click", kcif.beepOnOff, false);
-      }
-
-      // メイン:チェックボックス復元
-      kcif.restoreCheckboxes(maintab, checks);
-      kcif.beepOnOff();
+      kcif.renderMain();
 
       if (!all) {
         return;
       }
 
       // 艦娘
-      var shipstab = kcif.info_div.querySelector("#tab-ships");
-      var table = shipstab.querySelector("div.table-inner");
-      var pos = table ? table.scrollTop : 0;
-      html = "";
-      html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="ship-no th-right"><a class="list-header' + (kcif.sort_ships.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="ship-type"><a class="list-header' + (kcif.sort_ships.startsWith("type") ? ' sort-current' : '') + '" href="#">艦種</a></th><th class="ship-name' + (kcif.sort_ships.startsWith("name") ? ' sort-current' : '') + '"><a class="list-header" href="#">艦名</a></th><th class="ship-level th-right"><a class="list-header' + (kcif.sort_ships.startsWith("level") ? ' sort-current' : '') + '" href="#">LV</a></th><th class="ship-header-hp' + (kcif.getHpByMeter() ? '' : ' th-right') + '"><a class="list-header' + (kcif.sort_ships.startsWith("hp") ? ' sort-current' : '') + '" href="#">耐久</a></th><th class="ship-cond th-right"><a class="list-header' + (kcif.sort_ships.startsWith("cond") ? ' sort-current' : '') + '" href="#">疲労</a></th>' + (kcif.getFuelByMeter() ? '<th class="ship-fuel-bull-header">燃料弾薬</th>' : '<th class="ship-fuel th-right">燃料</th><th class="ship-bull th-right">弾薬</th>') + '<th class="ship-exp th-right">経験値</th><th class="ship-desc">所在</th></tr></thead>';
-      html += '<tbody>';
-
-      var ships = [];
-      for (var prop in kcif.ship_list) {
-        if (kcif.ship_list[prop].type) {
-          ships.push(kcif.ship_list[prop]);
-        }
-      }
-      ships.sort(kcif.compareShip);
-
-      for (var i = 0, ship; ship = ships[i]; i++) {
-        html += '<tr><td class="ship-no">' + (i + 1) + '</td>';
-        html += kcif.shipType(ship);
-        html += kcif.shipName(ship);
-        html += kcif.shipLevel(ship);
-        html += kcif.shipHp(ship);
-        html += kcif.shipCond(ship);
-        html += kcif.shipFuelBull(ship);
-        html += kcif.shipExp(ship);
-        var fleet = null;
-        for (var j = 0, deck; deck = kcif.deck_list[j]; j++) {
-          if (deck.api_ship.filter(function(e){ return e == ship.api_id; }).length != 0) {
-            fleet = j + 1;
-            break;
-          }
-        }
-        if (fleet) {
-          html += '<td class="ship-desc">第' + fleet + '艦隊<span class="color-gray">「' + kcif.deck_list[fleet - 1].api_name + '」</span></td>';
-        }
-        else if (kcif.isInDock(ship)) {
-          html += '<td class="ship-desc color-red">入渠中</td>';
-        }
-        else {
-          html += '<td class="ship-desc"></td>';
-        }
-        html += '</tr>';
-      }
-
-      html += '</tbody>';
-      html += '</table></div></div>';
-      shipstab.innerHTML = html;
-      shipstab.querySelector("div.table-inner").scrollTop = pos;
-
-      // 艦娘:ヘッダ行リンク
-      var elems = shipstab.querySelectorAll("th a");
-      for (var i = 0; i < elems.length; i++) {
-        elems[i].addEventListener("click", function(evt){
-          if (evt) evt.preventDefault();
-          var sort = this.parentNode.className.replace(/ .*/, "").replace(/^.*-/, "");
-          log("sort (ships) [" + kcif.sort_ships + "] -> [" + sort + "]");
-          if (kcif.sort_ships.startsWith(sort)) {
-            kcif.sort_ships = sort + (kcif.sort_ships.endsWith("+") ? "-" : "+");
-          }
-          else {
-            kcif.sort_ships = sort + (sort == "no" || sort == "level" ? "-" : "+");
-          }
-          kcif.renderInfo(true);
-        }, false);
-      }
+      kcif.renderShips();
 
       // アイテム
-      var itemstab = kcif.info_div.querySelector("#tab-items");
-      table = itemstab.querySelector("div.table-inner");
-      pos = table ? table.scrollTop : 0;
-      html = "";
-      html += '<div class="table-outer"><div class="table-inner"><table>';
-      html += '<thead><tr><th class="item-no th-right"><a class="list-header' + (kcif.sort_items.startsWith("no") ? ' sort-current' : '') + '" href="#">#</a></th><th class="item-type"><a class="list-header' + (kcif.sort_items.startsWith("type") ? ' sort-current' : '') + '" href="#">種別</a></th><th class="item-name"><a class="list-header' + (kcif.sort_items.startsWith("name") ? ' sort-current' : '') + '" href="#">名称</a></th><th class="item-level th-right"><a class="list-header' + (kcif.sort_items.startsWith("level") ? ' sort-current' : '') + '" href="#">改修</a></th><th class="item-alv th-right"><a class="list-header' + (kcif.sort_items.startsWith("alv") ? ' sort-current' : '') + '" href="#">熟練</a></th><th class="ship-name"><a class="list-header' + (kcif.sort_items.startsWith("holder") ? ' sort-current' : '') + '" href="#">所在</a></th><th class="ship-level"></th></tr></thead>';
-      html += '<tbody>';
+      kcif.renderItems();
+    }
+  },
 
-      var items = [];
-      for (var prop in kcif.item_list) {
-        if (kcif.item_list[prop].type[2]) {
-          items.push(kcif.item_list[prop]);
-        }
+  renderMain: function() {
+    var maintab = kcif.info_div.querySelector("#tab-main");
+    var checks = kcif.saveCheckboxes(maintab);
+    clearChildElements(maintab);
+    var html = "";
+
+    // 資源
+    var div = makeElement("div", "resource");
+    var h2 = makeElement("h2");
+    var elem = makeElement("span", null, "list-header", "資源等");
+    h2.appendChild(elem);
+    div.appendChild(h2);
+    var table = makeElement("table");
+    table.appendChild(kcif.formatMaterial("燃料", kcif.material[0], kcif.admiral_level));
+    table.appendChild(kcif.formatMaterial("弾薬", kcif.material[1], kcif.admiral_level));
+    table.appendChild(kcif.formatMaterial("鋼材", kcif.material[2], kcif.admiral_level));
+    table.appendChild(kcif.formatMaterial("ボーキサイト", kcif.material[3], kcif.admiral_level));
+    var tr = makeElement("tr");
+    var td = makeElement("th", null, "res-name", "\u00a0");
+    tr.appendChild(td);
+    td = makeElement("td", null, "res-value", "\u00a0");
+    tr.appendChild(td);
+    table.appendChild(tr);
+    table.appendChild(kcif.formatMaterial("高速修復材", kcif.material[5]));
+    table.appendChild(kcif.formatMaterial("開発資材", kcif.material[6]));
+    table.appendChild(kcif.formatMaterial("高速建造材", kcif.material[4]));
+    table.appendChild(kcif.formatMaterial("改修資材", kcif.material[7]));
+    div.appendChild(table);
+    maintab.appendChild(div);
+
+    // 艦隊
+    for (var i = 0; i < 4; i++) {
+      var deck = kcif.deck_list[i];
+      div = makeElement("div", "fleet" + (i + 1), "fleet");
+      h2 = makeElement("h2");
+      table = makeElement("table");
+      var col = "color-default";
+      var mission = kcif.mission[i];
+      var s = null;
+      if (kcif.isOnMission(mission)) {
+        var dt = new Date(mission[3]);
+        elem = makeElement("span", null, null, "遠征中");
+        elem.setAttribute("title", mission[2]);
+        s = [elem, makeText(" ")];
+        elem = makeElement("label", null, null, kcif.time2str(dt));
+        var input = makeElement("input", "check-fleet" + (i + 1), "check-timer check-expedition");
+        input.setAttribute("type", "checkbox");
+        input.value = "x";
+        elem.appendChild(input);
+        s.push(elem);
+        col = kcif.getTimeColor(dt);
       }
-      items.sort(function(a,b){
-        var result = 0;
-        if (kcif.sort_items.startsWith("no")) {
-          result = a.api_id - b.api_id;
+      else if (mission) {
+        if (kcif.isCombined(mission) || kcif.isOnPractice(mission) || kcif.getShowBattle()) {
+          s = [makeText(mission[0])];
         }
-        else if (kcif.sort_items.startsWith("type")) {
-          result = a.type[2] - b.type[2];
+        else {
+          s = [makeText("出撃中")];
         }
-        else if (kcif.sort_items.startsWith("name")) {
-          result = a.sort_no - b.sort_no;
+        if (kcif.getShowBattle() && mission.length > 1) {
+          s = s.concat(mission.slice(1));
         }
-        else if (kcif.sort_items.startsWith("level")) {
-          result = a.level - b.level;
-        }
-        else if (kcif.sort_items.startsWith("alv")) {
-          result = a.alv - b.alv;
-        }
-        else if (kcif.sort_items.startsWith("holder")) {
-          if (a.ship_id == null || a.ship_id < 0) {
-            if (b.ship_id == null || b.ship_id < 0) {
-              result = 0;
+        col = "color-green";
+      }
+
+      if (deck || i == 0) {
+        elem = makeElement("a", null, "list-header", '第' + (i + 1) + '艦隊');
+        elem.setAttribute("title", (deck ? deck.api_name : ""));
+        h2.appendChild(elem);
+
+        var ships = [];
+        var level_sum = 0;
+        var sup = [];
+        var sup_col = "";
+        var kira = [];
+        var drum = 0;
+        var drum_ship = [];
+        var dai = 0;
+        var dai_ship = [];
+        var seiku = 0;
+        var seiku_alv = 0;
+        var sakuteki = 0;
+        var sakuteki0 = 0;
+        var sakuteki1 = 0;
+        var sakuteki1i = 0;
+        var sakuteki2 = 0;
+        var sakuteki3 = 0;
+        var ndock = [];
+        var damage = [];
+        for (var j = 0; j < 6; j++) {
+          tr = makeElement("tr");
+          var id = deck ? deck.api_ship[j] : -1
+          if (id === -1 || id == null) {
+            td = makeElement("td", null, "ship-no", j + 1);
+            tr.appendChild(td);
+            td = makeElement("td");
+            td.setAttribute("colspan", "9");
+            tr.appendChild(td);
+            table.appendChild(tr);
+          }
+
+          var ship = kcif.ship_list[id];
+          if (ship != null) {
+            ships.push(ship);
+            var kit = null;
+            var slots = ship.slot.concat(ship.slot_ex);
+            for (var k = 0; k < slots.length; k++) {
+              if (slots[k] < 0) {
+                continue;
+              }
+              var item = kcif.item_list[slots[k]];
+              if (item && item.type[2] == 23) { // 応急修理要員・女神
+                kit = item.name;
+                break;
+              }
+            }
+            if (kit) {
+              td = makeElement("td", null, "ship-no color-red", j + 1);
+              td.setAttribute("title", kit);
             }
             else {
-              result = 1;
+              td = makeElement("td", null, "ship-no", j + 1);
+            }
+            tr.appendChild(td);
+            tr.appendChild(kcif.shipType(ship));
+            tr.appendChild(kcif.shipName(ship));
+            tr.appendChild(kcif.shipLevel(ship));
+            tr.appendChild(kcif.shipHp(ship));
+            tr.appendChild(kcif.shipCond(ship));
+            tr.appendChild(kcif.shipFuel(ship));
+            if (!kcif.getFuelByMeter()) {
+              tr.appendChild(kcif.shipBull(ship));
+            }
+            tr.appendChild(kcif.shipExp(ship));
+            if (kcif.isInDock(ship)) {
+              td = makeElement("td", null, "ship-desc color-red", "入渠中");
+              ndock.push(ship.name);
+            }
+            else {
+              td = makeElement("td", null, "ship-desc");
+            }
+            tr.appendChild(td);
+            table.appendChild(tr);
+
+            if (mission && !kcif.isOnMission(mission)) {
+              if (!ship.taihi && ship.hp <= ship.hp_max / 4) {
+                col = "color-red";
+              }
+              else if (!ship.taihi && ship.hp <= ship.hp_max / 2 && col != "color-red") {
+                col = "color-orange";
+              }
+            }
+            damage[j] = (ship.hp_max - ship.hp) / ship.hp_max;
+
+            level_sum += ship.level;
+            if (ship.fuel < ship.fuel_max || ship.bull < ship.bull_max) {
+              sup.push(ship.name);
+              var col1 = kcif.fuelBullColor(ship.fuel, ship.fuel_max);
+              var col2 = kcif.fuelBullColor(ship.bull, ship.bull_max);
+              if (/red/.test(col1)) {
+                sup_col = col1;
+              }
+              else if (/red/.test(col2)) {
+                sup_col = col2;
+              }
+              else if (!/red/.test(sup_col)) {
+                if (/orange/.test(col1)) {
+                  sup_col = col1;
+                }
+                else if (/orange/.test(col2)) {
+                  sup_col = col2;
+                }
+                else if (!/orange/.test(sup_col)) {
+                  if (/yellow/.test(col1)) {
+                    sup_col = col1;
+                  }
+                  else if (/yellow/.test(col2)) {
+                    sup_col = col2;
+                  }
+                }
+              }
+            }
+            if (ship.cond >= 50) {
+              kira.push(ship.name);
+            }
+            if (!ship.taihi) {
+              var drum_p = false;
+              var dai_p = false;
+              var s_base = ship.sakuteki;
+              var s_sakuteki = 0;
+              var s_sakuteki1 = 0;
+              var s_sakuteki2 = 0;
+              var s_sakuteki3 = 0;
+              for (var k = 0; ship.slot && k < 5; k++) {
+                if (ship.slot[k] < 0) {
+                  break;
+                }
+                var item = kcif.item_list[ship.slot[k]];
+                if (item) {
+                  if (item.item_id == 75) { // ドラム缶(輸送用)
+                    drum++;
+                    drum_p = true;
+                  }
+                  else if (item.item_id == 68 || item.item_id == 166) { // 大発動艇
+                    dai++;
+                    dai_p = true;
+                  }
+                  else if (kcif.hasSeiku(item.type[2]) && ship.equip[k] > 0) {
+                    seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
+                    if (kcif.getAircoverAlv()) {
+                      if (item.type[2] == 6 || item.type[2] == 45) { // 艦戦
+                        seiku_alv += [0, 0, 2, 5, 9, 14, 14, 22][item.alv];
+                      }
+                      else if (item.type[2] == 11) { // 水爆
+                        seiku_alv += [0, 0, 0, 1, 2, 4, 5, 6][item.alv];
+                      }
+                      seiku_alv += [0, 1, 2, 2, 2, 2, 2, 3][item.alv];
+                    }
+                  }
+                  s_base -= item.sakuteki;
+                  s_sakuteki += kcif.calcSakuteki(item, 3);
+                  s_sakuteki1 += kcif.calcSakuteki(item, 1);
+                  s_sakuteki2 += kcif.calcSakuteki(item, 2);
+                  s_sakuteki3 += kcif.calcSakuteki(item, 4);
+                }
+              }
+              if (drum_p) {
+                drum_ship.push(ship.name);
+              }
+              if (dai_p) {
+                dai_ship.push(ship.name);
+              }
+              s_sakuteki += Math.sqrt(s_base);
+              s_sakuteki2 += Math.sqrt(s_base) * 1.6841056;
+              s_sakuteki3 += Math.sqrt(s_base);
+              sakuteki += Math.floor(s_sakuteki);
+              sakuteki0 += ship.sakuteki;
+              sakuteki1 += s_base;
+              sakuteki1i += s_sakuteki1;
+              sakuteki2 += s_sakuteki2;
+              sakuteki3 += s_sakuteki3;
             }
           }
-          else if (b.ship_id == null || b.ship_id < 0) {
-            result = -1;
+        }
+        sakuteki -= Math.floor(0.4 * kcif.admiral_level);
+        sakuteki1 = Math.floor(Math.sqrt(sakuteki1)) + sakuteki1i;
+        sakuteki2 -= Math.ceil((kcif.admiral_level) / 5) * 5.0 * 0.6142467;
+        sakuteki3 -= Math.ceil(0.4 * kcif.admiral_level);
+        sakuteki3 += 2 * (6 - ships.length);
+
+        if (s) {
+          elem = makeElement("span", null, col, "[");
+          for (var j = 0; j < s.length; j++) {
+            elem.appendChild(s[j]);
+          }
+          elem.appendChild(makeText("]"));
+          s = [makeText(" "), elem];
+        }
+        else {
+          var reparing = false;
+          var num = 1;
+          if (ships.length > 0 && ships[0].type == 19) { // 工作艦
+            if (ships[0].name.indexOf("改") != -1) {
+              num++;
+            }
+            for (var j = 0, slot; j < 5 && (slot = ships[0].slot[j]) >= 0; j++) {
+              var item = kcif.item_list[slot];
+                if (item && item.type[2] == 31) { // 艦艇修理施設
+                num++;
+              }
+            }
+            for (var j = 0; j < num; j++) {
+              if (damage[j] && damage[j] < 0.5 && !kcif.isInDock(ships[j])) {
+                reparing = true;
+                break;
+              }
+            }
+          }
+          if (reparing) {
+            var rcol = "color-yellow";
+            if (!kcif.repair_start[i]) {
+              kcif.repair_start[i] = new Date().getTime();
+            }
+            var now = new Date().getTime();
+            var rt = kcif.repair_start[i] + 20 * 60 * 1000;
+            if (rt < now) {
+              rcol = "color-red";
+            }
+            elem = makeElement("span", null, rcol, "[修理中 ");
+            elem.setAttribute("title", num + "隻修理可能");
+            var label = makeElement("label", null, null, "更新" + kcif.time2str(new Date(rt)));
+            var input = makeElement("input", "check-fleet" + (i + 1), "check-timer check-repair");
+            input.setAttribute("type", "checkbox");
+            input.value = "x";
+            label.appendChild(input);
+            elem.appendChild(label);
+            elem.appendChild(makeText(" "));
+            s = [makeText(" "), elem];
           }
           else {
-            result = kcif.compareShip(kcif.ship_list[a.ship_id], kcif.ship_list[b.ship_id]);
+            s = [];
+          }
+          if (sup.length > 0) {
+            elem = makeElement("span", null, sup_col + " blink", "未補給");
+            elem.setAttribute("title", sup.join(", "));
+            s.push(makeText(" "), elem);
+          }
+          if (ndock.length > 0) {
+            elem = makeElement("span", null, "color-red", "入渠中");
+            elem.setAttribute("title", ndock.join(", "));
+            s.push(makeText(" "), elem);
           }
         }
 
-        if (kcif.sort_items.endsWith("-")) {
-          result = -result;
-        }
-        if (result == 0 && kcif.sort_items.startsWith("holder") && a.ship_id > 0) {
-          var slot = kcif.ship_list[a.ship_id].slot;
-          result = slot.indexOf(a.api_id) - slot.indexOf(b.api_id);
-        }
-        if (result == 0) {
-          result = a.sort_no - b.sort_no;
-        }
-        if (result == 0) {
-          result = a.api_id - b.api_id;
-        }
-        return result;
-      });
+        if (ships.length > 0) {
+          elem = makeElement("span", null, "color-gray", "LV:" + ships[0].level + "/" + level_sum);
+          elem.setAttribute("title", "旗艦 " + ships[0].name);
+          s.push(makeText(" "), elem);
 
-      for (var i = 0, item; item = items[i]; i++) {
-        html += '<tr><td class="item-no">' + (i + 1) + '</td>';
-        html += '<td class="item-type">' + item.type_name + '</td>';
-        html += '<td class="item-name">' + item.name + '</td>';
-        html += '<td class="item-level">' + item.level + '</td>';
-        html += '<td class="item-alv">' + item.alv + '</td>';
-        var ship = item.ship_id != null ? kcif.ship_list[item.ship_id] : null;
-        html += kcif.shipName(ship);
-        html += kcif.shipLevel(ship);
-      }
+          elem = makeElement("span", null, "color-gray", "制空:" + (seiku + seiku_alv));
+          elem.setAttribute("title", kcif.seiku2str(seiku, seiku_alv));
+          s.push(makeText(" "), elem);
 
-      html += '</tbody>';
-      html += '</table></div></div>';
-      itemstab.innerHTML = html;
-      itemstab.querySelector("div.table-inner").scrollTop = pos;
-
-      // アイテム:ヘッダ行リンク
-      var elems = itemstab.querySelectorAll("th a");
-      for (var i = 0; i < elems.length; i++) {
-        elems[i].addEventListener("click", function(evt){
-          if (evt) evt.preventDefault();
-          var parentClass = this.parentNode.className;
-          var sort = parentClass.replace(/ .*/, "").replace(/^.*-/, "");
-          log("sort (items) [" + kcif.sort_items + "] -> [" + sort + "]");
-          if (parentClass == "ship-name") {
-            sort = "holder";
+          var ss;
+          var formula = kcif.getSearchFormula();
+          if (formula == 0) {
+            ss = sakuteki0;
           }
-          if (kcif.sort_items.startsWith(sort)) {
-            kcif.sort_items = sort + (kcif.sort_items.endsWith("+") ? "-" : "+");
+          else if (formula == 1) {
+            ss = Math.floor(sakuteki1);
+          }
+          else if (formula == 2) {
+            ss = sakuteki2.toFixed(1);
+          }
+          else if (formula == 3) {
+            ss = sakuteki;
           }
           else {
-            kcif.sort_items = sort + (sort == "no" || sort == "level" || sort == "alv" ? "-" : "+");
+            ss = sakuteki3.toFixed(2);
           }
-          kcif.renderInfo(true);
-        }, false);
+          elem = makeElement("span", null, "color-gray", "索敵:" + ss);
+          ss = "";
+          if (formula != 0) {
+            ss += '総計:' + sakuteki0 + "\u000a";
+          }
+          if (formula != 1) {
+            ss += '旧2-5式:' + Math.floor(sakuteki1) + "\u000a";
+          }
+          if (formula != 2) {
+            ss += '2-5秋式:' + sakuteki2.toFixed(1) + "\u000a";
+          }
+          if (formula != 3) {
+            ss += '秋簡易式:' + sakuteki + "\u000a";
+          }
+          if (formula != 4) {
+            ss += '判定式(33):' + sakuteki3.toFixed(2) + "\u000a";
+          }
+          elem.setAttribute("title", ss);
+          s.push(makeText(" "), elem);
+
+          elem = makeElement("span", null, "color-gray", "キラ:" + kira.length + '/' + ships.length);
+          elem.setAttribute("title", kira.join(', '));
+          s.push(makeText(" "), elem);
+
+          if (drum > 0) {
+            elem = makeElement("span", null, "color-gray", "ドラム:" + drum + '/' + drum_ship.length);
+            elem.setAttribute("title", drum_ship.join(', '));
+            s.push(makeText(" "), elem);
+          }
+
+          if (dai > 0) {
+            elem = makeElement("span", null, "color-gray", "大発:" + dai);
+            elem.setAttribute("title", dai_ship.join(', '));
+            s.push(makeText(" "), elem);
+          }
+        }
+
+        for (var j = 0; j < s.length; j++) {
+          h2.appendChild(s[j]);
+        }
       }
+      else {
+        elem = makeElement("span", null, "list-header", '第' + (i + 1) + '艦隊');
+        h2.appendChild(elem);
+        h2.appendChild(makeText(" "));
+        elem = makeElement("span", null, "color-gray", "[未開放]");
+        h2.appendChild(elem);
+      }
+
+      div.appendChild(h2);
+      div.appendChild(table);
+      maintab.appendChild(div);
+    }
+
+    // 入渠
+    div = makeElement("div", "ndock");
+    h2 = makeElement("h2");
+    elem = makeElement("span", null, "list-header", "入渠");
+    h2.appendChild(elem);
+    div.appendChild(h2);
+    table = makeElement("table");
+    for (var i = 0; kcif.dock[i]; i++) {
+      tr = makeElement("tr");
+      if (kcif.dock[i].api_complete_time > 0) {
+        td = makeElement("td", null, "ship-no", kcif.dock[i].api_id);
+        tr.appendChild(td);
+        var ship = kcif.ship_list[kcif.dock[i].api_ship_id];
+        tr.appendChild(kcif.shipType(ship));
+        tr.appendChild(kcif.shipName(ship));
+        tr.appendChild(kcif.shipLevel(ship));
+        tr.appendChild(kcif.shipHp(ship));
+        tr.appendChild(kcif.shipCond(ship));
+        var dt = new Date(kcif.dock[i].api_complete_time);
+        td = makeElement("td", null, "ship-at " + kcif.getTimeColor(dt));
+        elem = makeElement("label", null, null, kcif.time2str(dt));
+        var input = makeElement("input", "check-dock" + kcif.dock[i].api_id, "check-timer check-dock");
+        input.setAttribute("type", "checkbox");
+        input.value = "x";
+        elem.appendChild(input);
+        td.appendChild(elem);
+        tr.appendChild(td);
+      }
+      else {
+        td = makeElement("td", null, "ship-no", kcif.dock[i].api_id);
+        tr.appendChild(td);
+        td = makeElement("td");
+        td.setAttribute("colspan", "6");
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+    }
+    div.appendChild(table);
+    maintab.appendChild(div);
+
+    // 建造
+    div = makeElement("div", "kdock");
+    h2 = makeElement("h2");
+    elem = makeElement("span", null, "list-header", "建造");
+    h2.appendChild(elem);
+    div.appendChild(h2);
+    table = makeElement("table");
+    for (var i = 0; kcif.build[i]; i++) {
+      tr = makeElement("tr");
+      if (kcif.build[i].api_complete_time > 0 || kcif.build[i].api_state == 3) {
+        td = makeElement("td", null, "ship-no", kcif.build[i].api_id);
+        tr.appendChild(td);
+        var ship = kcif.ship_master[kcif.build[i].api_created_ship_id];
+        if (kcif.getShowBuilt()) {
+          tr.appendChild(kcif.shipType(ship));
+          tr.appendChild(kcif.shipName(ship));
+        }
+        else {
+          td = makeElement("td", null, "ship-type", "???");
+          tr.appendChild(td);
+          td = makeElement("td", null, "ship-name", "???");
+          tr.appendChild(td);
+        }
+        var col;
+        var s;
+        if (kcif.build[i].api_complete_time > 0) {
+          var dt = new Date(kcif.build[i].api_complete_time);
+          s = kcif.time2str(dt);
+          col = kcif.getTimeColor(dt, true);
+        }
+        else {
+          s = "--:--";
+          col = "color-red";
+        }
+        td = makeElement("td", null, "ship-at " + col);
+        elem = makeElement("label", null, null, s);
+        var input = makeElement("input", "check-built" + kcif.build[i].api_id, "check-timer check-built");
+        input.setAttribute("type", "checkbox");
+        input.value = "x";
+        elem.appendChild(input);
+        td.appendChild(elem);
+        tr.appendChild(td);
+      }
+      else {
+        td = makeElement("td", null, "ship-no", kcif.build[i].api_id);
+        tr.appendChild(td);
+        td = makeElement("td");
+        td.setAttribute("colspan", "4");
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+    }
+    div.appendChild(table);
+    maintab.appendChild(div);
+
+    // メイン:艦隊
+    elems = maintab.querySelectorAll(".fleet h2 a");
+    for (var i = 0; i < elems.length; i++) {
+      elems[i].addEventListener("click", kcif.selectFleet, false);
+    }
+    var elem = maintab.querySelector("#" + kcif.current_fleet + " h2 a");
+    if (elem) {
+      elem.click();
+    }
+
+    // メイン:タイマーチェックボックス
+    elems = maintab.querySelectorAll("input.check-timer");
+    for (var i = 0; i < elems.length; i++) {
+      elems[i].addEventListener("click", kcif.beepOnOff, false);
+    }
+
+    // メイン:チェックボックス復元
+    kcif.restoreCheckboxes(maintab, checks);
+    kcif.beepOnOff();
+  },
+
+  renderShips: function() {
+    var shipstab = kcif.info_div.querySelector("#tab-ships");
+    var inner = shipstab.querySelector("div.table-inner");
+    var pos = inner ? inner.scrollTop : 0;
+    clearChildElements(shipstab);
+    var outer = makeElement("div", null, "table-outer");
+    inner = makeElement("div", null, "table-inner");
+    var table = makeElement("table");
+
+    // ヘッダ行
+    var thead = makeElement("thead");
+    var tr = makeElement("tr");
+
+    var td = makeElement("th", null, "ship-no th-right");
+    var elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("no") ? ' sort-current' : ''), "#");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "ship-type");
+    elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("type") ? ' sort-current' : ''), "艦種");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "ship-name");
+    elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("name") ? ' sort-current' : ''), "艦名");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "ship-level th-right");
+    elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("level") ? ' sort-current' : ''), "LV");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "ship-header-hp" + (kcif.getHpByMeter() ? '' : ' th-right'));
+    elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("hp") ? ' sort-current' : ''), "耐久");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "ship-cond th-right");
+    elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("cond") ? ' sort-current' : ''), "疲労");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    if (kcif.getFuelByMeter()) {
+      td = makeElement("th", null, "ship-fuel-bull-header", "燃料弾薬");
+      tr.appendChild(td);
+    }
+    else {
+      td = makeElement("th", null, "ship-fuel th-right", "燃料");
+      tr.appendChild(td);
+
+      td = makeElement("th", null, "ship-bull th-right", "弾薬");
+      tr.appendChild(td);
+    }
+
+    td = makeElement("th", null, "ship-exp th-right", "経験値");
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "ship-desc", "所在");
+    tr.appendChild(td);
+
+    thead.appendChild(tr);
+    table.appendChild(thead);
+
+    // データ
+    var tbody = makeElement("tbody");
+    var ships = [];
+    for (var prop in kcif.ship_list) {
+      if (kcif.ship_list[prop].type) {
+        ships.push(kcif.ship_list[prop]);
+      }
+    }
+    ships.sort(kcif.compareShip);
+
+    for (var i = 0, ship; ship = ships[i]; i++) {
+      tr = makeElement("tr");
+      td = makeElement("td", null, "ship-no", i + 1);
+      tr.appendChild(td);
+      tr.appendChild(kcif.shipType(ship));
+      tr.appendChild(kcif.shipName(ship));
+      tr.appendChild(kcif.shipLevel(ship));
+      tr.appendChild(kcif.shipHp(ship));
+      tr.appendChild(kcif.shipCond(ship));
+      tr.appendChild(kcif.shipFuel(ship));
+      if (!kcif.getFuelByMeter()) {
+        tr.appendChild(kcif.shipBull(ship));
+      }
+      tr.appendChild(kcif.shipExp(ship));
+      var fleet = null;
+      for (var j = 0, deck; deck = kcif.deck_list[j]; j++) {
+        if (deck.api_ship.filter(function(e){ return e == ship.api_id; }).length != 0) {
+          fleet = j + 1;
+          break;
+        }
+      }
+      if (fleet) {
+        td = makeElement("td", null, "ship-desc", "第" + fleet + "艦隊");
+        var elem = makeElement("span", null, "color-gray", "「" + kcif.deck_list[fleet - 1].api_name + "」");
+        td.appendChild(elem);
+      }
+      else if (kcif.isInDock(ship)) {
+        td = makeElement("td", null, "ship-desc color-red", "入渠中");
+      }
+      else {
+        td = makeElement("td", null, "ship-desc");
+      }
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+
+    inner.appendChild(table);
+    outer.appendChild(inner);
+    shipstab.appendChild(outer);
+    inner.scrollTop = pos;
+
+    // 艦娘:ヘッダ行リンク
+    var elems = shipstab.querySelectorAll("th a");
+    for (var i = 0; i < elems.length; i++) {
+      elems[i].addEventListener("click", function(evt){
+        if (evt) evt.preventDefault();
+        var sort = this.parentNode.className.replace(/ .*/, "").replace(/^.*-/, "");
+        log("sort (ships) [" + kcif.sort_ships + "] -> [" + sort + "]");
+        if (kcif.sort_ships.startsWith(sort)) {
+          kcif.sort_ships = sort + (kcif.sort_ships.endsWith("+") ? "-" : "+");
+        }
+        else {
+          kcif.sort_ships = sort + (sort == "no" || sort == "level" ? "-" : "+");
+        }
+        kcif.renderInfo(true);
+      }, false);
+    }
+  },
+
+  renderItems: function() {
+    var itemstab = kcif.info_div.querySelector("#tab-items");
+    var inner = itemstab.querySelector("div.table-inner");
+    pos = inner ? inner.scrollTop : 0;
+    clearChildElements(itemstab);
+    var outer = makeElement("div", null, "table-outer");
+    inner = makeElement("div", null, "table-inner");
+    var table = makeElement("table");
+
+    // ヘッダ行
+    var thead = makeElement("thead");
+    var tr = makeElement("tr");
+
+    var td = makeElement("th", null, "item-no th-right");
+    var elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("no") ? ' sort-current' : ''), "#");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "item-type");
+    elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("type") ? ' sort-current' : ''), "種別");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "item-name");
+    elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("name") ? ' sort-current' : ''), "名称");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "item-level th-right");
+    elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("level") ? ' sort-current' : ''), "改修");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "item-alv th-right");
+    elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("alv") ? ' sort-current' : ''), "熟練");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "ship-name");
+    elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("holder") ? ' sort-current' : ''), "所在");
+    elem.setAttribute("href", "#");
+    td.appendChild(elem);
+    tr.appendChild(td);
+
+    td = makeElement("th", null, "ship-level");
+    tr.appendChild(td);
+
+    thead.appendChild(tr);
+    table.appendChild(thead);
+
+    // データ
+    var tbody = makeElement("tbody");
+    var items = [];
+    for (var prop in kcif.item_list) {
+      if (kcif.item_list[prop].type[2]) {
+        items.push(kcif.item_list[prop]);
+      }
+    }
+    items.sort(function(a,b){
+      var result = 0;
+      if (kcif.sort_items.startsWith("no")) {
+        result = a.api_id - b.api_id;
+      }
+      else if (kcif.sort_items.startsWith("type")) {
+        result = a.type[2] - b.type[2];
+      }
+      else if (kcif.sort_items.startsWith("name")) {
+        result = a.sort_no - b.sort_no;
+      }
+      else if (kcif.sort_items.startsWith("level")) {
+        result = a.level - b.level;
+      }
+      else if (kcif.sort_items.startsWith("alv")) {
+        result = a.alv - b.alv;
+      }
+      else if (kcif.sort_items.startsWith("holder")) {
+        if (a.ship_id == null || a.ship_id < 0) {
+          if (b.ship_id == null || b.ship_id < 0) {
+            result = 0;
+          }
+          else {
+            result = 1;
+          }
+        }
+        else if (b.ship_id == null || b.ship_id < 0) {
+          result = -1;
+        }
+        else {
+          result = kcif.compareShip(kcif.ship_list[a.ship_id], kcif.ship_list[b.ship_id]);
+        }
+      }
+
+      if (kcif.sort_items.endsWith("-")) {
+        result = -result;
+      }
+      if (result == 0 && kcif.sort_items.startsWith("holder") && a.ship_id > 0) {
+        var slot = kcif.ship_list[a.ship_id].slot;
+        result = slot.indexOf(a.api_id) - slot.indexOf(b.api_id);
+      }
+      if (result == 0) {
+        result = a.sort_no - b.sort_no;
+      }
+      if (result == 0) {
+        result = a.api_id - b.api_id;
+      }
+      return result;
+    });
+
+    for (var i = 0, item; item = items[i]; i++) {
+      tr = makeElement("tr");
+      td = makeElement("td", null, "item-no", (i + 1));
+      tr.appendChild(td);
+      td = makeElement("td", null, "item-type", item.type_name);
+      tr.appendChild(td);
+      td = makeElement("td", null, "item-name", item.name);
+      tr.appendChild(td);
+      td = makeElement("td", null, "item-level", item.level);
+      tr.appendChild(td);
+      td = makeElement("td", null, "item-alv", item.alv);
+      tr.appendChild(td);
+      var ship = item.ship_id != null ? kcif.ship_list[item.ship_id] : null;
+      tr.appendChild(kcif.shipName(ship));
+      tr.appendChild(kcif.shipLevel(ship));
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+
+    inner.appendChild(table);
+    outer.appendChild(inner);
+    itemstab.appendChild(outer);
+    inner.scrollTop = pos;
+
+    // アイテム:ヘッダ行リンク
+    var elems = itemstab.querySelectorAll("th a");
+    for (var i = 0; i < elems.length; i++) {
+      elems[i].addEventListener("click", function(evt){
+        if (evt) evt.preventDefault();
+        var parentClass = this.parentNode.className;
+        var sort = parentClass.replace(/ .*/, "").replace(/^.*-/, "");
+        log("sort (items) [" + kcif.sort_items + "] -> [" + sort + "]");
+        if (parentClass == "ship-name") {
+          sort = "holder";
+        }
+        if (kcif.sort_items.startsWith(sort)) {
+          kcif.sort_items = sort + (kcif.sort_items.endsWith("+") ? "-" : "+");
+        }
+        else {
+          kcif.sort_items = sort + (sort == "no" || sort == "level" || sort == "alv" ? "-" : "+");
+        }
+        kcif.renderInfo(true);
+      }, false);
     }
   },
 
@@ -1707,10 +2258,10 @@ var kcif = {
   seiku2str: function(seiku, seiku_alv) {
     var seikuText = "";
     if (seiku_alv) {
-      seikuText += "自制空値: " + seiku + " + " + seiku_alv + "(熟練度ボーナス)&#10;";
+      seikuText += "自制空値: " + seiku + " + " + seiku_alv + "(熟練度ボーナス)\u000a";
       seiku += seiku_alv;
     }
-    seikuText += "敵制空値:&#10; ";
+    seikuText += "敵制空値:\u000a ";
     var tmp = Math.floor(seiku / 3);
     if (tmp < 1) {
       seikuText += "0: ";
@@ -1718,7 +2269,7 @@ var kcif = {
     else {
       seikuText += "0～" + tmp + ": ";
     }
-    seikuText += "制空権確保&#10; ";
+    seikuText += "制空権確保\u000a ";
     tmp++;
     var tmp2 = Math.floor(seiku / 1.5);
     if (tmp <= tmp2) {
@@ -1726,7 +2277,7 @@ var kcif = {
       if (tmp < tmp2) {
         seikuText += "～" + tmp2;
       }
-      seikuText += ": 航空優勢&#10; ";
+      seikuText += ": 航空優勢\u000a ";
       tmp = tmp2 + 1;
     }
     tmp2 = Math.floor(seiku * 1.5);
@@ -1735,7 +2286,7 @@ var kcif = {
       if (tmp < tmp2) {
         seikuText += "～" + tmp2;
       }
-      seikuText += ": 航空均衡&#10; ";
+      seikuText += ": 航空均衡\u000a ";
       tmp = tmp2 + 1;
     }
     tmp2 = Math.floor(seiku * 3);
@@ -1744,7 +2295,7 @@ var kcif = {
       if (tmp < tmp2) {
         seikuText += "～" + tmp2;
       }
-      seikuText += ": 航空劣勢&#10; ";
+      seikuText += ": 航空劣勢\u000a ";
       tmp = tmp2 + 1;
     }
     seikuText += tmp + "～: 制空権喪失";
@@ -1757,7 +2308,7 @@ var kcif = {
     if (ship && ship.type) {
       s = kcif.type2str(ship.type);
     }
-    return '<td class="ship-type">' + s + '</td>';
+    return makeElement("td", null, "ship-type", s);
   },
 
   itemName: function(item, equip, equip_max) {
@@ -1784,8 +2335,8 @@ var kcif = {
       s = ship.name || "(" + ship.ship_id + ")";
       for (var i = 0; ship.slot && (i < ship.slot.length); i++) {
         if (ship.slot[i] >= 0 && kcif.item_list[ship.slot[i]]) {
-          var item = kcif.item_list[ship.slot[i]]
-              var name = String(i + 1) + ": " + kcif.itemName(item, ship.equip[i], ship.equip_max[i]);
+          var item = kcif.item_list[ship.slot[i]];
+          var name = String(i + 1) + ": " + kcif.itemName(item, ship.equip[i], ship.equip_max[i]);
           items.push(name);
         }
       }
@@ -1797,33 +2348,37 @@ var kcif = {
         }
       }
     }
+
+    var td = makeElement("td", null, "ship-name", s);
     if (items.length > 0) {
-      items = ' title="' + items.join("&#10;") + '"';
+      td.setAttribute("title", items.join("\u000a"));
     }
-    else {
-      items = "";
-    }
-    return '<td class="ship-name"' + items + '>' + s + '</td>';
+    return td;
   },
 
   shipLevel: function(ship) {
     var col = "color-default";
-    var title = "";
+    var title = null;
     if (ship) {
       if (ship.afterlv > 0) {
         if (ship.level >= ship.afterlv) {
           col = "color-green";
-          title = ' title="改造後 ' + kcif.ship_master[ship.aftershipid].name + '(' + kcif.type2str(kcif.ship_master[ship.aftershipid].type) + ')"';
+          title = '改造後 ' + kcif.ship_master[ship.aftershipid].name + '(' + kcif.type2str(kcif.ship_master[ship.aftershipid].type) + ')';
         }
         else {
-          title = ' title="LV' + ship.afterlv + ' ' + kcif.ship_master[ship.aftershipid].name + '(' + kcif.type2str(kcif.ship_master[ship.aftershipid].type) + ')"';
+          title = 'LV' + ship.afterlv + ' ' + kcif.ship_master[ship.aftershipid].name + '(' + kcif.type2str(kcif.ship_master[ship.aftershipid].type) + ')';
         }
       }
       if (ship.level != ship.p_level) {
         col += " blink";
       }
     }
-    return '<td class="ship-level ' + col + '"' + title + '>' + (ship ? ship.level : "") + '</td>';
+
+    var td = makeElement("td", null, "ship-level " + col, ship ? ship.level : "");
+    if (title) {
+      td.setAttribute("title", title);
+    }
+    return td;
   },
 
   hp2meter: function(cur, max) {
@@ -1846,7 +2401,13 @@ var kcif = {
     else {
       status = "empty";
     }
-    return '<meter value="' + cur + '" min="0" max="' + max + '" title="' + Math.floor(cur * 100 / max) + '%" class="' + status + '"></meter>';
+
+    var meter = makeElement("meter", null, status);
+    meter.setAttribute("min", "0");
+    meter.setAttribute("max", max);
+    meter.setAttribute("title", Math.floor(cur * 100 / max) + '%');
+    meter.value = cur;
+    return meter;
   },
 
   shipHp: function(ship) {
@@ -1871,7 +2432,15 @@ var kcif = {
     if (ship.p_hp != hp) {
       col += " blink";
     }
-    return '<td class="ship-hp' + (kcif.getHpByMeter() ? '-meter ' : ' ') + col + '"' + (ship.p_hp != hp ? ' title="直前:' + ship.p_hp + '"': '') + '>' + (ship.taihi ? '退避' : (hp + '/' + ship.hp_max)) + (kcif.getHpByMeter() ? kcif.hp2meter(ship.hp, ship.hp_max) : '') + '</td>';
+
+    var td = makeElement("td", null, "ship-hp" + (kcif.getHpByMeter() ? '-meter ' : ' ') + col, ship.taihi ? "退避" : (hp + '/' + ship.hp_max));
+    if (ship.p_hp != hp) {
+      td.setAttribute("title", "直前:" + ship.p_hp);
+    }
+    if (kcif.getHpByMeter()) {
+      td.appendChild(kcif.hp2meter(ship.hp, ship.hp_max));
+    }
+    return td;
   },
 
   shipCond: function(ship) {
@@ -1892,7 +2461,7 @@ var kcif = {
     if (ship.cond != ship.p_cond) {
       col += " blink";
     }
-    return '<td class="ship-cond ' + col + '">' + ship.cond + '</td>';
+    return makeElement("td", null, "ship-cond " + col, ship.cond);
   },
 
   fuelBullColor: function(cur, max) {
@@ -1927,26 +2496,42 @@ var kcif = {
     else {
       status = "empty";
     }
-    return '<meter value="' + cur + '" min="0" max="' + max + '" class="' + status + '"></meter>';
+
+    var meter = makeElement("meter", null, status);
+    meter.setAttribute("min", "0");
+    meter.setAttribute("max", max);
+    meter.value = cur;
+    return meter;
   },
 
-  shipFuelBull: function(ship) {
+  shipFuel: function(ship) {
     if (kcif.getFuelByMeter()) {
-      return '<td class="ship-fuel-bull" title="燃料: ' + ship.fuel + '/' + ship.fuel_max + ' (' + Math.floor(ship.fuel * 100 / ship.fuel_max) + '%)&#10;弾薬: ' + ship.bull + '/' + ship.bull_max + ' (' + Math.floor(ship.bull * 100 / ship.bull_max) + '%)">' + kcif.fuel2meter(ship.fuel, ship.fuel_max) + kcif.fuel2meter(ship.bull, ship.bull_max) + '</td>';
+      var td = makeElement("td", null, "ship-fuel-bull");
+      td.setAttribute("title", '燃料: ' + ship.fuel + '/' + ship.fuel_max + ' (' + Math.floor(ship.fuel * 100 / ship.fuel_max) + '%)\u000a弾薬: ' + ship.bull + '/' + ship.bull_max + ' (' + Math.floor(ship.bull * 100 / ship.bull_max) + '%)');
+      td.appendChild(kcif.fuel2meter(ship.fuel, ship.fuel_max));
+      td.appendChild(kcif.fuel2meter(ship.bull, ship.bull_max));
+      return td;
     }
     else {
-      var f = "";
       var col = kcif.fuelBullColor(ship.fuel, ship.fuel_max);
       if (ship.fuel != ship.p_fuel) {
         col += " blink";
       }
-      f = '<td class="ship-fuel ' + col + '" title="' + ship.fuel + '/' + ship.fuel_max + '">' + Math.floor(ship.fuel * 100 / ship.fuel_max) + '%</td>';
+      var td = makeElement("td", null, "ship-fuel " + col, Math.floor(ship.fuel * 100 / ship.fuel_max) + '%');
+      td.setAttribute("title", ship.fuel + '/' + ship.fuel_max);
+      return td;
+    }
+  },
 
+  shipBull: function(ship) {
+    if (!kcif.getFuelByMeter()) {
       col = kcif.fuelBullColor(ship.bull, ship.bull_max);
       if (ship.bull != ship.p_bull) {
         col += " blink";
       }
-      return f + '<td class="ship-bull ' + col + '" title="' + ship.bull + '/' + ship.bull_max + '">' + Math.floor(ship.bull * 100 / ship.bull_max) + '%</td>';
+      var td = makeElement("td", null, "ship-bull " + col, Math.floor(ship.bull * 100 / ship.bull_max) + '%');
+      td.setAttribute("title", ship.bull + '/' + ship.bull_max);
+      return td;
     }
   },
 
@@ -1957,7 +2542,9 @@ var kcif = {
       total = ship.exp[0] + '/' + (ship.exp[0] + ship.exp[1]);
       need = ship.exp[1];
     }
-    return '<td class="ship-exp" title="' + total + '">' + need + '</td>';
+    var td = makeElement("td", null, "ship-exp", need);
+    td.setAttribute("title", total);
+    return td;
   },
 
   formatMaterial: function(name, value, level) {
@@ -1969,7 +2556,12 @@ var kcif = {
     else {
       col = value >= 3000 ? " color-red" : "";
     }
-    return '<tr><th class="res-name">' + name + '</th><td class="res-value' + col + '">' + value + '</td></tr>';
+    var tr = makeElement("tr");
+    var td = makeElement("th", null, "res-name", name);
+    tr.appendChild(td);
+    td = makeElement("td", null, "res-value" + col, value);
+    tr.appendChild(td);
+    return tr;
   },
 
   updateRepairStart: function(idx) {
@@ -2075,6 +2667,18 @@ var kcif = {
 
   isInDock: function(ship) {
     return kcif.dock.filter(function(e){return e.api_ship_id == ship.api_id}).length != 0;
+  },
+
+  isOnMission: function(mission) {
+    return mission && mission[0] == "遠征中";
+  },
+
+  isOnPractice: function(mission) {
+    return mission && mission[0] == "演習";
+  },
+
+  isCombined: function(mission) {
+    return mission && mission[0] == "(連合艦隊)";
   },
 
   calcSakuteki: function(item, type) {
@@ -2562,50 +3166,53 @@ var kcif = {
 
   battle: function(url, json) {
     try {
+      var elem;
       var deck_id = json.api_data.api_dock_id || json.api_data.api_deck_id || 1;
       if (json.api_data.api_formation) {
-        var s = "<span title='" + kcif.form2str(json.api_data.api_formation[0], "自") + " " + kcif.form2str(json.api_data.api_formation[1], "敵");
+        var title = kcif.form2str(json.api_data.api_formation[0], "自") + " " + kcif.form2str(json.api_data.api_formation[1], "敵");
         log("json.json.api_data.api_kouku = " + (json.api_data.api_kouku ? "exist" : "not exist"));
         if (json.api_data.api_kouku && json.api_data.api_kouku.api_stage1) {
-          s += " ";
+          title += " ";
           switch (Number(json.api_data.api_kouku.api_stage1.api_disp_seiku)) {
             case 1:
-              s += "制空権確保";
+              title += "制空権確保";
               break;
             case 2:
-              s += "航空優勢";
+              title += "航空優勢";
               break;
             case 0:
-              s += "航空均衡";
+              title += "航空均衡";
               break;
             case 3:
-              s += "航空劣勢";
+              title += "航空劣勢";
               break;
             case 4:
-              s += "制空権喪失";
+              title += "制空権喪失";
               break;
           }
         }
-        s += "'>";
+
+        var text = "";
         switch (json.api_data.api_formation[2]) {
           case 1:
-            s += "同航戦";
+            text = "同航戦";
             break;
           case 2:
-            s += "反航戦";
+            text = "反航戦";
             break;
           case 3:
-            s += "T字有利";
+            text = "T字有利";
             break;
           case 4:
-            s += "T字不利";
+            text = "T字不利";
             break;
         }
-        s += "</span>";
-        kcif.mission[deck_id - 1] += " " + s;
+        elem = makeElement("span", null, null, text);
+        elem.setAttribute("title", title);
+        kcif.mission[deck_id - 1] = [kcif.mission[deck_id - 1][0], makeText(" "), elem];
       }
       if (url.indexOf("combined") != -1) {
-        kcif.mission[1] = "(連合艦隊)";
+        kcif.mission[1] = ["(連合艦隊)"];
         if (url.indexOf("midnight") != -1) {
           // if it's combined fleet and midnight battle, it must be 2nd fleet.
           deck_id = 2;
@@ -2759,17 +3366,9 @@ var kcif = {
           break;
         }
       }
-      if (rank == "C" || rank == "D" || rank == "E") {
-        rank = "<span class='color-red'>" + rank + "</span> ";
-      }
-      else if (rank == "SS" || rank == "S") {
-        rank = "<span class='color-green'>" + rank + "</span> ";
-      }
-      else if (rank) {
-        rank = "<span class='color-gray'>" + rank + "</span> ";
-      }
+      rank = makeElement("span", null, ((rank == "C" || rank == "D" || rank == "E") ? "color-red" : (rank == "SS" || rank == "S") ? "color-green" : "color-gray"), rank);
 
-      var s = "";
+      var s = [];
       for (var i = 0; i < 6; i++) {
         if (enemies[i] && enemies[i].hp_max > 0) {
           var t = "";
@@ -2778,31 +3377,44 @@ var kcif = {
           }
           t += String(enemies[i].hp) + "/" + String(enemies[i].hp_max);
           if (enemies[i].hp > enemies[i].hp_max * 3 / 4) {
-            s += "<span class='color-green' title='" + t + "'>◎</span>";
+            elem = makeElement("span", null, "color-green", "◎");
           }
           else if (enemies[i].hp > enemies[i].hp_max / 2) {
-            s += "<span class='color-yellow' title='" + t + "'>◎</span>";
+            elem = makeElement("span", null, "color-yellow", "◎");
           }
           else if (enemies[i].hp > enemies[i].hp_max / 4) {
-            s += "<span class='color-orange' title='" + t + "'>○</span>";
+            elem = makeElement("span", null, "color-orange", "○");
           }
           else if (enemies[i].hp > 0) {
-            s += "<span class='color-red' title='" + t + "'>△</span>";
+            elem = makeElement("span", null, "color-red", "△");
           }
           else if (enemies[i].hp <= 0) {
-            s += "<span class='color-gray' title='" + t + "'>×</span>";
+            elem = makeElement("span", null, "color-gray", "×");
           }
+          elem.setAttribute("title", t);
+          s.push(elem);
         }
+      }
+      elem = makeElement("span");
+      elem.style.letterSpacing = "-2px";
+      for (var i = 0; i < s.length; i++) {
+        elem.appendChild(s[i]);
       }
 
       if (url.indexOf("combined") != -1 && url.indexOf("midnight") != -1) {
         deck_id = 1;
       }
-      var n = kcif.mission[deck_id - 1].indexOf(' <span class="battle-result"');
-      if (n != -1) {
-        kcif.mission[deck_id - 1] = kcif.mission[deck_id - 1].substring(0, n);
+
+      for (var i = 1; i < kcif.mission[deck_id - 1].length; i++) {
+        if (kcif.mission[deck_id - 1][i] && kcif.mission[deck_id - 1][i].className == "battle-result") {
+          kcif.mission[deck_id - 1].splice(i, kcif.mission[deck_id - 1].length - i);
+        }
       }
-      kcif.mission[deck_id - 1] += ' <span class="battle-result">' + rank + '<span style="letter-spacing: -2px;">' + s + '</span>';
+      var bresult = makeElement("span", null, "battle-result", " ");
+      bresult.appendChild(rank);
+      bresult.appendChild(makeText(" "));
+      bresult.appendChild(elem);
+      kcif.mission[deck_id - 1].push(bresult);
     }
     catch (exc) {
       log("  failed: " + String(deck_id) + ": " + String(exc));
@@ -2855,12 +3467,12 @@ var kcif = {
       for (var i = 0, deck; deck = deck_list[i]; i++) {
         if (deck.api_mission[2] > 0) {
           var master = kcif.mission_master[deck.api_mission[1]];
-          kcif.mission[i] = [deck.api_mission[0], master ? master.name : "", deck.api_mission[2]];
+          kcif.mission[i] = ["遠征中", deck.api_mission[0], master ? master.name : "", deck.api_mission[2]];
         }
-        else if (Array.isArray(kcif.mission[i])) {
+        else if (kcif.isOnMission(kcif.mission[i])) {
           kcif.mission[i] = null;
         }
-        log("deck mission: " + i + ": " + kcif.mission[i]);
+        log("deck mission: " + i + ": " + (kcif.mission[i] ? kcif.mission[i][1] : "null"));
       }
       update_all = false;
     }
@@ -3279,15 +3891,15 @@ var kcif = {
       update_all = false;
     }
     else if (url.indexOf("battle") != -1) {
-      if (kcif.getShowBattle()) {
-        log("battle: " + url);
-        var deck_id = Number(json.api_data.api_dock_id || json.api_data.api_deck_id);
-        if (url.indexOf("practice") != -1 && (!kcif.mission[deck_id - 1] || kcif.mission[deck_id - 1].indexOf("演習") == -1)) {
-          kcif.mission[deck_id - 1] = "演習";
-          if (url.indexOf("midnight") == -1) {
-            kcif.setupFleetStatus();
-          }
+      log("battle: " + url);
+      var deck_id = Number(json.api_data.api_dock_id || json.api_data.api_deck_id);
+      if (url.indexOf("practice") != -1 && (!kcif.mission[deck_id - 1] || kcif.isOnPractice(kcif.mission[deck_id - 1]))) {
+        kcif.mission[deck_id - 1] = ["演習"];
+        if (url.indexOf("midnight") == -1) {
+          kcif.setupFleetStatus();
         }
+      }
+      if (kcif.getShowBattle()) {
         kcif.battle(url, json);
       }
     }
@@ -3296,20 +3908,19 @@ var kcif = {
       var deck_id = Number(query["api_deck_id"]);
       if (deck_id > 0) {
         kcif.repair_start[deck_id - 1] = null;
-        kcif.mission[deck_id - 1] = kcif.map2str(json.api_data);
-        log("start: " + deck_id + ": " + kcif.mission[deck_id - 1]);
+        kcif.mission[deck_id - 1] = [kcif.map2str(json.api_data)];
+        log("start: " + deck_id + ": " + kcif.mission[deck_id - 1][0]);
       }
       update_all = false;
     }
     else if (url.indexOf("_map/next") != -1) {
       kcif.setupFleetStatus();
       for (var i = 0; i < 4; i++) {
-        var mission = kcif.mission[i]
-            if (mission && !Array.isArray(mission)) {
-              kcif.mission[i] = kcif.map2str(json.api_data);
-              log("next: " + (i + 1) + ": " + kcif.mission[i]);
-              break;
-            }
+        if (kcif.mission[i] && !kcif.isOnMission(kcif.mission[i])) {
+          kcif.mission[i] = [kcif.map2str(json.api_data)];
+          log("next: " + (i + 1) + ": " + kcif.mission[i][0]);
+          break;
+        }
       }
       update_all = false;
     }
@@ -3327,7 +3938,7 @@ var kcif = {
         for (var i = 0, deck; deck = deck_list[i]; i++) {
           master = kcif.mission_master[deck.api_mission[1]];
           if (deck.api_mission[2] > 0) {
-            kcif.mission[i] = [deck.api_mission[1], master ? master.name : "", deck.api_mission[2]];
+            kcif.mission[i] = ["遠征中", deck.api_mission[1], master ? master.name : "", deck.api_mission[2]];
           }
           else {
             kcif.mission[i] = null;
@@ -3384,7 +3995,7 @@ var kcif = {
         var now = new Date().getTime();
         for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
           var leader = kcif.ship_list[deck.api_ship[0]];
-          if (Array.isArray(kcif.mission[i]) || !leader || leader.type != 19) {
+          if (kcif.isOnMission(kcif.mission[i]) || !leader || leader.type != 19) {
             continue;
           }
           var num = 1;

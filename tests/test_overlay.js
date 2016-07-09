@@ -87,8 +87,152 @@ JUST.testCase({
       100: {"name": "テスト100", type: 2},
       101: {"name": "テスト101", type: 2},
     };
-    kcif.info_div = document.body;
+    kcif.document = document;
+    kcif.info_div = kcif.document.body;
     kcif.renderFrame();
+  },
+
+  testMakeElement: function(){
+    var elem = makeElement("div");
+    assertEqual("<div></div>", elem.outerHTML);
+
+    elem = makeElement("div", "id");
+    assertEqual('<div id="id"></div>', elem.outerHTML);
+
+    elem = makeElement("div", "id", "class");
+    assertMatch(/^<div [^>]+><\/div>$/, elem.outerHTML);
+    assertMatch(/id="id"/, elem.outerHTML);
+    assertMatch(/class="class"/, elem.outerHTML);
+
+    elem = makeElement("div", "id", null, "text");
+    assertEqual('<div id="id">text</div>', elem.outerHTML);
+
+    elem = makeElement("div", "id", "class", "text");
+    assertMatch(/^<div [^>]+>text<\/div>$/, elem.outerHTML);
+    assertMatch(/id="id"/, elem.outerHTML);
+    assertMatch(/class="class"/, elem.outerHTML);
+
+    elem = makeElement("div", null, "class");
+    assertEqual('<div class="class"></div>', elem.outerHTML);
+
+    elem = makeElement("div", null, "class", "text");
+    assertEqual('<div class="class">text</div>', elem.outerHTML);
+
+    elem = makeElement("div", null, null, "text");
+    assertEqual('<div>text</div>', elem.outerHTML);
+  },
+
+  testMakeText: function(){
+    var elem = makeText("text");
+    assertEqual("[object Text]", String(elem));
+  },
+
+  testClearChildElements: function(){
+    var elem = makeElement("div", null, null, "text1");
+    elem.appendChild(makeText("text2"));
+    elem.appendChild(makeElement("span", null, null, "text3"));
+    elem.appendChild(makeText("text4"));
+    assertEqual("<div>text1text2<span>text3</span>text4</div>", elem.outerHTML);
+    clearChildElements(elem);
+    assertEqual("<div></div>", elem.outerHTML);
+
+    elem = makeElement("div");
+    clearChildElements(elem);
+    assertEqual("<div></div>", elem.outerHTML);
+  },
+
+  testParseQuery: function(){
+    var listener = new TracingListener();
+    var result = listener.parseQuery("a=1&b=2&c=3");
+    assertEqual(1, result["a"]);
+    assertEqual(2, result["b"]);
+    assertEqual(3, result["c"]);
+    refute(result["d"], "no such parameter");
+  },
+
+  testRenderInfo: function(){
+    // TODO
+    kcif.renderInfo(false);
+
+    kcif.renderInfo(true);
+  },
+
+  testOnLoad: function(){
+    // TODO
+    evt = {originalTarget: document};
+    kcif.onLoad(evt);
+  },
+
+  testCheckConfigChanged: function(){
+    kcif.resetConfig();
+    refute(kcif.checkConfigChanged(), "nothing is changed");
+
+    var elem = kcif.info_div.querySelector("#capture-save-dir");
+    elem.value = "hoge";
+    assert(kcif.checkConfigChanged(), "capture-save-dir is changed");
+
+    kcif.resetConfig();
+    var elem = kcif.info_div.querySelector("#capture-save-base");
+    elem.value = "hoge";
+    assert(kcif.checkConfigChanged(), "capture-save-base is changed");
+
+    kcif.resetConfig();
+    var elem = kcif.info_div.querySelector("#beep-url");
+    elem.value = "hoge";
+    assert(kcif.checkConfigChanged(), "beep-url is changed");
+
+    kcif.resetConfig();
+    var elem = kcif.info_div.querySelector("#beep-volume");
+    elem.value = 0;
+    assert(kcif.checkConfigChanged(), "beep-volume is changed");
+
+    kcif.resetConfig();
+    elem = kcif.info_div.querySelector("#beep-expedition");
+    elem.checked = false;
+    assert(kcif.checkConfigChanged(), "beep-expedition is changed");
+
+    kcif.resetConfig();
+    elem = kcif.info_div.querySelector("#beep-dock");
+    elem.checked = false;
+    assert(kcif.checkConfigChanged(), "beep-dock is changed");
+
+    kcif.resetConfig();
+    elem = kcif.info_div.querySelector("#beep-built");
+    elem.checked = false;
+    assert(kcif.checkConfigChanged(), "beep-built is changed");
+
+    kcif.resetConfig();
+    elem = kcif.info_div.querySelector("#beep-repair");
+    elem.checked = false;
+    assert(kcif.checkConfigChanged(), "beep-repair is changed");
+
+    kcif.resetConfig();
+    elem = kcif.info_div.querySelector("#show-battle");
+    elem.checked = false;
+    assert(kcif.checkConfigChanged(), "show-battle is changed");
+
+    kcif.resetConfig();
+    elem = kcif.info_div.querySelector("#show-built");
+    elem.checked = false;
+    assert(kcif.checkConfigChanged(), "show-built is changed");
+
+    kcif.resetConfig();
+    elem = kcif.info_div.querySelector("#hp-by-meter");
+    elem.checked = false;
+    assert(kcif.checkConfigChanged(), "hp-by-meter is changed");
+
+    kcif.resetConfig();
+    elem = kcif.info_div.querySelector("#fuel-by-meter");
+    elem.checked = false;
+    assert(kcif.checkConfigChanged(), "fuel-by-meter is changed");
+
+    kcif.resetConfig();
+    elem = kcif.info_div.querySelector("#search-formula");
+    elem.selectedIndex = 0;
+    assert(kcif.checkConfigChanged(), "search-formula is changed");
+
+    kcif.resetConfig();
+    refute(kcif.checkConfigChanged(), "nothing is changed");
   },
 
   testTime2str: function(){
@@ -115,6 +259,23 @@ JUST.testCase({
     assertEqual("color-default", kcif.getTimeColor(dt));
     dt = new Date(0);
     assertEqual("color-red", kcif.getTimeColor(dt));
+
+    dt = new Date(new Date().getTime() - 500);
+    assertEqual("color-red", kcif.getTimeColor(dt, true));
+    dt = new Date();
+    assertEqual("color-red", kcif.getTimeColor(dt, true));
+    dt = new Date(new Date().getTime() + 500);
+    assertEqual("color-yellow", kcif.getTimeColor(dt, true));
+    dt = new Date(new Date().getTime() + 59500);
+    assertEqual("color-yellow", kcif.getTimeColor(dt, true));
+    dt = new Date(new Date().getTime() + 60500);
+    assertEqual("color-yellow", kcif.getTimeColor(dt, true));
+    dt = new Date(new Date().getTime() + 5 * 60000 - 500);
+    assertEqual("color-yellow", kcif.getTimeColor(dt, true));
+    dt = new Date(new Date().getTime() + 5 * 60000 + 500);
+    assertEqual("color-default", kcif.getTimeColor(dt, true));
+    dt = new Date(0);
+    assertEqual("color-red", kcif.getTimeColor(dt, true));
   },
 
   testHash2str: function(){
@@ -124,6 +285,39 @@ JUST.testCase({
     assertEqual("a=123", kcif.hash2str(hash));
     hash["b"] = "abc";
     assertMatch(/^(?:a=123&b=abc|b=abc&a=123)$/, kcif.hash2str(hash));
+  },
+
+  testMap2str: function(){
+    var json = {
+      api_maparea_id: 1,
+      api_mapinfo_no: 2,
+      api_no: 3,
+      api_bosscell_no: 5,
+      api_event_id: 4,
+      api_event_kind: 1,
+    };
+    assertEqual("+ 1-2-3", kcif.map2str(json));
+    json.api_no = 4;
+    json.api_event_id = 3;
+    json.api_event_kind = 0;
+    assertEqual("- 1-2-4", kcif.map2str(json));
+    json.api_no = 5;
+    json.api_event_id = 5;
+    json.api_event_kind = 1;
+    assertEqual("* 1-2-5", kcif.map2str(json));
+  },
+
+  testType2str: function(){
+    assertEqual("駆逐", kcif.type2str(2));
+    // TODO
+  },
+
+  testSeiku2str: function(){
+    assertEqual("敵制空値:\u000a 0: 制空権確保\u000a 1～: 制空権喪失", kcif.seiku2str(0));
+    assertEqual("敵制空値:\u000a 0: 制空権確保\u000a 1: 航空均衡\u000a 2～3: 航空劣勢\u000a 4～: 制空権喪失", kcif.seiku2str(1));
+    assertEqual("敵制空値:\u000a 0: 制空権確保\u000a 1: 航空優勢\u000a 2～3: 航空均衡\u000a 4～6: 航空劣勢\u000a 7～: 制空権喪失", kcif.seiku2str(2));
+    assertEqual("敵制空値:\u000a 0～1: 制空権確保\u000a 2: 航空優勢\u000a 3～4: 航空均衡\u000a 5～9: 航空劣勢\u000a 10～: 制空権喪失", kcif.seiku2str(3));
+    assertEqual("敵制空値:\u000a 0～1: 制空権確保\u000a 2～3: 航空優勢\u000a 4～7: 航空均衡\u000a 8～15: 航空劣勢\u000a 16～: 制空権喪失", kcif.seiku2str(5));
   },
 
   testShipType: function(){
@@ -378,6 +572,160 @@ JUST.testCase({
     assertMatch(/<td class="ship-bull color-orange" title="49\/99">49%<\/td>$/, kcif.shipBull(ship).outerHTML);
   },
 
+  testShipExp: function(){
+    var ship = {
+      exp: [456, 123],
+    };
+    var elem = kcif.shipExp(ship);
+    assertMatch(/^<td [^>]+>123<\/td>$/, elem.outerHTML);
+    assertEqual("ship-exp", elem.className);
+    assertEqual("456/579", elem.getAttribute("title"));
+  },
+
+  testFormatMaterial: function(){
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">0</td></tr>', kcif.formatMaterial("test", 0, 1).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">999</td></tr>', kcif.formatMaterial("test", 999, 1).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">1000</td></tr>', kcif.formatMaterial("test", 1000, 1).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">299999</td></tr>', kcif.formatMaterial("test", 299999, 1).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-red">300000</td></tr>', kcif.formatMaterial("test", 300000, 1).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">1000</td></tr>', kcif.formatMaterial("test", 1000, 2).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">1249</td></tr>', kcif.formatMaterial("test", 1249, 2).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">1250</td></tr>', kcif.formatMaterial("test", 1250, 2).outerHTML);
+
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">0</td></tr>', kcif.formatMaterial("test", 0).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value">2999</td></tr>', kcif.formatMaterial("test", 2999).outerHTML);
+    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-red">3000</td></tr>', kcif.formatMaterial("test", 3000).outerHTML);
+  },
+
+  testUpdateRepairStart: function(){
+    kcif.repair_start = [null, null, null, null];
+    kcif.deck_list[0] = {
+      api_ship: [100, -1, -1, -1, -1, -1, -1],
+    };
+    refute(kcif.repair_start[0]);
+    kcif.updateRepairStart(0);
+    assert(true, !!kcif.repair_start[0]);
+    kcif.deck_list[0].api_ship[0] = 101;
+    kcif.updateRepairStart(0);
+    refute(kcif.repair_start[0]);
+    kcif.deck_list[0].api_ship[1] = 100;
+    kcif.updateRepairStart(0);
+    refute(kcif.repair_start[0]);
+  },
+
+  testRemoveFromDeck: function(){
+    kcif.deck_list[0] = {
+      api_ship: [100, 101, 102, -1, -1, -1, -1],
+    };
+    assert(kcif.removeFromDeck(101));
+    assertEqual([100, 102, -1, -1, -1, -1, -1], kcif.deck_list[0].api_ship);
+    refute(kcif.removeFromDeck(9999));
+    assertEqual([100, 102, -1, -1, -1, -1, -1], kcif.deck_list[0].api_ship);
+  },
+
+  testMakeItem: function(){
+    // TODO
+  },
+
+  testMakeShip: function(){
+    // TODO
+  },
+
+  testHasSeiku: function(){
+    for (var i = 1; i <= 5; i++) {
+      refute(kcif.hasSeiku(i));
+    }
+    assert(kcif.hasSeiku(6));
+    assert(kcif.hasSeiku(7));
+    assert(kcif.hasSeiku(8));
+    refute(kcif.hasSeiku(9));
+    refute(kcif.hasSeiku(10));
+    assert(kcif.hasSeiku(11));
+    for (var i = 12; i <= 44; i++) {
+      refute(kcif.hasSeiku(i));
+    }
+    assert(kcif.hasSeiku(45));
+    for (var i = 46; i <= 199; i++) {
+      refute(kcif.hasSeiku(i));
+    }
+  },
+
+  testIsPlane: function(){
+    for (var i = 1; i <= 5; i++) {
+      refute(kcif.isPlane(i));
+    }
+    for (var i = 6; i <= 11; i++) {
+      assert(kcif.isPlane(i));
+    }
+    for (var i = 12; i <= 24; i++) {
+      refute(kcif.isPlane(i));
+    }
+    assert(kcif.isPlane(25));
+    assert(kcif.isPlane(26));
+    for (var i = 27; i <= 40; i++) {
+      refute(kcif.isPlane(i));
+    }
+    assert(kcif.isPlane(41));
+    for (var i = 42; i <= 44; i++) {
+      refute(kcif.isPlane(i));
+    }
+    assert(kcif.isPlane(45));
+    for (var i = 46; i <= 93; i++) {
+      refute(kcif.isPlane(i));
+    }
+    assert(kcif.isPlane(94));
+    for (var i = 95; i <= 199; i++) {
+      refute(kcif.isPlane(i));
+    }
+  },
+
+  testIsInDock: function(){
+    var ship = {
+      api_id: 100,
+    };
+    kcif.dock = [
+      { api_ship_id: 100 },
+      { api_ship_id: 101 },
+      { api_ship_id: -1 },
+      { api_ship_id: 102 },
+    ];
+    assert(kcif.isInDock(ship));
+    ship.api_id = 101;
+    assert(kcif.isInDock(ship));
+    ship.api_id = 102;
+    assert(kcif.isInDock(ship));
+    ship.api_id = 103;
+    refute(kcif.isInDock(ship));
+  },
+
+  testIsOnMission: function(){
+    refute(kcif.isOnMission(null));
+    refute(kcif.isOnMission(["+ 1-2-3"]));
+    refute(kcif.isOnMission(["(連合艦隊)"]));
+    refute(kcif.isOnMission(["演習"]));
+    assert(kcif.isOnMission(["遠征中"]));
+  },
+
+  testIsOnPractice: function(){
+    refute(kcif.isOnPractice(null));
+    refute(kcif.isOnPractice(["+ 1-2-3"]));
+    refute(kcif.isOnPractice(["(連合艦隊)"]));
+    assert(kcif.isOnPractice(["演習"]));
+    refute(kcif.isOnPractice(["遠征中"]));
+  },
+
+  testIsCombined: function(){
+    refute(kcif.isCombined(null));
+    refute(kcif.isCombined(["+ 1-2-3"]));
+    assert(kcif.isCombined(["(連合艦隊)"]));
+    refute(kcif.isCombined(["演習"]));
+    refute(kcif.isCombined(["遠征中"]));
+  },
+
+  testCalcSakuteki: function(){
+    // TODO
+  },
+
   testCompareShip: function(){
     var a = {
       api_id: 1,
@@ -433,6 +781,25 @@ JUST.testCase({
 
     kcif.sort_ships = "cond-";
     assert(kcif.compareShip(a, b) > 0);
+  },
+
+  testSetupFleetStatus: function(){
+    kcif.deck_list[0] = {
+      api_ship: [100, 101, -1, -1, -1, -1, -1],
+    };
+    kcif.ship_list[100].hp = 0;
+    kcif.battle_result = [[0], [0]];
+    kcif.setupFleetStatus();
+    assertEqual([], kcif.battle_result[0]);
+    assertEqual([], kcif.battle_result[1]);
+    assertEqual(101, kcif.deck_list[0].api_ship[0]);
+    assertEqual(-1, kcif.deck_list[0].api_ship[1]);
+  },
+
+  testForm2str: function(){
+    assertEqual("単縦陣", kcif.form2str(1));
+    assertEqual("自:単縦陣", kcif.form2str(1, "自"));
+    // TODO
   },
 
   testReflectDamage: function(){
@@ -491,185 +858,28 @@ JUST.testCase({
     assertEqual("B", kcif.judgeBattleResult([{hp: 17}, {hp: 19}, {hp: 23}, {hp: 28}, {hp: 22}, {hp: 22}], [{hp: 79}, {hp: 59}, {hp: 27}, {hp: 0}, {hp: 0}, {hp: 0}], [0, 0, 0, 0, 0, 0], [11, 17, 49, 50, 43, 45]));
   },
 
-  testUpdateRepairStart: function(){
-    kcif.repair_start = [null, null, null, null];
-    kcif.deck_list[0] = {
-      api_ship: [100, -1, -1, -1, -1, -1, -1],
-    };
-    refute(kcif.repair_start[0]);
-    kcif.updateRepairStart(0);
-    assert(true, !!kcif.repair_start[0]);
-    kcif.deck_list[0].api_ship[0] = 101;
-    kcif.updateRepairStart(0);
-    refute(kcif.repair_start[0]);
-    kcif.deck_list[0].api_ship[1] = 100;
-    kcif.updateRepairStart(0);
-    refute(kcif.repair_start[0]);
+  testJudgeLdBattleResult: function(){
+    assertEqual("SS", kcif.judgeLdBattleResult([{hp: 100}], [0]));
+    assertEqual("A", kcif.judgeLdBattleResult([{hp: 91}], [9]));
+    assertEqual("B", kcif.judgeLdBattleResult([{hp: 90}], [10]));
+    assertEqual("B", kcif.judgeLdBattleResult([{hp: 81}], [19]));
+    assertEqual("C", kcif.judgeLdBattleResult([{hp: 80}], [20]));
+    assertEqual("C", kcif.judgeLdBattleResult([{hp: 51}], [49]));
+    assertEqual("D", kcif.judgeLdBattleResult([{hp: 50}], [50]));
+    assertEqual("D", kcif.judgeLdBattleResult([{hp: 21}], [79]));
+    assertEqual("E", kcif.judgeLdBattleResult([{hp: 20}], [80]));
   },
 
-  testGetTimeColor: function(){
-    var now = new Date();
-    assertEqual("color-red", kcif.getTimeColor(now));
-    assertEqual("color-red", kcif.getTimeColor(now, false));
-    assertEqual("color-red", kcif.getTimeColor(now, true));
-
-    assertEqual("color-orange", kcif.getTimeColor(new Date(now.getTime() + 59 * 1000)));
-    assertEqual("color-orange", kcif.getTimeColor(new Date(now.getTime() + 59 * 1000), false));
-    assertEqual("color-yellow", kcif.getTimeColor(new Date(now.getTime() + 59 * 1000), true));
-
-    assertEqual("color-yellow", kcif.getTimeColor(new Date(now.getTime() + 61 * 1000)));
-    assertEqual("color-yellow", kcif.getTimeColor(new Date(now.getTime() + 61 * 1000), false));
-    assertEqual("color-yellow", kcif.getTimeColor(new Date(now.getTime() + 61 * 1000), true));
-
-    assertEqual("color-yellow", kcif.getTimeColor(new Date(now.getTime() + 299 * 1000)));
-    assertEqual("color-yellow", kcif.getTimeColor(new Date(now.getTime() + 299 * 1000), false));
-    assertEqual("color-yellow", kcif.getTimeColor(new Date(now.getTime() + 299 * 1000), true));
-
-    assertEqual("color-default", kcif.getTimeColor(new Date(now.getTime() + 301 * 1000)));
-    assertEqual("color-default", kcif.getTimeColor(new Date(now.getTime() + 301 * 1000), false));
-    assertEqual("color-default", kcif.getTimeColor(new Date(now.getTime() + 301 * 1000), true));
-  },
-
-  testMap2str: function(){
-    var json = {
-      api_maparea_id: 1,
-      api_mapinfo_no: 2,
-      api_no: 3,
-      api_bosscell_no: 5,
-      api_event_id: 4,
-      api_event_kind: 1,
-    };
-    assertEqual("+ 1-2-3", kcif.map2str(json));
-    json.api_no = 4;
-    json.api_event_id = 3;
-    json.api_event_kind = 0;
-    assertEqual("- 1-2-4", kcif.map2str(json));
-    json.api_no = 5;
-    json.api_event_id = 5;
-    json.api_event_kind = 1;
-    assertEqual("* 1-2-5", kcif.map2str(json));
-  },
-
-  testFormatMaterial: function(){
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">0</td></tr>', kcif.formatMaterial("test", 0, 1).outerHTML);
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">999</td></tr>', kcif.formatMaterial("test", 999, 1).outerHTML);
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">1000</td></tr>', kcif.formatMaterial("test", 1000, 1).outerHTML);
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">299999</td></tr>', kcif.formatMaterial("test", 299999, 1).outerHTML);
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-red">300000</td></tr>', kcif.formatMaterial("test", 300000, 1).outerHTML);
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">1000</td></tr>', kcif.formatMaterial("test", 1000, 2).outerHTML);
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">1249</td></tr>', kcif.formatMaterial("test", 1249, 2).outerHTML);
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-yellow">1250</td></tr>', kcif.formatMaterial("test", 1250, 2).outerHTML);
-
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">0</td></tr>', kcif.formatMaterial("test", 0).outerHTML);
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value">2999</td></tr>', kcif.formatMaterial("test", 2999).outerHTML);
-    assertEqual('<tr><th class="res-name">test</th><td class="res-value color-red">3000</td></tr>', kcif.formatMaterial("test", 3000).outerHTML);
-  },
-
-  testSeiku2str: function(){
-    assertEqual("敵制空値:\u000a 0: 制空権確保\u000a 1～: 制空権喪失", kcif.seiku2str(0));
-    assertEqual("敵制空値:\u000a 0: 制空権確保\u000a 1: 航空均衡\u000a 2～3: 航空劣勢\u000a 4～: 制空権喪失", kcif.seiku2str(1));
-    assertEqual("敵制空値:\u000a 0: 制空権確保\u000a 1: 航空優勢\u000a 2～3: 航空均衡\u000a 4～6: 航空劣勢\u000a 7～: 制空権喪失", kcif.seiku2str(2));
-    assertEqual("敵制空値:\u000a 0～1: 制空権確保\u000a 2: 航空優勢\u000a 3～4: 航空均衡\u000a 5～9: 航空劣勢\u000a 10～: 制空権喪失", kcif.seiku2str(3));
-    assertEqual("敵制空値:\u000a 0～1: 制空権確保\u000a 2～3: 航空優勢\u000a 4～7: 航空均衡\u000a 8～15: 航空劣勢\u000a 16～: 制空権喪失", kcif.seiku2str(5));
-  },
-
-  testCheckConfigChanged: function(){
-    kcif.resetConfig();
-    refute(kcif.checkConfigChanged(), "nothing is changed");
-
-    var elem = kcif.info_div.querySelector("#capture-save-dir");
-    elem.value = "hoge";
-    assert(kcif.checkConfigChanged(), "capture-save-dir is changed");
-
-    kcif.resetConfig();
-    var elem = kcif.info_div.querySelector("#capture-save-base");
-    elem.value = "hoge";
-    assert(kcif.checkConfigChanged(), "capture-save-base is changed");
-
-    kcif.resetConfig();
-    var elem = kcif.info_div.querySelector("#beep-url");
-    elem.value = "hoge";
-    assert(kcif.checkConfigChanged(), "beep-url is changed");
-
-    kcif.resetConfig();
-    var elem = kcif.info_div.querySelector("#beep-volume");
-    elem.value = 0;
-    assert(kcif.checkConfigChanged(), "beep-volume is changed");
-
-    kcif.resetConfig();
-    elem = kcif.info_div.querySelector("#beep-expedition");
-    elem.checked = false;
-    assert(kcif.checkConfigChanged(), "beep-expedition is changed");
-
-    kcif.resetConfig();
-    elem = kcif.info_div.querySelector("#beep-dock");
-    elem.checked = false;
-    assert(kcif.checkConfigChanged(), "beep-dock is changed");
-
-    kcif.resetConfig();
-    elem = kcif.info_div.querySelector("#beep-built");
-    elem.checked = false;
-    assert(kcif.checkConfigChanged(), "beep-built is changed");
-
-    kcif.resetConfig();
-    elem = kcif.info_div.querySelector("#beep-repair");
-    elem.checked = false;
-    assert(kcif.checkConfigChanged(), "beep-repair is changed");
-
-    kcif.resetConfig();
-    elem = kcif.info_div.querySelector("#show-battle");
-    elem.checked = false;
-    assert(kcif.checkConfigChanged(), "show-battle is changed");
-
-    kcif.resetConfig();
-    elem = kcif.info_div.querySelector("#show-built");
-    elem.checked = false;
-    assert(kcif.checkConfigChanged(), "show-built is changed");
-
-    kcif.resetConfig();
-    elem = kcif.info_div.querySelector("#hp-by-meter");
-    elem.checked = false;
-    assert(kcif.checkConfigChanged(), "hp-by-meter is changed");
-
-    kcif.resetConfig();
-    elem = kcif.info_div.querySelector("#fuel-by-meter");
-    elem.checked = false;
-    assert(kcif.checkConfigChanged(), "fuel-by-meter is changed");
-
-    kcif.resetConfig();
-    elem = kcif.info_div.querySelector("#search-formula");
-    elem.selectedIndex = 0;
-    assert(kcif.checkConfigChanged(), "search-formula is changed");
-
-    kcif.resetConfig();
-    refute(kcif.checkConfigChanged(), "nothing is changed");
-  },
-
-  testSetupFleetStatus: function(){
-    kcif.deck_list[0] = {
-      api_ship: [100, 101, -1, -1, -1, -1, -1],
-    };
-    kcif.ship_list[100].hp = 0;
-    kcif.battle_result = [[0], [0]];
-    kcif.setupFleetStatus();
-    assertEqual([], kcif.battle_result[0]);
-    assertEqual([], kcif.battle_result[1]);
-    assertEqual(101, kcif.deck_list[0].api_ship[0]);
-    assertEqual(-1, kcif.deck_list[0].api_ship[1]);
-  },
-
-  testMain: function(){
+  testBattle: function(){
     // TODO
-    kcif.main(null, null, null);
   },
 
-  testParseQuery: function(){
-    var listener = new TracingListener();
-    var result = listener.parseQuery("a=1&b=2&c=3");
-    assertEqual(1, result["a"]);
-    assertEqual(2, result["b"]);
-    assertEqual(3, result["c"]);
-    refute(result["d"], "no such parameter");
+  testBasic: function(){
+    // TODO
+  },
+
+  testSlot_item: function(){
+    // TODO
   },
 
   testKdock: function(){
@@ -682,16 +892,8 @@ JUST.testCase({
     kcif.ndock([{}, {}, {}, {}]);
   },
 
-  testRenderInfo: function(){
+  testMain: function(){
     // TODO
-    kcif.renderInfo(false);
-
-    kcif.renderInfo(true);
-  },
-
-  testOnLoad: function(){
-    // TODO
-    evt = {originalTarget: document};
-    kcif.onLoad(evt);
+    kcif.main(null, null, null);
   },
 });

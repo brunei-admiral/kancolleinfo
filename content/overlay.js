@@ -3452,6 +3452,25 @@ var kcif = {
     }
   },
 
+  ndock: function(dock_list) {
+    for (var i = 0, dock; dock = dock_list[i]; i++) {
+      if (kcif.dock[i] && kcif.dock[i].api_ship_id >= 0 && kcif.dock[i].api_ship_id != dock.api_ship_id) {
+        var ship = kcif.ship_list[kcif.dock[i].api_ship_id];
+        if (ship) {
+          ship.p_hp = ship.hp;
+          ship.hp = ship.hp_max;
+          if (ship.cond < 40) {
+            ship.p_cond = ship.cond;
+            ship.cond = 40;
+          }
+          log("ndock: " + kcif.dock[i].api_id + ": completed: " + ship.api_id);
+        }
+      }
+      kcif.dock[i] = dock;
+      log("ndock: " + kcif.dock[i].api_id + ": " + kcif.dock[i].api_complete_time);
+    }
+  },
+
   main: function(request, content, query) {
     if (kcif.timer) {
       window.clearTimeout(kcif.timer);
@@ -3493,11 +3512,7 @@ var kcif = {
       }
     }
     else if (url.indexOf("/ndock") != -1) {
-      var dock_list = json.api_data;
-      for (var i = 0, dock; dock = dock_list[i]; i++) {
-        kcif.dock[i] = dock;
-        log("ndock: " + kcif.dock[i].api_id + ": " + kcif.dock[i].api_complete_time);
-      }
+      kcif.ndock(json.api_data);
       update_all = false;
     }
     else if (url.indexOf("/createship_speedchange") != -1) {
@@ -4025,10 +4040,7 @@ var kcif = {
         }
 
         // 入渠状況更新
-        var dock_list = json.api_data.api_ndock;
-        for (var i = 0, dock; dock = dock_list[i]; i++) {
-          kcif.dock[i] = dock;
-        }
+        kcif.ndock(json.api_data.api_ndock);
       }
 
       log("etc: " + String(kcif.ship_num) + " ships (" + (port ? "port" : ship2 ? "ship2" : "ship3") + ")");

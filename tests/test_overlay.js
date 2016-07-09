@@ -672,6 +672,16 @@ JUST.testCase({
     refute(result["d"], "no such parameter");
   },
 
+  testKdock: function(){
+    // TODO
+    kcif.kdock([{}, {}, {}, {}]);
+  },
+
+  testNdock: function(){
+    // TODO
+    kcif.ndock([{}, {}, {}, {}]);
+  },
+
   testRenderInfo: function(){
     // TODO
     kcif.renderInfo(false);

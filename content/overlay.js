@@ -315,7 +315,7 @@ var kcif = {
 
       kcif.renderFrame();
 
-      kcif.document.body.setAttribute("onload", "function setHeight(){if (typeof ConstGadgetInfo != 'undefined') ConstGadgetInfo.height = 920; else window.setTimer(setHeight, 100);} setHeight();");
+      kcif.document.body.setAttribute("onLoad", "var setHeightRetry = 10; function setHeight(){ if (typeof ConstGadgetInfo != 'undefined') { if (ConstGadgetInfo.height != 920) { console.log('[kcif] set height ' + ConstGadgetInfo.height + ' -> 920 (' + setHeightRetry + ')'); ConstGadgetInfo.height = 920; } } else { console.log('[kcif] ConstGadgetInfo is undefined (' + setHeightRetry + ')'); } if (--setHeightRetry > 0) window.setTimeout(setHeight, 1000); } setHeight();");
     }
     else if (url.match(/\/app_id=854854\//)) {
       log("DOMloaded:", url);

@@ -3491,7 +3491,7 @@ var kcif = {
         else if (kcif.isOnMission(kcif.mission[i])) {
           kcif.mission[i] = null;
         }
-        log("deck mission: " + i + ": " + (kcif.mission[i] ? kcif.mission[i][1] : "null"));
+        log("deck mission: " + i + ": " + (kcif.mission[i] ? kcif.mission[i][2] : "null"));
       }
       update_all = false;
     }

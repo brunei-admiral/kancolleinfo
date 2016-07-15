@@ -3909,8 +3909,8 @@ var kcif = {
       log("battle: " + url);
       var deck_id = Number(json.api_data.api_dock_id || json.api_data.api_deck_id);
       if (url.indexOf("practice") != -1 && (!kcif.mission[deck_id - 1] || kcif.isOnPractice(kcif.mission[deck_id - 1]))) {
-        kcif.mission[deck_id - 1] = ["演習"];
         if (url.indexOf("midnight") == -1) {
+          kcif.mission[deck_id - 1] = ["演習"];
           kcif.setupFleetStatus();
         }
       }

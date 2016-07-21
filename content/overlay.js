@@ -1022,7 +1022,14 @@ var kcif = {
                     dai_p = true;
                   }
                   else if (kcif.hasSeiku(item.type[2]) && ship.equip[k] > 0) {
-                    seiku += Math.floor(item.taiku * Math.sqrt(ship.equip[k]));
+                    var hosei = item.level;
+                    if (item.type[2] == 6) { // 艦戦
+                      hosei *= 0.2;
+                    }
+                    else if (item.type[2] == 7) { // 艦爆
+                      hosei *= 0.25;
+                    }
+                    seiku += Math.floor((item.taiku + hosei) * Math.sqrt(ship.equip[k]));
                     if (kcif.getAircoverAlv()) {
                       if (item.type[2] == 6 || item.type[2] == 45) { // 艦戦
                         seiku_alv += [0, 0, 2, 5, 9, 14, 14, 22][item.alv];

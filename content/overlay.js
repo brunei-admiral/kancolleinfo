@@ -1029,16 +1029,18 @@ var kcif = {
                     else if (item.type[2] == 7) { // 艦爆
                       hosei *= 0.25;
                     }
-                    seiku += Math.floor((item.taiku + hosei) * Math.sqrt(ship.equip[k]));
+                    var alv = 0;
                     if (kcif.getAircoverAlv()) {
                       if (item.type[2] == 6 || item.type[2] == 45) { // 艦戦
-                        seiku_alv += [0, 0, 2, 5, 9, 14, 14, 22][item.alv];
+                        alv = [0, 0, 2, 5, 9, 14, 14, 22][item.alv];
                       }
                       else if (item.type[2] == 11) { // 水爆
-                        seiku_alv += [0, 0, 0, 1, 2, 4, 5, 6][item.alv];
+                        alv = [0, 0, 1, 1, 1, 3, 3, 6][item.alv];
                       }
-                      seiku_alv += [0, 1, 2, 2, 2, 2, 2, 3][item.alv];
+                      alv += Math.sqrt([0, 1, 2.5, 4, 5.5, 7, 8.5, 10][item.alv]);
+                      seiku_alv += alv;
                     }
+                    seiku += Math.floor((item.taiku + hosei) * Math.sqrt(ship.equip[k]) + alv);
                   }
                   s_base -= item.sakuteki;
                   s_sakuteki += kcif.calcSakuteki(item, 3);
@@ -1140,7 +1142,7 @@ var kcif = {
           elem.setAttribute("title", "旗艦 " + ships[0].name);
           s.push(makeText(" "), elem);
 
-          elem = makeElement("span", null, "color-gray", "制空:" + (seiku + seiku_alv));
+          elem = makeElement("span", null, "color-gray", "制空:" + seiku);
           elem.setAttribute("title", kcif.seiku2str(seiku, seiku_alv));
           s.push(makeText(" "), elem);
 
@@ -2265,8 +2267,7 @@ var kcif = {
   seiku2str: function(seiku, seiku_alv) {
     var seikuText = "";
     if (seiku_alv) {
-      seikuText += "自制空値: " + seiku + " + " + seiku_alv + "(熟練度ボーナス)\u000a";
-      seiku += seiku_alv;
+      seikuText += "自制空値: " + seiku + " (うち、熟練度ボーナス: " + Math.floor(seiku_alv) + ")\u000a";
     }
     seikuText += "敵制空値:\u000a ";
     var tmp = Math.floor(seiku / 3);

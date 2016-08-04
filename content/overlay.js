@@ -48,7 +48,7 @@ function clearChildElements(elem) {
 
 // Helper function for XPCOM instanciation (from Firebug)
 function CCIN(cName, ifaceName) {
-  return Cc[cName].createInstance(Ci[ifaceName]);
+  return Components.classes[cName].createInstance(Components.interfaces[ifaceName]);
 }
 
 // Copy response listener implementation.
@@ -96,8 +96,8 @@ TracingListener.prototype = {
   },
 
   QueryInterface: function(aIID) {
-    if (aIID.equals(Ci.nsIStreamListener) ||
-        aIID.equals(Ci.nsISupports)) {
+    if (aIID.equals(Components.interfaces.nsIStreamListener) ||
+        aIID.equals(Components.interfaces.nsISupports)) {
       return this;
     }
     throw Components.results.NS_NOINTERFACE;
@@ -119,12 +119,12 @@ TracingListener.prototype = {
   // Helper function to read post text (derived from Firebug)
   readPostTextFromRequest: function(request, context) {
     try {
-      var channel = request.QueryInterface(Ci.nsIUploadChannel);
+      var channel = request.QueryInterface(Components.interfaces.nsIUploadChannel);
       var stream = channel.uploadStream;
-      var ss = stream.QueryInterface(Ci.nsISeekableStream);
+      var ss = stream.QueryInterface(Components.interfaces.nsISeekableStream);
 
       var offset = stream.tell();
-      ss.seek(Ci.nsISeekableStream.NS_SEEK_SET, 0);
+      ss.seek(Components.interfaces.nsISeekableStream.NS_SEEK_SET, 0);
 
       var sis = CCIN("@mozilla.org/scriptableinputstream;1", "nsIScriptableInputStream");
       sis.init(stream);
@@ -136,7 +136,7 @@ TracingListener.prototype = {
 
       var text = segments.join("");
 
-      ss.seek(Ci.nsISeekableStream.NS_SEEK_SET, offset);
+      ss.seek(Components.interfaces.nsISeekableStream.NS_SEEK_SET, offset);
 
       var index = text.indexOf("\r\n\r\n");
       if (index != -1) {
@@ -158,12 +158,12 @@ var kcifHttpObserver = {
   observe: function (aSubject, aTopic, aData) {
     if (aTopic !== TOPIC) return;
 
-    var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
+    var httpChannel = aSubject.QueryInterface(Components.interfaces.nsIHttpChannel);
     var path = httpChannel.URI.path;
     if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material|require_info)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset(_ex)?|unsetslot_all|slot_(exchange_index|deprive))|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select)|api_req_sortie\/((ld_)?air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/(((ld_)?air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
-      aSubject.QueryInterface(Ci.nsITraceableChannel);
+      aSubject.QueryInterface(Components.interfaces.nsITraceableChannel);
       newListener.originalListener = aSubject.setNewListener(newListener);
     }
   },
@@ -199,14 +199,24 @@ var kcif = {
   material: [0, 0, 0, 0, 0, 0, 0, 0],
   battle_result: [[], []],
   timer: null,
+  window: null,
 
-  init: function(evt) {
+  init: function(evt, win) {
     log("init");
+    if (win != null) {
+      kcif.window = win;
+    }
+    if (kcif.info_div != null) {
+      kcif.info_div.parentNode.removeChild(kcif.info_div);
+    }
     Services.obs.addObserver(kcifHttpObserver, TOPIC, false);
   },
 
   destroy: function(evt) {
     log("destroy");
+    if (kcif.info_div) {
+      kcif.info_div.parentNode.removeChild(kcif.info_div);
+    }
     Services.obs.removeObserver(kcifHttpObserver, TOPIC);
     if (kcif.beep) {
       kcif.beep.pause();
@@ -220,6 +230,7 @@ var kcif = {
       log("DOMloaded:", url);
 
       kcif.document = doc;
+      kcif.document.characterSet = "UTF-8";
       var div = makeElement("div");
       var elem = kcif.document.querySelector("#sectionWrap");
       if (elem) {
@@ -649,8 +660,8 @@ var kcif = {
       var elem = kcif.info_div.querySelector("#capture");
       if (elem) {
         elem.addEventListener("click", kcif.captureAndSave, false);
-        document.addEventListener("keypress", function(evt){
-          var url = content.document.URL;
+        kcif.document.addEventListener("keypress", function(evt){
+          var url = kcif.document.URL;
           if (url.match(/\/app_id=854854\//) &&
               evt.keyCode == 113) { // F2
             kcif.captureAndSave(evt);
@@ -725,7 +736,7 @@ var kcif = {
             return;
           }
           if (!beeptest) {
-            beeptest = new Audio(url);
+            beeptest = new kcif.window.Audio(url);
             beeptest.loop = true;
             beeptest.volume = kcif.info_div.querySelector("#beep-volume").value / 100.0;
             beeptest.load();
@@ -744,7 +755,7 @@ var kcif = {
         kcif.beep.pause();
         kcif.beep = null;
       }
-      kcif.beep = new Audio(kcif.getBeepUrl());
+      kcif.beep = new kcif.window.Audio(kcif.getBeepUrl());
       if (kcif.beep) {
         kcif.beep.loop = true;
         kcif.beep.volume = kcif.getBeepVolume() / 100.0;
@@ -1674,19 +1685,19 @@ var kcif = {
     var elem = configtab.querySelector("#capture-save-dir");
     if (elem) {
       str.data = elem.value;
-      kcif.myPref().setComplexValue("capture.directory", Ci.nsISupportsString, str);
+      kcif.myPref().setComplexValue("capture.directory", Components.interfaces.nsISupportsString, str);
     }
 
     elem = configtab.querySelector("#capture-save-base");
     if (elem) {
       str.data = elem.value;
-      kcif.myPref().setComplexValue("capture.basename", Ci.nsISupportsString, str);
+      kcif.myPref().setComplexValue("capture.basename", Components.interfaces.nsISupportsString, str);
     }
 
     elem = configtab.querySelector("#beep-url");
     if (elem) {
       str.data = elem.value;
-      kcif.myPref().setComplexValue("beep.url", Ci.nsISupportsString, str);
+      kcif.myPref().setComplexValue("beep.url", Components.interfaces.nsISupportsString, str);
     }
 
     elem = configtab.querySelector("#beep-volume");
@@ -1945,83 +1956,101 @@ var kcif = {
   },
 
   myGetTmpDir: function() {
-    return Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile).path;
+    return Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("TmpD", Components.interfaces.nsIFile).path;
   },
 
   myPref: function() {
-    return Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService).getBranch("extensions.kancolleinfo.");
+    return Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("extensions.kancolleinfo.");
   },
 
-  getStringPref: function(pref) {
-    return kcif.myPref().getComplexValue(pref, Ci.nsISupportsString).data;
+  getStringPref: function(pref, def) {
+    try {
+      return kcif.myPref().getComplexValue(pref, Components.interfaces.nsISupportsString).data;
+    }
+    catch (exc) {
+      log("getStringProf(" + pref + ") failed: " + String(exc));
+      return def;
+    }
   },
 
-  getIntPref: function(pref) {
-    return kcif.myPref().getIntPref(pref);
+  getIntPref: function(pref, def) {
+    try {
+      return kcif.myPref().getIntPref(pref);
+    }
+    catch (exc) {
+      log("getIntProf(" + pref + ") failed: " + String(exc));
+      return def;
+    }
   },
 
-  getBoolPref: function(pref) {
-    return kcif.myPref().getBoolPref(pref);
+  getBoolPref: function(pref, def) {
+    try {
+      return kcif.myPref().getBoolPref(pref);
+    }
+    catch (exc) {
+      log("getBoolProf(" + pref + ") failed: " + String(exc));
+      return def;
+    }
   },
 
   getCaptureSaveDir: function() {
-    return kcif.getStringPref("capture.directory") || kcif.myGetTmpDir();
+    return kcif.getStringPref("capture.directory", kcif.myGetTmpDir());
   },
 
   getCaptureSaveBase: function() {
-    return kcif.getStringPref("capture.basename") || "kancolle-";
+    return kcif.getStringPref("capture.basename", "kancolle-");
   },
 
   getBeepUrl: function() {
-    return kcif.getStringPref("beep.url") || "file:///C:/Windows/Media/ringout.wav";
+    return kcif.getStringPref("beep.url", "file:///C:/Windows/Media/ringout.wav");
   },
 
   getBeepVolume: function() {
-    return kcif.getIntPref("beep.volume");
+    return kcif.getIntPref("beep.volume", 100);
   },
 
   getBeepExpedition: function() {
-    return kcif.getBoolPref("beep.expedition");
+    return kcif.getBoolPref("beep.expedition", false);
   },
 
   getBeepDock: function() {
-    return kcif.getBoolPref("beep.dock");
+    return kcif.getBoolPref("beep.dock", false);
   },
 
   getBeepBuilt: function() {
-    return kcif.getBoolPref("beep.built");
+    return kcif.getBoolPref("beep.built", false);
   },
 
   getBeepRepair: function() {
-    return kcif.getBoolPref("beep.repair");
+    return kcif.getBoolPref("beep.repair", false);
   },
 
   getShowBattle: function() {
-    return kcif.getBoolPref("show.battle");
+    return kcif.getBoolPref("show.battle", false);
   },
 
   getShowBuilt: function() {
-    return kcif.getBoolPref("show.built");
+    return kcif.getBoolPref("show.built", false);
   },
 
   getHpByMeter: function() {
-    return kcif.getBoolPref("meter.hp");
+    return kcif.getBoolPref("meter.hp", true);
   },
 
   getFuelByMeter: function() {
-    return kcif.getBoolPref("meter.fuel");
+    return kcif.getBoolPref("meter.fuel", true);
   },
 
   getSearchFormula: function() {
-    return kcif.getIntPref("search.formula");
+    return kcif.getIntPref("search.formula", 4);
   },
 
   getAircoverAlv: function() {
-    return kcif.getBoolPref("aircover.alv");
+    return kcif.getBoolPref("aircover.alv", true);
   },
 
   getLogLevel: function() {
-    return kcif.getIntPref("debug.loglevel");
+    return kcif.getIntPref("debug.loglevel", 0);
   },
 
   saveCheckboxes: function(tab) {
@@ -2065,7 +2094,7 @@ var kcif = {
       return;
     }
     if (!kcif.beep) {
-      kcif.beep = new Audio(url);
+      kcif.beep = new kcif.window.Audio(url);
       kcif.beep.loop = true;
       kcif.beep.load();
     }
@@ -2093,17 +2122,17 @@ var kcif = {
 
   saveFile: function(blob, path) {
     log("saveFile start: data=" + blob + ", path=" + path);
-    var reader = new FileReader();
+    var reader = new kcif.window.FileReader();
     reader.onloadend = function() {
       var file = CCIN("@mozilla.org/file/local;1", "nsILocalFile");
       file.initWithPath(path);
-      file.createUnique(Ci.nsIFile.NORMAL_FILE_TYPE, 0644);
+      file.createUnique(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0644);
       var stream = CCIN("@mozilla.org/network/safe-file-output-stream;1", "nsIFileOutputStream");
       stream.init(file, 0x04 | 0x08 | 0x20, 0644, 0);
       var binary = reader.result;
       log("saveFile size=" + binary.length + ", [" + binary.substr(1, 3) + "]");
       stream.write(binary, binary.length);
-      if (stream instanceof Ci.nsISafeOutputStream) {
+      if (stream instanceof Components.interfaces.nsISafeOutputStream) {
         stream.finish();
       }
       else {
@@ -2114,7 +2143,7 @@ var kcif = {
   },
 
   getPathSeparator: function() {
-    var profD = Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties).get("ProfD", Ci.nsIFile);
+    var profD = Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("ProfD", Components.interfaces.nsIFile);
     profD.append("dummy");
     profD.append("dummy");
     return profD.path.substr(profD.path.length - ("dummy".length) - 1, 1);
@@ -2125,14 +2154,14 @@ var kcif = {
 
     var rect = kcif.flash.getBoundingClientRect();
     var rect2 = kcif.game_frame.getBoundingClientRect();
-    var canvas = document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+    var canvas = kcif.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
     scale = 1.0;
     canvas.mozOpaque = true;
     canvas.width = rect.width;
     canvas.height = rect.height;
     var context = canvas.getContext("2d");
     context.scale(scale, scale);
-    context.drawWindow(window.content, rect.left + rect2.left + window.content.scrollX + 1, rect.top + rect2.top + window.content.scrollY, rect.width, rect.height, "white");
+    context.drawWindow(kcif.window.content, rect.left + rect2.left + kcif.window.content.scrollX + 1, rect.top + rect2.top + kcif.window.content.scrollY, rect.width, rect.height, "white");
 
     canvas.toBlob(function(blob){
       var dir = kcif.getCaptureSaveDir();
@@ -3481,7 +3510,7 @@ var kcif = {
 
   main: function(request, content, query) {
     if (kcif.timer) {
-      window.clearTimeout(kcif.timer);
+      kcif.window.clearTimeout(kcif.timer);
       kcif.timer = null;
     }
 
@@ -4060,13 +4089,13 @@ var kcif = {
     kcif.renderInfo(update_all);
 
     if (kcif.timer) {
-      window.clearTimeout(kcif.timer);
+      kcif.window.clearTimeout(kcif.timer);
       kcif.timer = null;
     }
-    kcif.timer = window.setTimeout(kcif.main, 10 * 1000);
+    kcif.timer = kcif.window.setTimeout(kcif.main, 10 * 1000);
   },
 };
 
-window.addEventListener("load", kcif.init, false);
-window.addEventListener("unload", kcif.destroy, false);
-document.addEventListener("DOMContentLoaded", kcif.onLoad, true);
+//window.addEventListener("load", kcif.init, false);
+//window.addEventListener("unload", kcif.destroy, false);
+//document.addEventListener("DOMContentLoaded", kcif.onLoad, true);

@@ -3966,11 +3966,46 @@ var kcif = {
       update_all = false;
     }
     else if (url.indexOf("_map/next") != -1) {
+      var recovery = Number(query["api_recovery_type"]);
       kcif.setupFleetStatus();
       for (var i = 0; i < 4; i++) {
         if (kcif.mission[i] && !kcif.isOnMission(kcif.mission[i])) {
           kcif.mission[i] = [kcif.map2str(json.api_data)];
           log("next: " + (i + 1) + ": " + kcif.mission[i][0]);
+          if (recovery > 0) {
+            log("recovery_type: " + recovery);
+            var ship = kcif.ship_list[kcif.deck_list[i].api_ship[0]];
+            if (ship.hp <= Math.floor(ship.hp_max / 5) && ship.slot) {
+              var slots = ship.slot.concat(ship.slot_ex);
+              for (var i = 0; i < slots.length && !found; i++) {
+                if (slots[i] < 0) {
+                  continue;
+                }
+                var item = kcif.item_list[slots[i]];
+                if (item) {
+                  if (item.item_id == 42) {      // 応急修理要員
+                    ship.hp = Math.floor(ship.hp_max / 2);
+                    found = true;
+                  }
+                  else if (item.item_id == 43) { // 応急修理女神
+                    ship.hp = ship.hp_max;
+                    found = true;
+                  }
+                  if (found) {
+                    if (i >= ship.slot.length) {
+                      ship.slot_ex = -1;
+                    }
+                    else {
+                      for (var j = i + 1; j < ship.slot.length - 1; j++) {
+                        ship.slot[j - 1] = ship.slot[j];
+                      }
+                      ship.slot[slots.length - 1] = -1;
+                    }
+                  }
+                }
+              }
+            }
+          }
           break;
         }
       }
@@ -4095,7 +4130,3 @@ var kcif = {
     kcif.timer = kcif.window.setTimeout(kcif.main, 10 * 1000);
   },
 };
-
-//window.addEventListener("load", kcif.init, false);
-//window.addEventListener("unload", kcif.destroy, false);
-//document.addEventListener("DOMContentLoaded", kcif.onLoad, true);

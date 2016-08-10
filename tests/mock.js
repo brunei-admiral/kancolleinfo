@@ -39,6 +39,7 @@ var dummyCc = {
   getService: function(){
     var obj = {
       newURI: function(){},
+      get: function(){ return {put: function(){}};},
       getCodebasePrincipal: function(){},
       getLocalStorageForPrincipal: function(){},
     };
@@ -46,20 +47,22 @@ var dummyCc = {
   },
 }
 
-const Cc = {
-  "@mozilla.org/network/io-service;1": dummyCc,
-  "@mozilla.org/scriptsecuritymanager;1": dummyCc,
-  "@mozilla.org/dom/storagemanager;1": dummyCc,
+const Components = {
+  classes: {
+    "@mozilla.org/file/directory_service;1": dummyCc,
+    "@mozilla.org/network/io-service;1": dummyCc,
+    "@mozilla.org/scriptsecuritymanager;1": dummyCc,
+    "@mozilla.org/dom/storagemanager;1": dummyCc,
+  },
+  interfaces: {
+    nsIDOMStorageManager: null,
+    nsIIOService: null,
+    nsIScriptSecuirtyManager: null,
+    nsISupportsString: null,
+  },
 }
 
-const Ci = {
-  nsIDOMStorageManager: null,
-  nsIIOService: null,
-  nsIScriptSecuirtyManager: null,
-  nsISupportsString: null,
-};
-
-function Audio(){
+window.Audio = function(){
   var obj = {
     load: function(){
     },
@@ -67,7 +70,7 @@ function Audio(){
     },
   };
   return obj;
-}
+};
 
 function sendSyncMessage(){
   return [null];

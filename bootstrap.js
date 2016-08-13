@@ -11,7 +11,7 @@ function load(script, root){
     script = IOService.newFileURI(root).spec;
   }
   else {
-    script = 'jar:' + IOService.newFileURI(root).spec + '!/content' + script;
+    script = 'jar:' + IOService.newFileURI(root).spec + '!/content/' + script;
     script = IOService.newURI(script, null, null).spec;
   }
 

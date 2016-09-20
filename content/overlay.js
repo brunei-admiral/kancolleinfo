@@ -662,8 +662,7 @@ var kcif = {
         elem.addEventListener("click", kcif.captureAndSave, false);
         kcif.document.addEventListener("keypress", function(evt){
           var url = kcif.document.URL;
-          if (url.match(/\/app_id=854854\//) &&
-              evt.keyCode == 113) { // F2
+          if (url.match(/\/app_id=854854\//) && evt.keyCode == 113) { // F2
             kcif.captureAndSave(evt);
           }
         }, false);
@@ -2354,7 +2353,7 @@ var kcif = {
       name += "+" + item.level;
     }
     if (item.alv > 0) {
-      name += "+" + item.alv;
+      name += " lv." + item.alv;
     }
     if (item.type && kcif.isPlane(item.type[2])) {
       name += " [" + String(equip) + "/" + String(equip_max) + "]";

@@ -15,7 +15,7 @@
 //--></script>
 <style type="text/css"><!--
 body {
-  font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif;
   font-size: 12pt;
   line-height: 1.3;
 }
@@ -167,10 +167,10 @@ span.bugfix:after {
 }
 
 /* 以下、モック用 */
-#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; text-align: left; }
-#kancolle-info * { font-family: Verdana, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; }
+#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; text-align: left; }
+#kancolle-info * { font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; }
 #kancolle-info #tab-headers { color: #ccc; background-color: #444; line-height: 1.5; font-weight: bold; }
-#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; padding: 1px 12px 2px 12px; }
+#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-left: 4px; margin-right: -2px; padding: 1px 12px 2px 12px; }
 #kancolle-info #base-info { float: right; margin-right: 8px; color: white; font-weight: normal; }
 #kancolle-info #base-info button { height: 21px; position: relative; top: -1px; font-size: 10px; }
 #kancolle-info #updated { font-weight: bold; color: lightgreen; }
@@ -825,7 +825,9 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 
 <h3 id="bugs">動作上の制限事項など</h3>
 <p>
-ゲーム開始時にkancolleinfo画面が正しく表示されない場合は、一度リロードしてみてください。
+ゲーム開始時にkancolleinfo画面が正しく表示されない場合は、しばらく待ってみてください。
+「提督が鎮守府に着任しました」のアナウンス後でも表示がおかしい場合は何かの異常ですので、リロードしてみるなどしてみてください。
+それでもうまくいかないようならごめんなさい。
 </p>
 <p>
 なんか表示内容が実際の『艦これ』の中身とずれてるなあ、と思ったら、母港と工廠あたりを行き来してみてください。
@@ -834,6 +836,9 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 <p>
 戦闘で艦娘がドロップしたり、イベント海域でクリア報酬として装備品や艦娘を入手した場合、表示にうまく反映されない場合があります。
 その場合は母港に戻った時点でたぶん反映されます。
+</p>
+<p>
+1分以内の入渠時、艦娘の修理は即座に終了しますが、表示にそれが反映されるのは母港に戻った時点となります。
 </p>
 <p>
 出撃中の燃料・弾薬の消費は一連の戦闘が終了した後で表示に反映されます。つまり、昼戦と夜戦が連続した場合、夜戦開始時には本来は既に昼戦分の燃料・弾薬が消費されているはずですが、それは表示には反映されません。また、うずしおを踏んだ場合の消費も、実際には既に燃料または弾薬が減っているはずですが、次の一連の戦闘が終了するまでは表示には反映されません。
@@ -873,7 +878,7 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 <h2 id="histroy">履歴</h2>
 <dl>
   <dt>2016-??-??</dt>
-  <dd id="v210">ver 2.1.0<br><span class="update"></span>内部構造を変更。デグレってたらごめんなさい。<br><span class="update"></span>制空値に艦戦等の改修による効果を反映するように変更。<br><span class="update"></span>制空値に艦載機熟練度のボーナスを加算する場合、算出式を現時点での最新の知見によるものに変更。<br><span class="update"></span>艦名に対するポップアップでの装備表示で、艦載機の熟練度が「+数字」で表示されていて改修値と区別が付かなかったのを、「lv.数字」と表示するように変更。<br><span class="bugfix"></span>入渠が完了した艦があったとき、一度母港画面に戻るまでは、耐久値等の回復が反映されていなかった不具合をようやく修正。</dd>
+  <dd id="v210">ver 2.1.0<br><span class="feature"></span>2016-10-05アップデートに対応。敵連合艦隊(6-5ボス)戦に対応。<br><span class="update"></span>Firefoxの最近のバージョンアップに要求されて内部構造を変更。デグレってたらごめんなさい。<br><span class="update"></span>制空値に艦戦等の改修による効果を反映するように変更。<br><span class="update"></span>制空値に艦載機熟練度のボーナスを加算する場合、算出式を現時点での最新の知見によるものに変更。<br><span class="update"></span>艦名に対するポップアップでの装備表示で、艦載機の熟練度が「+数字」で表示されていて改修値と区別が付かなかったのを、「lv.数字」と表示するように変更。<br><span class="update"></span>使用フォントを、游ゴシックよりメイリオを優先するように変更。<br><span class="update"></span>タブをもうちょっとタブっぽく見えるように変更。<br><span class="bugfix"></span>入渠が完了した艦があったとき、一度母港画面に戻るまでは、耐久値等の回復が反映されていなかった不具合をようやく修正。</dd>
 
   <dt>2016-07-05</dt>
   <dd id="v204">ver 2.0.4<br><span class="feature"></span>2016-06-01アップデートに対応。多艦装備中装備変更に対応。<br><span class="feature"></span>2016-06-30アップデートに対応。対潜先制攻撃に対応。<br><span class="update"></span>水上戦闘機の熟練度による制空値ボーナスを艦上戦闘機と同等として扱うように変更。</dd>

@@ -22,6 +22,7 @@ function load(script, root){
 
 var WindowListener = {
   onOpenWindow: function(xulWindow){
+    log("new opened xulWindow: title = " + xulWindow.title);
     var window = xulWindow.QueryInterface(Components.interfaces.nsIInterfaceRequestor).getInterface(Components.interfaces.nsIDOMWindow);
     function loadListener(){
       window.removeEventListener('load', loadListener);
@@ -39,27 +40,22 @@ var WindowListener = {
   },
 };
 
-function loadOverlay(window){
-  window.addEventListener("unload", kcif.destroy, false);
-  window.document.addEventListener("DOMContentLoaded", kcif.onLoad, true);
-  kcif.init(null, window);
-}
-
-function unloadOverlay(window){
-  window.document.removeEventListener("DOMContentLoaded", kcif.onLoad);
-  kcif.destroy(null);
-}
-
 function install(data, reason){
+}
+
+function uninstall(data, reason){
 }
 
 function startup(data, reason){
   Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
   load("overlay.js", data.installPath);
+  kcif.init();
 
   var windows = Services.wm.getEnumerator('navigator:browser');
   while (windows.hasMoreElements()) {
-    loadOverlay(windows.getNext().QueryInterface(Components.interfaces.nsIDOMWindow));
+    var xulWindow = windows.getNext()
+    log("use existent xulWindow: title = ", xulWindow.title);
+    loadOverlay(xulWindow.QueryInterface(Components.interfaces.nsIDOMWindow));
   }
   Services.wm.addListener(WindowListener);
 }
@@ -70,7 +66,17 @@ function shutdown(data, reason){
     unloadOverlay(windows.getNext().QueryInterface(Components.interfaces.nsIDOMWindow));
   }
   Services.wm.removeListener(WindowListener);
+  kcif.destroy();
 }
 
-function uninstall(data, reason){
+var listener = null;
+function loadOverlay(window){
+  kcif.mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor).getInterface(Components.interfaces.nsIWebNavigation).QueryInterface(Components.interfaces.nsIDocShellTreeItem).rootTreeItem.QueryInterface(Components.interfaces.nsIInterfaceRequestor).getInterface(Components.interfaces.nsIDOMWindow);
+  kcif.window = window.content;
+  window.document.addEventListener("DOMContentLoaded", kcif.onLoad, false);
+}
+
+function unloadOverlay(window){
+  window.document.removeEventListener("DOMContentLoaded", kcif.onLoad, false);
+  kcif.unload();
 }

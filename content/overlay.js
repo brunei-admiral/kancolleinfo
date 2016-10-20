@@ -199,44 +199,63 @@ var kcif = {
   material: [0, 0, 0, 0, 0, 0, 0, 0],
   battle_result: [[], []],
   timer: null,
+  mainWindow: null,
   window: null,
 
-  init: function(evt, win) {
+  init: function(evt) {
     log("init");
-    if (win != null) {
-      kcif.window = win;
-    }
-    if (kcif.info_div != null) {
-      kcif.info_div.parentNode.removeChild(kcif.info_div);
-    }
     Services.obs.addObserver(kcifHttpObserver, TOPIC, false);
   },
 
   destroy: function(evt) {
     log("destroy");
-    if (kcif.info_div) {
-      kcif.info_div.parentNode.removeChild(kcif.info_div);
+    try {
+      Services.obs.removeObserver(kcifHttpObserver, TOPIC);
     }
-    Services.obs.removeObserver(kcifHttpObserver, TOPIC);
-    if (kcif.beep) {
-      kcif.beep.pause();
+    catch (exc) {
+      log("kcif.destroy failed: " + String(exc));
+    }
+  },
+
+  unload: function() {
+    log("unload");
+    if (kcif.info_div) {
+      log("  remove info_div");
+      kcif.info_div.parentNode.removeChild(kcif.info_div);
+      kcif.info_div = null;
     }
   },
 
   onLoad: function(evt) {
     var doc = evt.originalTarget;
-    var url = doc.location.href;
-    if (url.match(/osapi\.dmm\.com\//) && url.match(/aid=854854/)) {
+    var url = doc.URL;
+    if (url.match(/osapi\.dmm\.com/) && url.match(/aid=854854/)) {
       log("DOMloaded:", url);
+
+      if (kcif.beep) {
+        kcif.beep.pause();
+        kcif.beep = null;
+      }
 
       kcif.document = doc;
       kcif.document.characterSet = "UTF-8";
+
+      var prev_div = kcif.document.querySelector("#kancolle-info");
+      while (prev_div) {
+        log("remove garbage info_div");
+        var div = prev_div.parentNode;
+        div.parentNode.removeChild(div);
+        prev_div = kcif.document.querySelector("#kancolle-info");
+      }
+
       var div = makeElement("div");
       var elem = kcif.document.querySelector("#sectionWrap");
       if (elem) {
+        log("insert before sectionWrap");
         elem.parentNode.insertBefore(div, elem);
       }
       else {
+        log("append to body");
         kcif.document.body.appendChild(div);
       }
       kcif.info_div = div;
@@ -250,7 +269,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; text-align: left; }', sheet.length);
       sheet.insertRule('#kancolle-info * { font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-headers { color: #ccc; background-color: #444; line-height: 1.5; font-weight: bold; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; padding: 1px 12px 2px 12px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; padding: 1px 12px 2px 12px; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-left: 4px; margin-right: -2px; }', sheet.length);
       sheet.insertRule('#kancolle-info #base-info { float: right; margin-right: 8px; color: white; font-weight: normal; }', sheet.length);
       sheet.insertRule('#kancolle-info #base-info button { height: 21px; position: relative; top: -1px; font-size: 10px; }', sheet.length);
       sheet.insertRule('#kancolle-info #updated { font-weight: bold; color: lightgreen; }', sheet.length);
@@ -320,9 +339,10 @@ var kcif = {
       sheet.insertRule('#kancolle-info .color-default { color: inherit; }', sheet.length);
       sheet.insertRule('#kancolle-info .blink { -moz-animation: blink 1.0s ease-in-out infinite alternate; }', sheet.length);
       sheet.insertRule('@-moz-keyframes blink { 0% {background-color: rgba(240,208,0,0.5);} 60% {background-color: inherit;} 100% {background-color: inherit;} }', sheet.length);
+      log("  div created");
 
-      log("create div");
       kcif.flash = kcif.document.querySelector("#flashWrap");
+      log("  found flashWrap");
 
       kcif.renderFrame();
 
@@ -330,13 +350,25 @@ var kcif = {
     }
     else if (url.match(/\/app_id=854854\//)) {
       log("DOMloaded:", url);
+
+      for (var i = 1; i < kcif.mainWindow.length; i++) {
+        if (kcif.mainWindow[i].document == doc) {
+          log("found correct window");
+          kcif.window = kcif.mainWindow[i];
+          break;
+        }
+      }
+
       var area_game = doc.querySelector("#area-game");
       if (area_game) {
+        log("  found area-game");
         area_game.style.height = '920px';
         kcif.area_game = area_game;
       }
       var game_frame = doc.querySelector("#game_frame");
       if (game_frame) {
+        log("  found game_frame");
+        game_frame.style.height = '920px';
         kcif.game_frame = game_frame;
       }
 
@@ -345,9 +377,6 @@ var kcif = {
   },
 
   renderFrame: function() {
-    if (kcif.area_game && parseInt(kcif.area_game.style.height) < 920) {
-        kcif.area_game.style.height = '920px';
-    }
     if (kcif.info_div) {
       var base = makeElement("div", "kancolle-info");
 
@@ -735,7 +764,7 @@ var kcif = {
             return;
           }
           if (!beeptest) {
-            beeptest = new kcif.window.Audio(url);
+            beeptest = new kcif.mainWindow.Audio(url);
             beeptest.loop = true;
             beeptest.volume = kcif.info_div.querySelector("#beep-volume").value / 100.0;
             beeptest.load();
@@ -754,7 +783,7 @@ var kcif = {
         kcif.beep.pause();
         kcif.beep = null;
       }
-      kcif.beep = new kcif.window.Audio(kcif.getBeepUrl());
+      kcif.beep = new kcif.mainWindow.Audio(kcif.getBeepUrl());
       if (kcif.beep) {
         kcif.beep.loop = true;
         kcif.beep.volume = kcif.getBeepVolume() / 100.0;
@@ -764,6 +793,13 @@ var kcif = {
   },
 
   renderInfo: function(all) {
+    if (kcif.area_game && parseInt(kcif.area_game.style.height) < 920) {
+        kcif.area_game.style.height = '920px';
+    }
+    if (kcif.game_frame && parseInt(kcif.game_frame.style.height) < 920) {
+        kcif.game_frame.style.height = '920px';
+    }
+
     if (kcif.info_div) {
       // ベース
       var base = kcif.info_div.querySelector("#base-info");
@@ -2093,7 +2129,7 @@ var kcif = {
       return;
     }
     if (!kcif.beep) {
-      kcif.beep = new kcif.window.Audio(url);
+      kcif.beep = new kcif.mainWindow.Audio(url);
       kcif.beep.loop = true;
       kcif.beep.load();
     }
@@ -2121,7 +2157,7 @@ var kcif = {
 
   saveFile: function(blob, path) {
     log("saveFile start: data=" + blob + ", path=" + path);
-    var reader = new kcif.window.FileReader();
+    var reader = new kcif.mainWindow.FileReader();
     reader.onloadend = function() {
       var file = CCIN("@mozilla.org/file/local;1", "nsILocalFile");
       file.initWithPath(path);
@@ -2158,9 +2194,14 @@ var kcif = {
     canvas.mozOpaque = true;
     canvas.width = rect.width;
     canvas.height = rect.height;
+    var target = kcif.window;
     var context = canvas.getContext("2d");
     context.scale(scale, scale);
-    context.drawWindow(kcif.window.content, rect.left + rect2.left + kcif.window.content.scrollX + 1, rect.top + rect2.top + kcif.window.content.scrollY, rect.width, rect.height, "white");
+    log("capture X=" + (rect.left + rect2.left + target.scrollX + 1));
+    log("capture Y=" + (rect.top + rect2.top + target.content.scrollY));
+    log("capture W=" + rect.width);
+    log("capture H=" + rect.height);
+    context.drawWindow(target, rect.left + rect2.left + target.scrollX + 1, rect.top + rect2.top + target.content.scrollY, rect.width, rect.height, "white");
 
     canvas.toBlob(function(blob){
       var dir = kcif.getCaptureSaveDir();

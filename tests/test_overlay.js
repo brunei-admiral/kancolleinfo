@@ -31,7 +31,7 @@ kcif.getFuelByMeter = function(){
   return meter;
 };
 kcif.document = document;
-kcif.window = window;
+kcif.mainWindow = kcif.window = window;
 
 JUST.testCase({
   setup: function(){

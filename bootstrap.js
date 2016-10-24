@@ -41,12 +41,15 @@ var WindowListener = {
 };
 
 function install(data, reason){
+  Services.console.logStringMessage("[kcif] install");
 }
 
 function uninstall(data, reason){
+  Services.console.logStringMessage("[kcif] uninstall");
 }
 
 function startup(data, reason){
+  Services.console.logStringMessage("[kcif] startup");
   Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
   load("overlay.js", data.installPath);
   kcif.init();
@@ -61,6 +64,7 @@ function startup(data, reason){
 }
 
 function shutdown(data, reason){
+  Services.console.logStringMessage("[kcif] shutdown");
   var windows = Services.wm.getEnumerator('navigator:browser');
   while (windows.hasMoreElements()) {
     unloadOverlay(windows.getNext().QueryInterface(Components.interfaces.nsIDOMWindow));

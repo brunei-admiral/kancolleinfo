@@ -2008,12 +2008,17 @@ var kcif = {
     }
   },
 
-  getIntPref: function(pref, def) {
+  getIntPref: function(pref, def, force_log) {
     try {
       return kcif.myPref().getIntPref(pref);
     }
     catch (exc) {
-      log("getIntProf(" + pref + ") failed: " + String(exc));
+      if (force_log) {
+        Services.console.logStringMessage("[kcif]: getIntProf(" + pref + ") failed: " + String(exc));
+      }
+      else {
+        log("getIntProf(" + pref + ") failed: " + String(exc));
+      }
       return def;
     }
   },
@@ -2085,7 +2090,7 @@ var kcif = {
   },
 
   getLogLevel: function() {
-    return kcif.getIntPref("debug.loglevel", 0);
+    return kcif.getIntPref("debug.loglevel", 0, true);
   },
 
   saveCheckboxes: function(tab) {

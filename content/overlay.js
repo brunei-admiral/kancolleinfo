@@ -346,7 +346,7 @@ var kcif = {
 
       kcif.renderFrame();
 
-      kcif.document.body.setAttribute("onLoad", "var setHeightRetry = 10; function setHeight(){ if (typeof ConstGadgetInfo != 'undefined') { if (ConstGadgetInfo.height != 920) { console.log('[kcif] set height ' + ConstGadgetInfo.height + ' -> 920 (' + setHeightRetry + ')'); ConstGadgetInfo.height = 920; } } else { console.log('[kcif] ConstGadgetInfo is undefined (' + setHeightRetry + ')'); } if (--setHeightRetry > 0) window.setTimeout(setHeight, 1000); } setHeight();");
+      kcif.document.body.setAttribute("onLoad", "var setHeightRetry = 10; function setHeight(){ if (typeof ConstGadgetInfo != 'undefined') { if (ConstGadgetInfo.height != 920) { ConstGadgetInfo.height = 920; } } if (--setHeightRetry > 0) window.setTimeout(setHeight, 1000); } setHeight();");
     }
     else if (url.match(/\/app_id=854854\//)) {
       log("DOMloaded:", url);
@@ -2008,15 +2008,12 @@ var kcif = {
     }
   },
 
-  getIntPref: function(pref, def, force_log) {
+  getIntPref: function(pref, def, ignore_exc) {
     try {
       return kcif.myPref().getIntPref(pref);
     }
     catch (exc) {
-      if (force_log) {
-        Services.console.logStringMessage("[kcif]: getIntProf(" + pref + ") failed: " + String(exc));
-      }
-      else {
+      if (!ignore_exc) {
         log("getIntProf(" + pref + ") failed: " + String(exc));
       }
       return def;

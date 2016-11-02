@@ -1,4 +1,5 @@
 Components.utils.import("resource://gre/modules/Services.jsm");
+Components.utils.import("resource://gre/modules/Timer.jsm");
 
 function load(script, root){
   const IOService = Components.classes['@mozilla.org/network/io-service;1']

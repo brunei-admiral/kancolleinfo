@@ -3586,7 +3586,7 @@ var kcif = {
 
   main: function(request, content, query) {
     if (kcif.timer) {
-      kcif.window.clearTimeout(kcif.timer);
+      clearTimeout(kcif.timer);
       kcif.timer = null;
     }
 
@@ -4200,9 +4200,9 @@ var kcif = {
     kcif.renderInfo(update_all);
 
     if (kcif.timer) {
-      kcif.window.clearTimeout(kcif.timer);
+      clearTimeout(kcif.timer);
       kcif.timer = null;
     }
-    kcif.timer = kcif.window.setTimeout(kcif.main, 10 * 1000);
+    kcif.timer = setTimeout(kcif.main, 10 * 1000);
   },
 };

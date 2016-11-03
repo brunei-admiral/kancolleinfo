@@ -199,6 +199,7 @@ var kcif = {
   material: [0, 0, 0, 0, 0, 0, 0, 0],
   battle_result: [[], []],
   timer: null,
+  update: null,
   mainWindow: null,
   window: null,
 
@@ -860,6 +861,28 @@ var kcif = {
     }
   },
 
+  setNextUpdate: function(dt, redonly) {
+    var now = new Date().getTime();
+    if (dt < now) {
+      return;
+    }
+    if (!redonly) {
+      var five = dt - 5 * 60 * 1000;
+      if (five < now) {
+        var one = dt - 1 * 60 * 1000;
+        if (one > now) {
+          dt = one;
+        }
+      }
+      else {
+        dt = five;
+      }
+    }
+    if (!kcif.update || kcif.update > dt) {
+      kcif.update = dt;
+    }
+  },
+
   renderMain: function() {
     var maintab = kcif.info_div.querySelector("#tab-main");
     var checks = kcif.saveCheckboxes(maintab);
@@ -901,6 +924,7 @@ var kcif = {
       var s = null;
       if (kcif.isOnMission(mission)) {
         var dt = new Date(mission[3]);
+        kcif.setNextUpdate(dt);
         elem = makeElement("span", null, null, "遠征中");
         elem.setAttribute("title", mission[2]);
         s = [elem, makeText(" ")];
@@ -1154,6 +1178,7 @@ var kcif = {
             }
             var now = new Date().getTime();
             var rt = kcif.repair_start[i] + 20 * 60 * 1000;
+            kcif.setNextUpdate(rt, true);
             if (rt < now) {
               rcol = "color-red";
             }
@@ -1282,6 +1307,7 @@ var kcif = {
         tr.appendChild(kcif.shipHp(ship));
         tr.appendChild(kcif.shipCond(ship));
         var dt = new Date(kcif.dock[i].api_complete_time);
+        kcif.setNextUpdate(dt);
         td = makeElement("td", null, "ship-at " + kcif.getTimeColor(dt));
         elem = makeElement("label", null, null, kcif.time2str(dt));
         var input = makeElement("input", "check-dock" + kcif.dock[i].api_id, "check-timer check-dock");
@@ -1330,6 +1356,7 @@ var kcif = {
         var s;
         if (kcif.build[i].api_complete_time > 0) {
           var dt = new Date(kcif.build[i].api_complete_time);
+          kcif.setNextUpdate(dt);
           s = kcif.time2str(dt);
           col = kcif.getTimeColor(dt, true);
         }
@@ -3584,11 +3611,27 @@ var kcif = {
     }
   },
 
-  main: function(request, content, query) {
+  setupTimer: function(clearonly) {
     if (kcif.timer) {
       clearTimeout(kcif.timer);
       kcif.timer = null;
     }
+    if (clearonly) {
+      return;
+    }
+
+    if (kcif.update) {
+      log("set update timer at " + kcif.update);
+      kcif.timer = setTimeout(kcif.main, kcif.update - new Date().getTime() + 10); /* 10ms to make sure */
+      kcif.update = null;
+    }
+    else {
+      //kcif.timer = setTimeout(kcif.main, 10 * 1000);
+    }
+  },
+
+  main: function(request, content, query) {
+    kcif.setupTimer(true);
 
     var url = request ? request.name : "";
     var update_all = url != "";
@@ -4199,10 +4242,6 @@ var kcif = {
 
     kcif.renderInfo(update_all);
 
-    if (kcif.timer) {
-      clearTimeout(kcif.timer);
-      kcif.timer = null;
-    }
-    kcif.timer = setTimeout(kcif.main, 10 * 1000);
+    kcif.setupTimer();
   },
 };

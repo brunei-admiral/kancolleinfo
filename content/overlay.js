@@ -924,7 +924,7 @@ var kcif = {
       var s = null;
       if (kcif.isOnMission(mission)) {
         var dt = new Date(mission[3]);
-        kcif.setNextUpdate(dt);
+        kcif.setNextUpdate(dt.getTime());
         elem = makeElement("span", null, null, "遠征中");
         elem.setAttribute("title", mission[2]);
         s = [elem, makeText(" ")];
@@ -1307,7 +1307,7 @@ var kcif = {
         tr.appendChild(kcif.shipHp(ship));
         tr.appendChild(kcif.shipCond(ship));
         var dt = new Date(kcif.dock[i].api_complete_time);
-        kcif.setNextUpdate(dt);
+        kcif.setNextUpdate(dt.getTime());
         td = makeElement("td", null, "ship-at " + kcif.getTimeColor(dt));
         elem = makeElement("label", null, null, kcif.time2str(dt));
         var input = makeElement("input", "check-dock" + kcif.dock[i].api_id, "check-timer check-dock");
@@ -1356,7 +1356,7 @@ var kcif = {
         var s;
         if (kcif.build[i].api_complete_time > 0) {
           var dt = new Date(kcif.build[i].api_complete_time);
-          kcif.setNextUpdate(dt);
+          kcif.setNextUpdate(dt.getTime());
           s = kcif.time2str(dt);
           col = kcif.getTimeColor(dt, true);
         }
@@ -3621,7 +3621,7 @@ var kcif = {
     }
 
     if (kcif.update) {
-      log("set update timer at " + kcif.update);
+      log("set update timer at " + new Date(kcif.update));
       kcif.timer = setTimeout(kcif.main, kcif.update - new Date().getTime() + 10); /* 10ms to make sure */
       kcif.update = null;
     }

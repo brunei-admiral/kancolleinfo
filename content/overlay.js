@@ -58,6 +58,8 @@ function TracingListener() {
 }
 
 TracingListener.prototype = {
+  savedQuery: null,
+
   onDataAvailable: function(request, context, inputStream, offset, count) {
     var binaryInputStream = CCIN("@mozilla.org/binaryinputstream;1", "nsIBinaryInputStream");
     var storageStream = CCIN("@mozilla.org/storagestream;1", "nsIStorageStream");
@@ -77,6 +79,13 @@ TracingListener.prototype = {
   },
 
   onStartRequest: function(request, context) {
+    this.savedQuery = null;
+    if (request.requestMethod.toLowerCase() == "post") {
+      var postText = this.readPostTextFromRequest(request, context);
+      if (postText) {
+        this.savedQuery = this.parseQuery(String(postText));
+      }
+    }
     this.originalListener.onStartRequest(request, context);
   },
 
@@ -86,6 +95,10 @@ TracingListener.prototype = {
       var postText = this.readPostTextFromRequest(request, context);
       if (postText) {
         query = this.parseQuery(String(postText));
+      }
+      else {
+        query = this.savedQuery;
+        this.savedQuery = null;
       }
     }
     this.originalListener.onStopRequest(request, context, statusCode);
@@ -108,9 +121,11 @@ TracingListener.prototype = {
     var result = {};
     for (var i = 0; i < vars.length; i++) {
       var pair = vars[i].split("=", 2);
-      var key = pair[0].replace(/%([0-9A-F][0-9A-F])/gi, function(a, s){return String.fromCharCode(parseInt(s, 16));});
-      var val = pair[1].replace(/%([0-9A-F][0-9A-F])/gi, function(a, s){return String.fromCharCode(parseInt(s, 16));});
-      result[key] = val;
+      if (pair[1]) {
+        var key = pair[0].replace(/%([0-9A-F][0-9A-F])/gi, function(a, s){return String.fromCharCode(parseInt(s, 16));});
+        var val = pair[1].replace(/%([0-9A-F][0-9A-F])/gi, function(a, s){return String.fromCharCode(parseInt(s, 16));});
+        result[key] = val;
+      }
       //log("query: " + key + " = " + val);
     }
     return result;
@@ -121,9 +136,13 @@ TracingListener.prototype = {
     try {
       var channel = request.QueryInterface(Components.interfaces.nsIUploadChannel);
       var stream = channel.uploadStream;
-      var ss = stream.QueryInterface(Components.interfaces.nsISeekableStream);
+      if (!(stream instanceof Components.interfaces.nsISeekableStream)) {
+        //log("readPostTextFromRequest: stream is not nsISeekableStream!!");
+        return null;
+      }
+      var ss = stream;
 
-      var offset = stream.tell();
+      var offset = ss.tell();
       ss.seek(Components.interfaces.nsISeekableStream.NS_SEEK_SET, 0);
 
       var sis = CCIN("@mozilla.org/scriptableinputstream;1", "nsIScriptableInputStream");
@@ -146,7 +165,7 @@ TracingListener.prototype = {
       return text;
     }
     catch (exc) {
-      log("readPostTextFromRequest failed: " + String(exc));
+      log("readPostTextFromRequest failed at " + exc.lineNumber + ": " + String(exc));
     }
     return null;
   },

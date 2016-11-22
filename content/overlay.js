@@ -2295,7 +2295,7 @@ var kcif = {
     if (map.api_no == map.api_bosscell_no || map.api_event_id == 5) {
       cell = "*";
     }
-    else if (map.api_event_kind) {
+    else if (map.api_event_id == 4 || map.api_event_id == 7) {
       cell = "+";
     }
     else {

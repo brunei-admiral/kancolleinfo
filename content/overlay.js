@@ -3469,7 +3469,7 @@ var kcif = {
           if (json.api_data.api_hougeki) { // midnight battle
             log("  hougeki (midnight)");
             if (json.api_data.api_active_deck) {
-              kcif.damageHougeki(kcif.deck_list[json.api_data.api_active_deck[0] - 1], enemies, 6 * (json.api_data.api_active_deck[1] - 1), json.api_data.api_hougeki);
+              kcif.damageHougeki(kcif.deck_list[json.api_data.api_active_deck[0] - 1], enemies, json.api_data.api_hougeki, 6 * (json.api_data.api_active_deck[1] - 1));
             }
             else {
               kcif.damageHougeki(deck, enemies, json.api_data.api_hougeki);
@@ -3488,7 +3488,7 @@ var kcif = {
               kcif.damageHougeki(deck, enemies, json.api_data.api_hougeki1);
             }
           }
-          if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && (url.indexOf("each_") != -1 && url.indexOf("water") == -1)) {
+          if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && url.indexOf("each_") == -1 && url.indexOf("water") == -1) {
             log("  raigeki");
             var rdeck = deck;
             if (url.indexOf("ec_") == -1) {
@@ -3499,7 +3499,12 @@ var kcif = {
           }
           if (json.api_data.api_hougeki2) {
             log("  hougeki2");
-            kcif.damageHougeki(deck, enemies, json.api_data.api_hougeki2);
+            if (url.indexOf("each") != -1) {
+              kcif.damageHougeki(deck, enemies, json.api_data.api_hougeki2, 0, kcif.deck_list[1]);
+            }
+            else {
+              kcif.damageHougeki(deck, enemies, json.api_data.api_hougeki2);
+            }
           }
           if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && url.indexOf("each_") != -1 && url.indexOf("water") == -1) {
             log("  raigeki");

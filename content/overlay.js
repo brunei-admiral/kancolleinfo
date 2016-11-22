@@ -179,7 +179,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Components.interfaces.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material|require_info)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset(_ex)?|unsetslot_all|slot_(exchange_index|deprive))|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select)|api_req_sortie\/((ld_)?air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((ec_)?((ld_)?air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material|require_info)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset(_ex)?|unsetslot_all|slot_(exchange_index|deprive))|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select)|api_req_sortie\/((ld_)?air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((ec_|each_)?((ld_)?air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Components.interfaces.nsITraceableChannel);
@@ -3475,7 +3475,7 @@ var kcif = {
               kcif.damageHougeki(deck, enemies, json.api_data.api_hougeki1);
             }
           }
-          if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && url.indexOf("water") == -1) {
+          if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && (url.indexOf("each_") != -1 || url.indexOf("water") == -1)) {
             log("  raigeki");
             var rdeck = deck;
             if (url.indexOf("ec_") == -1) {
@@ -3487,6 +3487,12 @@ var kcif = {
           if (json.api_data.api_hougeki2) {
             log("  hougeki2");
             kcif.damageHougeki(deck, enemies, json.api_data.api_hougeki2);
+          }
+          if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && url.indexOf("each_") != -1 && url.indexOf("water") == -1) {
+            log("  raigeki");
+            var rdeck = deck;
+            rdeck = kcif.deck_list[1];
+            kcif.damageRaigeki(rdeck, enemies, json.api_data.api_raigeki);
           }
           if (json.api_data.api_hougeki3) { // combined battle
             log("  hougeki3");

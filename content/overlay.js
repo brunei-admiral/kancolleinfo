@@ -179,7 +179,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Components.interfaces.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material|require_info)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset(_ex)?|unsetslot_all|slot_(exchange_index|deprive))|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select)|api_req_sortie\/((ld_)?air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((ec_|each_)?((ld_)?air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material|require_info)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset(_ex)?|unsetslot_all|slot_(exchange_index|deprive))|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select|combined)|api_req_sortie\/((ld_)?air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((ec_|each_)?((ld_)?air|midnight_)?battle(_water)?(result)?|sp_midnight|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Components.interfaces.nsITraceableChannel);
@@ -4074,6 +4074,15 @@ var kcif = {
       deck.api_ship = json.api_data.api_ship;
       kcif.updateRepairStart(deck_id - 1);
     }
+    else if (url.indexOf("/api_req_hensei/combined") != -1) {
+      var type = Number(query["api_combined_type"]);
+      if (type == 0) {
+        kcif.mission[1] = null;
+      }
+      else {
+        kcif.mission[1] = ["(連合艦隊)"];
+      }
+    }
     else if (url.indexOf("goback_port") != -1) {
       var ship1 = null, ship2 = null;
       for (var i = 0, deck; i < 2 && (deck = kcif.deck_list[i]); i++) {
@@ -4186,6 +4195,9 @@ var kcif = {
           else {
             kcif.mission[i] = null;
           }
+        }
+        if (json.api_data.api_combined_flag > 0) {
+          kcif.mission[1] = "(連合艦隊)";
         }
 
         kcif.basic(json.api_data.api_basic);

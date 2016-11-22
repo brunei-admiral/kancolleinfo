@@ -3108,7 +3108,7 @@ var kcif = {
     }
   },
 
-  damageHougeki: function(deck, enemies, hougeki) {
+  damageHougeki: function(deck, enemies, hougeki, deck2) {
     for (var i = 1, t_list; t_list = hougeki.api_df_list[i]; i++) {
       for (var j = 0, target; target = t_list[j]; j++) {
         var damage = Math.floor(hougeki.api_damage[i][j]);
@@ -3118,7 +3118,13 @@ var kcif = {
         }
 
         if (eflag == 1 || (eflag == -1 && target >= 1 && target <= 6)) {
-          var id = deck.api_ship[target - 1];
+          var id;
+          if (target <= 6) {
+            id = deck.api_ship[target - 1];
+          }
+          else {
+            id = deck.api_ship[target - 7];
+          }
           log("    fleet " + deck.api_id + " ship " + target + "(" + String(id) + ") damaged " + damage);
           var ship = kcif.ship_list[id];
           kcif.reflectDamage(kcif.battle_result[0], target - 1, ship, damage);
@@ -3467,7 +3473,10 @@ var kcif = {
           }
           if (json.api_data.api_hougeki1) {
             log("  hougeki1");
-            if (url.indexOf("combined") != -1 && url.indexOf("water") == -1 && url.indexOf("ec_") == -1) {
+            if (url.indexOf("each") != -1) {
+              kcif.damageHougeki(kcif.deck_list[0], enemies, json.api_data.api_hougeki3, kcif.deck_list[1]);
+            }
+            else if (url.indexOf("combined") != -1 && url.indexOf("water") == -1 && url.indexOf("ec_") == -1) {
               // must be 2nd fleet
               kcif.damageHougeki(kcif.deck_list[1], enemies, json.api_data.api_hougeki1);
             }
@@ -3496,7 +3505,10 @@ var kcif = {
           }
           if (json.api_data.api_hougeki3) { // combined battle
             log("  hougeki3");
-            if (url.indexOf("water") != -1) {
+            if (url.indexOf("each") != -1) {
+              kcif.damageHougeki(kcif.deck_list[0], enemies, json.api_data.api_hougeki3, kcif.deck_list[1]);
+            }
+            else if (url.indexOf("water") != -1) {
               // must be 2nd fleet
               kcif.damageHougeki(kcif.deck_list[1], enemies, json.api_data.api_hougeki3);
             }

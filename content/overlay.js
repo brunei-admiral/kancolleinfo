@@ -4201,7 +4201,7 @@ var kcif = {
           }
         }
         if (json.api_data.api_combined_flag > 0) {
-          kcif.mission[1] = "(連合艦隊)";
+          kcif.mission[1] = ["(連合艦隊)"];
         }
 
         kcif.basic(json.api_data.api_basic);

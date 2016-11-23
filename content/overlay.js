@@ -4143,7 +4143,7 @@ var kcif = {
       var recovery = Number(query["api_recovery_type"]);
       kcif.setupFleetStatus();
       for (var i = 0; i < 4; i++) {
-        if (kcif.mission[i] && !kcif.isOnMission(kcif.mission[i])) {
+        if (kcif.mission[i] && !kcif.isOnMission(kcif.mission[i]) && !kcif.isCombined(kcif.mission[i])) {
           kcif.mission[i] = [kcif.map2str(json.api_data)];
           log("next: " + (i + 1) + ": " + kcif.mission[i][0]);
           if (recovery > 0) {

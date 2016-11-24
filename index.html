@@ -184,6 +184,7 @@ span.bugfix:after {
 #kancolle-info .tab-header a:hover { color: yellow; cursor: pointer; }
 #kancolle-info .tab { padding: 2px 8px 2px 8px; }
 #kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }
+#kancolle-info .tab .fleet-header { width: 600px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #kancolle-info .tab .list-header { color: skyblue; text-decoration: none; font-weight: bold; }
 #kancolle-info .tab a.list-header:hover { color: yellow !important; dext-decoration: none !important; font-weight: bold !important; cursor: pointer; }
 #kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }
@@ -197,7 +198,7 @@ span.bugfix:after {
 #kancolle-info .tab .ship-no { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }
 #kancolle-info .tab .item-no { text-align: right; padding: 0 6px 0 4px; width: 2.4em; }
 #kancolle-info .tab .ship-type { width: 2.7em; }
-#kancolle-info .tab .ship-name { display: block; font-weight: bold; width: 8.5em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+#kancolle-info .tab .ship-name { display: block; font-weight: bold; width: 8.5em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; padding-right: 15px; }
 #kancolle-info .tab .ship-header-hp { width: 70px; }
 #kancolle-info .tab .ship-hp { text-align: right; width: 70px; }
@@ -365,7 +366,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       </table>
     </div>
     <div id="fleet1" class="fleet">
-      <h2><a class="list-header" href="#" title="第1艦隊">第1艦隊</a> <span class="color-red">[<span id="battle-show">出撃中</span><span id="battle-result" style="display: none;"><span title="敵ピケット艦隊(ID0) 輪形陣&#10; 1: 軽母ヌ級elite&#10; 2: 軽巡ヘ級flagship&#10; 3: 駆逐ロ級flagship&#10; 4: 駆逐ロ級flagship&#10; 5: 駆逐イ級elite&#10; 6: 駆逐イ級elite">+ 5-4-1</span> <span title="自:単縦陣 敵:輪形陣 制空権確保">同航戦</span> <span class="color-gray">B</span> <span style="letter-spacing: -2px;"><span class="color-gray" title="軽母ヌ級flagship 0/84">×</span><span class="color-green" title="軽巡ヘ級flagship 57/57">◎</span><span class="color-red" title="駆逐ロ級flagship 9/43">△</span><span class="color-orange" title="駆逐ロ級flagship 20/43">○</span><span class="color-gray" title="駆逐イ級elite 0/30">×</span><span class="color-yellow" title="駆逐イ級elite 22/30">◎</span></span></span>]</span> <span class="color-gray" title="旗艦 Bismarck drei">LV:105/475</span> <span class="color-gray" title="敵制空値:&#10; 0～52: 制空権確保&#10; 53～104: 航空優勢&#10; 105～234: 航空均衡&#10; 235～468: 航空劣勢&#10; 469～: 制空権喪失">制空:156</span> <span class="color-gray">索敵:8</span> <span class="color-gray" title="Bismarck drei, Верный">キラ:2/6</span> <span class="color-gray" title="暁改, Верный">ドラム:4/2</span></h2>
+      <h2 class="fleet-header"><a class="list-header" href="#" title="第1艦隊">第1艦隊</a> <span class="color-red">[<span id="battle-show">出撃中</span><span id="battle-result" style="display: none;"><span title="敵ピケット艦隊(ID0) 輪形陣&#10; 1: 軽母ヌ級elite&#10; 2: 軽巡ヘ級flagship&#10; 3: 駆逐ロ級flagship&#10; 4: 駆逐ロ級flagship&#10; 5: 駆逐イ級elite&#10; 6: 駆逐イ級elite">+ 5-4-1</span> <span title="自:単縦陣 敵:輪形陣 制空権確保">同航戦</span> <span class="color-gray">B</span> <span style="letter-spacing: -2px;"><span class="color-gray" title="軽母ヌ級flagship 0/84">×</span><span class="color-green" title="軽巡ヘ級flagship 57/57">◎</span><span class="color-red" title="駆逐ロ級flagship 9/43">△</span><span class="color-orange" title="駆逐ロ級flagship 20/43">○</span><span class="color-gray" title="駆逐イ級elite 0/30">×</span><span class="color-yellow" title="駆逐イ級elite 22/30">◎</span></span></span>]</span> <span class="color-gray" title="旗艦 Bismarck drei">LV:105/475</span> <span class="color-gray" title="敵制空値:&#10; 0～52: 制空権確保&#10; 53～104: 航空優勢&#10; 105～234: 航空均衡&#10; 235～468: 航空劣勢&#10; 469～: 制空権喪失">制空:156</span> <span class="color-gray">索敵:8</span> <span class="color-gray" title="Bismarck drei, Верный">キラ:2/6</span> <span class="color-gray" title="暁改, Верный">ドラム:4/2</span></h2>
       <table>
         <tr><td class="ship-no color-red" title="1: 応急修理要員">1</td><td class="ship-type">巡戦</td><td class="ship-name" title="Bismarck Drei&#10;1: 38cm連装砲改&#10;2: 38cm連装砲改&#10;3: 61cm四連装(酸素)魚雷&#10;4: 応急修理要員">Bismarck Drei</td><td class="ship-level">105</td><td class="ship-hp-meter" data-now="99" data-max="99"></td><td class="ship-cond color-green blink">53</td><td class="ship-fuel-bull" data-fuelnow="93" data-fuelmax="93" data-bullnow="131" data-bullmax="131"></td><td class="ship-exp" title="1020512/1025000">4488</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">戦艦</td><td class="ship-name" title="大和改&#10;1: 46cm三連装砲&#10;2: 46cm三連装砲&#10;3: 46cm三連装砲&#10;4: 46cm三連装砲">大和改</td><td class="ship-level">61</td><td class="ship-hp-meter" data-now="96" data-max="96"></td><td class="ship-cond color-yellow">30</td><td class="ship-fuel-bull" data-fuelnow="125" data-fuelmax="250" data-bullnow="162" data-bullmax="325"></td><td class="ship-exp" title="189084/195800">6716</td><td class="ship-desc"><td class="ship-desc"></td></tr>
@@ -376,7 +377,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       </table>
     </div>
     <div id="fleet2" class="fleet">
-      <h2><a class="list-header" href="#" title="第2艦隊">第2艦隊</a> <span class="color-red">[<span title="長距離練習航海">遠征中</span> <label>20:33帰還<input class="check-timer" type="checkbox" value="x"></label>]</span> <span class="color-gray" title="旗艦 北上改二">LV:92/155</span> <span class="color-gray" title="敵制空値:&#10; 0～12: 制空権確保&#10; 13～24: 航空優勢&#10; 25～55: 航空均衡&#10; 56～111: 航空劣勢&#10; 112～: 制空権喪失">制空:37</span> <span class="color-gray">索敵:0</span> <span class="color-gray">キラ:0/4</span></h2>
+      <h2 class="fleet-header"><a class="list-header" href="#" title="第2艦隊">第2艦隊</a> <span class="color-red">[<span title="長距離練習航海">遠征中</span> <label>20:33帰還<input class="check-timer" type="checkbox" value="x"></label>]</span> <span class="color-gray" title="旗艦 北上改二">LV:92/155</span> <span class="color-gray" title="敵制空値:&#10; 0～12: 制空権確保&#10; 13～24: 航空優勢&#10; 25～55: 航空均衡&#10; 56～111: 航空劣勢&#10; 112～: 制空権喪失">制空:37</span> <span class="color-gray">索敵:0</span> <span class="color-gray">キラ:0/4</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type">雷巡</td><td class="ship-name" title="北上改二&#10;1: 61cm五連装(酸素)魚雷&#10;2: 61cm五連装(酸素)魚雷&#10;3: 甲標的">北上改二</td><td class="ship-level">92</td><td class="ship-hp-meter" data-now="43" data-max="43"></td><td class="ship-cond color-default">49</td><td class="ship-fuel-bull" data-fuelnow="25" data-fuelmax="25" data-bullnow="75" data-bullmax="75"></td><td class="ship-exp" title="604698/606500">1802</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">航巡</td><td class="ship-name" title="最上改&#10;1: 瑞雲 [5/5]&#10;2: 瑞雲(六三四空)+6 [6/6]&#10;3: 瑞雲 [5/5]&#10;4: 零式水上偵察機 [3/3]">最上改</td><td class="ship-level">27</td><td class="ship-hp-meter" data-now="50" data-max="50"></td><td class="ship-cond color-default">49</td><td class="ship-fuel-bull" data-fuelnow="50" data-fuelmax="50" data-bullnow="55" data-bullmax="55"></td><td class="ship-exp" title="36465/37800">1335</td><td class="ship-desc"></td></tr>
@@ -387,7 +388,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       </table>
     </div>
     <div id="fleet3" class="fleet">
-      <h2><a class="list-header" href="#" title="第3艦隊">第3艦隊</a> <span class="color-yellow">[<span title="警備任務">遠征中</span> <label>20:40帰還<input class="check-timer" type="checkbox" value="x"></label>]</span> <span class="color-gray" title="旗艦 吹雪改">LV:55/152</span> <span class="color-gray" title="敵制空値:&#10; 0: 制空権確保&#10; 1～: 制空権喪失">制空:0</span> <span class="color-gray">索敵:0</span> <span class="color-gray">キラ:0/3</span></h2>
+      <h2 class="fleet-header"><a class="list-header" href="#" title="第3艦隊">第3艦隊</a> <span class="color-yellow">[<span title="警備任務">遠征中</span> <label>20:40帰還<input class="check-timer" type="checkbox" value="x"></label>]</span> <span class="color-gray" title="旗艦 吹雪改">LV:55/152</span> <span class="color-gray" title="敵制空値:&#10; 0: 制空権確保&#10; 1～: 制空権喪失">制空:0</span> <span class="color-gray">索敵:0</span> <span class="color-gray">キラ:0/3</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type">駆逐</td><td class="ship-name" title="吹雪改&#10;1: 12.7cm連装砲&#10;2: 12.7cm連装砲&#10;3: 13号対空電探">吹雪改</td><td class="ship-level" title="LV70 吹雪改二(駆逐)">55</td><td class="ship-hp-meter" data-now="30" data-max="30"></td><td class="ship-cond color-default">49</td><td class="ship-fuel-bull" data-fuelnow="15" data-fuelmax="15" data-bullnow="20" data-bullmax="20"></td><td class="ship-exp" title="151958/155500">3542</td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">駆逐</td><td class="ship-name" title="天津風改&#10;1: 12.7cm連装砲&#10;2: 三式水中探信儀&#10;3: 九四式爆雷投射機">天津風改</td><td class="ship-level">24</td><td class="ship-hp-meter" data-now="34" data-max="34"></td><td class="ship-cond color-default">49</td><td class="ship-fuel-bull" data-fuelnow="20" data-fuelmax="20" data-bullnow="20" data-bullmax="20"></td><td class="ship-exp" title="28135/30000">1865</td><td class="ship-desc"></td></tr>
@@ -398,7 +399,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       </table>
     </div>
     <div id="fleet4" class="fleet">
-      <h2><a class="list-header" href="#" title="第4艦隊">第4艦隊</a> <span class="color-yellow blink" title="大鯨">未補給</span> <span class="color-red" title="千歳甲">入渠中</span> <span class="color-gray" title="旗艦 千歳甲">LV:12/63</span> <span class="color-gray" title="敵制空値:&#10; 0: 制空権確保&#10; 1～: 制空権喪失">制空:0</span> <span class="color-gray">索敵:0</span> <span class="color-gray">キラ:0/2</span> <span class="color-gray" title="千歳甲">大発:1</span></h2>
+      <h2 class="fleet-header"><a class="list-header" href="#" title="第4艦隊">第4艦隊</a> <span class="color-yellow blink" title="大鯨">未補給</span> <span class="color-red" title="千歳甲">入渠中</span> <span class="color-gray" title="旗艦 千歳甲">LV:12/63</span> <span class="color-gray" title="敵制空値:&#10; 0: 制空権確保&#10; 1～: 制空権喪失">制空:0</span> <span class="color-gray">索敵:0</span> <span class="color-gray">キラ:0/2</span> <span class="color-gray" title="千歳甲">大発:1</span></h2>
       <table>
         <tr><td class="ship-no">1</td><td class="ship-type">水母</td><td class="ship-name" title="千歳甲&#10;1: 試製晴嵐 [12/12]&#10;2: 大発動艇(八九式中戦車&陸戦隊)&#10;3: 大発動艇">千歳甲</td><td class="ship-level" title="LV15 千歳航(軽空)">12</td><td class="ship-hp-meter" data-now="40" data-max="42"></td><td class="ship-cond">49</td><td class="ship-fuel-bull" data-fuelnow="35" data-fuelmax="35" data-bullnow="45" data-bullmax="45"></td><td class="ship-exp" title="6726/7800">1074</td><td class="ship-desc color-red">入渠中</td></tr>
         <tr><td class="ship-no">2</td><td class="ship-type">潜母</td><td class="ship-name" title="大鯨&#10;1: 15.5cm三連装副砲&#10;2: 15.5cm三連装副砲&#10;3: 新型高温高圧缶">大鯨</td><td class="ship-level color-green" title="改造後 龍鳳(軽空)">52</td><td class="ship-hp-meter" data-now="39" data-max="39"></td><td class="ship-cond">49</td><td class="ship-fuel-bull" data-fuelnow="28" data-fuelmax="35" data-bullnow="8" data-bullmax="10"></td><td class="ship-exp" title="132638/132700">62</td><td class="ship-desc"></td></tr>
@@ -888,7 +889,7 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 <h2 id="histroy">履歴</h2>
 <dl>
   <dt>2016-??-??</dt>
-  <dd id="v215">ver 2.1.5<br><span class="update"></span>長すぎる艦名を省略表示するように変更(コマたん…)。<br><span class="update"></span>艦名に対するポップアップ内に艦名を含めるように変更。<br><span class="bugfix"></span>連合艦隊編成中に第3・第4艦隊で出撃すると現在位置表示が乱れる不具合を修正。</dd>
+  <dd id="v215">ver 2.1.5<br><span class="update"></span>長すぎる艦名を省略表示するように変更(コマたん…)。<br><span class="update"></span>艦名に対するポップアップ内に艦名を含めるように変更。<br><span class="update"></span>艦隊情報が長すぎる場合も省略表示して1行に収まるように変更。<br><span class="bugfix"></span>連合艦隊編成中に第3・第4艦隊で出撃すると現在位置表示が乱れる不具合を修正。</dd>
 
   <dt>2016-11-24</dt>
   <dd id="v214">ver 2.1.4<br><span class="feature"></span>2016-11-18アップデートに対応。連合艦隊vs連合艦隊(秋イベE-3ボス)戦に対応<br><span class="update"></span>同じく、API変更に伴って、非戦闘マスでも戦闘あり表示(+)になっていたのを修正。<br><span class="update"></span>いまさらながら、連合艦隊を編成・解除した際は即座にそれを表示反映するよう変更。</dd>
@@ -927,7 +928,7 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
   <dd id="v193">ver 1.9.3<br><span class="feature"></span>2015-10-30アップデートに対応。編成プリセットおよび装備のドラッグアンドドロップに対応。<br><span class="feature"></span>遅ればせながら、艦載機熟練度を表示するように。とりあえず数値で。<br><span class="update"></span>制空値に艦載機熟練度ボーナスを加算するように。設定を追加したので、従来の挙動に戻すなら設定を変更してください。<br><span class="bugfix"></span>設定を変更して保存した際、変更内容が表示に即座には反映されていなかった不具合の修正。</dd>
 
   <dt>2015-10-13</dt>
-  <dd id="v192">ver 1.9.2<br><span class="feature"></span>本バージョンより、Firefox Add-onsの事前審査を受けて、<a href="http://mzl.la/1QmqYuj">Mozillaのサイトからダウンロード</a>するように。<br><span class="update"></span>新艦種「補給艦」表示に対応。<br><span class="update"></span>2015-08-10アップデートに伴い、母港に帰還直後に所持アイテム数が即座には更新されなくなっていた問題に対応。<br><span class="bugfix"></span>装備改修時、消費装備があっても所持アイテム数が更新されなかった不具合の修正。<br><span class="bugfix"></span>撃沈艦があったとき、戦闘終了後も艦隊情報から撃沈艦が取り除かれなかった不具合の修正。</dd>
+  <dd id="v192">ver 1.9.2<br><span class="feature"></span>本バージョンより、Firefox Add-onsの事前審査を受けて、<a href="http://mzl.la/1QmqYuj">Mozillaのサイトからダウンロード</a>するように。<br><span class="update"></span>新艦種「補給艦」表示に対応。<br><span class="update"></span>2015-08-10アップデートに伴い、母港に帰還直後に所持アイテム数が即座には更新されなくなっていた問題に対応。<br><span class="bugfix"></span>装備改修時、消費装備があっても所持アイテム数が更新されなかった不具合の修正。<br><span class="bugfix"></span>撃沈艦があったとき、戦闘終了後も艦隊から撃沈艦が取り除かれなかった不具合の修正。</dd>
 
   <dt>2015-07-17</dt>
   <dd id="v190">ver 1.9.0<br><span class="feature"></span>2015-07-17アップデートに対応。戦闘結果表示時、現在位置が戦闘マスの場合の既知敵編成表示はできなくなった(敵編成IDが通信から削除されたため)<br><span class="feature"></span>ブラウザの「戻る」操作を無効化。<br><span class="update"></span>艦名ポップアップで表示される現在装備に改修レベルを表示するよう変更。<br><span class="bugfix"></span>艦娘タブの耐久値でのソートができなくなっていた不具合の修正。</dd>

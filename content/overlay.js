@@ -299,6 +299,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab-header a:hover { color: yellow; cursor: pointer; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab { padding: 2px 8px 2px 8px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .fleet-header { width: 600px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .list-header { color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab a.list-header:hover { color: yellow !important; dext-decoration: none !important; font-weight: bold !important; cursor: pointer; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }', sheet.length);
@@ -312,7 +313,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .ship-no { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-no { text-align: right; padding: 0 6px 0 4px; width: 2.4em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-type { width: 2.7em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-name { display: block; font-weight: bold; width: 8.5em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-name { display: block; font-weight: bold; width: 8.5em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; padding-right: 15px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-header-hp { width: 70px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 70px; }', sheet.length);
@@ -932,7 +933,7 @@ var kcif = {
     for (var i = 0; i < 4; i++) {
       var deck = kcif.deck_list[i];
       div = makeElement("div", "fleet" + (i + 1), "fleet");
-      h2 = makeElement("h2");
+      h2 = makeElement("h2", null, "fleet-header");
       table = makeElement("table");
       var col = "color-default";
       var mission = kcif.mission[i];

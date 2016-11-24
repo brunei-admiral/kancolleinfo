@@ -285,7 +285,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; text-align: left; }', sheet.length);
       sheet.insertRule('#kancolle-info * { font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-headers { color: #ccc; background-color: #444; line-height: 1.5; font-weight: bold; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; padding: 1px 12px 2px 12px; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-left: 4px; margin-right: -2px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-left: 4px; margin-right: -2px; padding: 1px 12px 2px 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info #base-info { float: right; margin-right: 8px; color: white; font-weight: normal; }', sheet.length);
       sheet.insertRule('#kancolle-info #base-info button { height: 21px; position: relative; top: -1px; font-size: 10px; }', sheet.length);
       sheet.insertRule('#kancolle-info #updated { font-weight: bold; color: lightgreen; }', sheet.length);
@@ -312,7 +312,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .ship-no { text-align: right; padding: 0 6px 0 4px; width: 1.8em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-no { text-align: right; padding: 0 6px 0 4px; width: 2.4em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-type { width: 2.7em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-name { font-weight: bold; width: 8.5em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-name { display: block; font-weight: bold; width: 8.5em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; padding-right: 15px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-header-hp { width: 70px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 70px; }', sheet.length);
@@ -326,7 +326,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .ship-exp { text-align: right; width: 5.0em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-desc { text-align: left; padding-left: 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-type { width: 8.5em; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .item-name { font-weight: bold; width: 15em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .item-name { display: block; font-weight: bold; width: 15em; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .item-level, #kancolle-info .tab .item-alv { text-align: right; width: 2.2em; padding-right: 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .res-name { font-weight: bold; width: 6em; padding-left: 1.5em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .res-value { text-align: right; width: 4.5em; }', sheet.length);
@@ -2454,6 +2454,7 @@ var kcif = {
     }
     else {
       s = ship.name || "(" + ship.ship_id + ")";
+      items.push(s);
       for (var i = 0; ship.slot && (i < ship.slot.length); i++) {
         if (ship.slot[i] >= 0 && kcif.item_list[ship.slot[i]]) {
           var item = kcif.item_list[ship.slot[i]];

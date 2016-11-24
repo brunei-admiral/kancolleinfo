@@ -336,11 +336,11 @@ JUST.testCase({
       equip: [0, 0, 0, 0],
       equip_max: [2, 2, 2, 2],
     };
-    assertMatch(/^<td class="ship-name">テスト1<\/td>$/, kcif.shipName(ship).outerHTML);
+    assertMatch(/^<td class="ship-name" title="テスト1">テスト1<\/td>$/, kcif.shipName(ship).outerHTML);
     ship.slot = [1];
-    assertMatch(/^<td class="ship-name" title="1: アイテム1">テスト1<\/td>$/, kcif.shipName(ship).outerHTML);
+    assertMatch(/^<td class="ship-name" title="テスト1\u000a1: アイテム1">テスト1<\/td>$/, kcif.shipName(ship).outerHTML);
     ship.slot = [2, 1];
-    assertMatch(/^<td class="ship-name" title="1: アイテム2 \[0\/2\]\u000a2: アイテム1">テスト1<\/td>$/, kcif.shipName(ship).outerHTML);
+    assertMatch(/^<td class="ship-name" title="テスト1\u000a1: アイテム2 \[0\/2\]\u000a2: アイテム1">テスト1<\/td>$/, kcif.shipName(ship).outerHTML);
   },
 
   testShipLevel: function(){

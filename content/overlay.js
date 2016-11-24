@@ -15,11 +15,7 @@ function logging(level, args) {
 }
 
 function log() {
-  logging(5, arguments); // Debug
-}
-
-function flog() {
-  Services.console.logStringMessage("[kcif DEBUG]: " + Array.join(arguments, " "));
+  logging(5, arguments); // 5 means DEBUG
 }
 
 function makeElement(tag, id, className, text) {

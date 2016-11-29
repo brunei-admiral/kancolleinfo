@@ -1159,7 +1159,7 @@ var kcif = {
         sakuteki3 -= Math.ceil(0.4 * kcif.admiral_level);
         sakuteki3 += 2 * (6 - ships.length);
 
-        if (s) {
+        if (s && (!kcif.isCombined(mission) || kcif.mission[0])) {
           elem = makeElement("span", null, col, "[");
           for (var j = 0; j < s.length; j++) {
             elem.appendChild(s[j]);
@@ -1207,6 +1207,14 @@ var kcif = {
             label.appendChild(input);
             elem.appendChild(label);
             elem.appendChild(makeText(" "));
+            s = [makeText(" "), elem];
+          }
+          else if (kcif.isCombined(mission) && !kcif.mission[0]) {
+            elem = makeElement("span", null, col, "[");
+            for (var j = 0; j < s.length; j++) {
+              elem.appendChild(s[j]);
+            }
+            elem.appendChild(makeText("]"));
             s = [makeText(" "), elem];
           }
           else {
@@ -3082,7 +3090,7 @@ var kcif = {
     }
   },
 
-  damageRaigeki: function(deck, enemies, raigeki) {
+  damageRaigeki: function(deck, enemies, raigeki, deck2) {
     var damage_list = raigeki.api_fdam;
     var id_list = deck.api_ship;
     for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
@@ -3091,6 +3099,17 @@ var kcif = {
         log("    fleet " + deck.api_id + " ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
         var ship = kcif.ship_list[id];
         kcif.reflectDamage(kcif.battle_result[0], i, ship, damage);
+      }
+    }
+    if (deck2) {
+      id_list = deck2.api_ship;
+      for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
+        if (damage_list[i + 7] >= 0 && raigeki.api_erai.indexOf(i + 7) != -1) {
+          var damage = Math.floor(damage_list[i + 7]);
+          log("    fleet " + deck2.api_id + " ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
+          var ship = kcif.ship_list[id];
+          kcif.reflectDamage(kcif.battle_result[0], i, ship, damage);
+        }
       }
     }
 
@@ -3456,12 +3475,16 @@ var kcif = {
           }
           if (json.api_data.api_opening_atack) {
             log("  opening");
-            if (url.indexOf("combined") != -1 && url.indexOf("ec_") == -1) {
+            if (url.indexOf("combined") != -1 && url.indexOf("ec_") == -1 && url.indexOf("each") == -1) {
               // must be 2nd fleet
               kcif.damageRaigeki(kcif.deck_list[1], enemies, json.api_data.api_opening_atack);
             }
             else {
-              kcif.damageRaigeki(deck, enemies, json.api_data.api_opening_atack);
+              var deck2 = null;
+              if (url.indexOf("each") != -1) {
+                deck2 = kcif.deck_list[1];
+              }
+              kcif.damageRaigeki(deck, enemies, json.api_data.api_opening_atack, deck2);
             }
           }
           if (json.api_data.api_hougeki) { // midnight battle
@@ -3486,7 +3509,7 @@ var kcif = {
               kcif.damageHougeki(deck, enemies, json.api_data.api_hougeki1);
             }
           }
-          if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && url.indexOf("each_") == -1 && url.indexOf("water") == -1) {
+          if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && url.indexOf("each") == -1 && url.indexOf("water") == -1) {
             log("  raigeki");
             var rdeck = deck;
             if (url.indexOf("ec_") == -1) {
@@ -3504,11 +3527,9 @@ var kcif = {
               kcif.damageHougeki(deck, enemies, json.api_data.api_hougeki2);
             }
           }
-          if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && url.indexOf("each_") != -1 && url.indexOf("water") == -1) {
+          if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && url.indexOf("each") != -1 && url.indexOf("water") == -1) {
             log("  raigeki");
-            var rdeck = deck;
-            rdeck = kcif.deck_list[1];
-            kcif.damageRaigeki(rdeck, enemies, json.api_data.api_raigeki);
+            kcif.damageRaigeki(deck, enemies, json.api_data.api_raigeki, kcif.deck_list[1]);
           }
           if (json.api_data.api_hougeki3) { // combined battle
             log("  hougeki3");
@@ -3527,6 +3548,9 @@ var kcif = {
             log("  raigeki");
             if (url.indexOf("combined") == -1) {
               kcif.damageRaigeki(deck, enemies, json.api_data.api_raigeki);
+            }
+            else if (url.indexOf("each") != -1) {
+              kcif.damageRaigeki(deck, enemies, json.api_data.api_raigeki, kcif.deck_list[1]);
             }
             else {
               // must be 2nd fleet

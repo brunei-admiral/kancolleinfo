@@ -810,11 +810,16 @@ var kcif = {
   },
 
   renderInfo: function(all) {
-    if (kcif.area_game && parseInt(kcif.area_game.style.height) < 920) {
+    try {
+      if (kcif.area_game && parseInt(kcif.area_game.style.height) < 920) {
         kcif.area_game.style.height = '920px';
-    }
-    if (kcif.game_frame && parseInt(kcif.game_frame.style.height) < 920) {
+      }
+      if (kcif.game_frame && parseInt(kcif.game_frame.style.height) < 920) {
         kcif.game_frame.style.height = '920px';
+      }
+    }
+    catch (exc) {
+      log("renderInfo streching area failed: " + String(exc));
     }
 
     if (kcif.info_div) {

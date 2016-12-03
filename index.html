@@ -170,7 +170,7 @@ span.bugfix:after {
 #kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; text-align: left; }
 #kancolle-info * { font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; }
 #kancolle-info #tab-headers { color: #ccc; background-color: #444; line-height: 1.5; font-weight: bold; }
-#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-left: 4px; margin-right: -2px; padding: 1px 12px 2px 12px; }
+#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-left: 4px; margin-right: -2px; padding: 1px 12px 3px 12px; }
 #kancolle-info #base-info { float: right; margin-right: 8px; color: white; font-weight: normal; }
 #kancolle-info #base-info button { height: 21px; position: relative; top: -1px; font-size: 10px; }
 #kancolle-info #updated { font-weight: bold; color: lightgreen; }
@@ -185,6 +185,7 @@ span.bugfix:after {
 #kancolle-info .tab { padding: 2px 8px 2px 8px; }
 #kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }
 #kancolle-info .tab .fleet-header { width: 600px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#kancolle-info #tab-main .fleet { width: 600px; }
 #kancolle-info .tab .list-header { color: skyblue; text-decoration: none; font-weight: bold; }
 #kancolle-info .tab a.list-header:hover { color: yellow !important; dext-decoration: none !important; font-weight: bold !important; cursor: pointer; }
 #kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }
@@ -199,12 +200,13 @@ span.bugfix:after {
 #kancolle-info .tab .item-no { text-align: right; padding: 0 6px 0 4px; width: 2.4em; }
 #kancolle-info .tab .ship-type { width: 2.7em; }
 #kancolle-info .tab .ship-name { display: block; font-weight: bold; width: 8.5em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; padding-right: 15px; }
+#kancolle-info .tab .ship-level { text-align: right; width: 2.7em; padding-right: 15px; }
+#kancolle-info .tab .ship-cond { text-align: right; width: 2.5em; padding-right: 10px; }
 #kancolle-info .tab .ship-header-hp { width: 70px; }
 #kancolle-info .tab .ship-hp { text-align: right; width: 70px; }
 #kancolle-info .tab .ship-hp-meter { padding-top: 4px; text-align: right; width: 70px; line-height: 0; font-size: 8pt; }
 #kancolle-info .tab .ship-hp-meter meter { width: 70px; height: 6px; margin-top: 5px; }
-#kancolle-info .tab .ship-at { text-align: right; width: 7.4em; }
+#kancolle-info .tab .ship-at { text-align: right; width: 7.7em; }
 #kancolle-info .tab .ship-fuel, #kancolle-info .tab .ship-bull { text-align: right; width: 3.8em; }
 #kancolle-info .tab .ship-fuel-bull-header { width: 4.2em; }
 #kancolle-info .tab .ship-fuel-bull { width: 4.2em; line-height: 0; }
@@ -233,6 +235,7 @@ span.bugfix:after {
 #kancolle-info #tab-config td.config-input button { padding: 0; margin: 0; height: 24px; font-size: 10.5px; }
 #kancolle-info #tab-config div.config-buttons { text-align: center; }
 #kancolle-info #tab-config div.config-buttons button { width: 5em; padding: 0; margin: 0; height: 24px; font-size: 10.5px; }
+#kancolle-info .clearfix:after { content: ""; clear: both; display: block; height: 0; padding: 0; margin: 0; }
 #kancolle-info .color-green { color: lightgreen; }
 #kancolle-info .color-yellow { color: yellow; }
 #kancolle-info .color-orange { color: orange; }
@@ -272,6 +275,49 @@ function toggleShowOlds(evt) {
   var elems = document.querySelectorAll("li.old")
   for (var i = 0; i < elems.length; i++) {
     elems[i].style.display = hide ? "none" : "list-item";
+  }
+}
+
+function recursive_call(elem, func) {
+  func(elem);
+  var children = elem.children;
+  for (var i = 0; i < children.length; i++) {
+    recursive_call(children[i], func);
+  }
+}
+
+var mode = 0;
+function dummy(evt) {
+  document.querySelector("#dummy").textContent = document.lastModified + " 更新版";
+  if (mode == 0) {
+    mode = 1;
+    var elems = document.querySelectorAll(".fleet");
+    for (var i = 0; i < elems.length; i++) {
+      elems[i].style.backgroundColor = "blue";
+    }
+
+    elems = document.querySelectorAll(".fleet-header");
+    for (var i = 0; i < elems.length; i++) {
+      elems[i].style.backgroundColor = "green";
+    }
+
+    elems = document.querySelectorAll(".fleet table");
+    for (var i = 0; i < elems.length; i++) {
+      elems[i].style.backgroundColor = "yellow";
+    }
+
+    var elem = document.querySelector("#resource");
+    elem.style.backgroundColor = "red";
+  }
+  else if (mode == 1) {
+    mode = 2;
+    var elems = document.querySelectorAll(".fleet");
+    for (var i = 0; i < elems.length; i++) {
+      elems[i].parentNode.removeChild(elems[i]);
+    }
+  }
+  else {
+    location.reload(false);
   }
 }
 //--></script>
@@ -341,17 +387,18 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 <h2 id="ss">スクリーンショット</h2>
 <p>
 というか、動的モックです。
-実物とは微妙に細部が異なるかもしれません。
+実物とは微妙に細部が異なるかもしれません。<span id="dummy" style="font-weight: bold; color: red;"></span>
 </p>
 <div id="kancolle-info">
-  <div id="tab-headers">
+  <div id="tab-headers" class="clearfix">
     <div id="tab-header-main" class="tab-header"><a href="#">メイン</a></div>
     <div id="tab-header-ships" class="tab-header"><a href="#">艦娘</a></div>
     <div id="tab-header-items" class="tab-header"><a href="#">装備</a></div>
     <div id="tab-header-config" class="tab-header"><a href="#">設定</a></div>
-    <div id="base-info"><span class="color-default">20</span>/100 ships; <span class="color-default">78</span>/500 items <span id="updated">20:35更新</span> <button id="capture">画面キャプチャ</button></div>
+    <div id="base-info"><span class="color-default">20</span>/100 ships; <span class="color-default">78</span>/500 items <span id="updated">20:35更新</span> <button id="capture" onclick="dummy();">画面キャプチャ</button></div>
   </div>
   <div id="tab-main" class="tab">
+    <div id="upper_group" class="clearfix">
     <div id="resource">
       <h2><span class="list-header">資源等</span></h2>
       <table>
@@ -409,6 +456,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
         <tr><td class="ship-no">5</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
         <tr><td class="ship-no">6</td><td class="ship-type"></td><td class="ship-name"></td><td class="ship-level"></td><td class="ship-hp-meter"></td><td class="ship-cond"></td><td class="ship-fuel-bull"></td><td class="ship-exp" title=""></td><td class="ship-desc"></td></tr>
       </table>
+    </div>
     </div>
     <div id="ndock">
       <h2><span class="list-header">入渠</span></h2>
@@ -571,7 +619,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
       <button id="config-reset">クリア</button>
     </div>
   </div>
-</div>
+</div><div style="clear: both;"></div>
 
 <h2>使い方</h2>
 <h3>インストール</h3>
@@ -604,7 +652,7 @@ kancolleinfo自体は『艦これ』サーバとは一切通信を行ってい�
 </p>
 <p>
 一番右に<samp>画面キャプチャ</samp>ボタンがあります。
-クリックすると現在のゲーム画面をPNG形式でキャプチャし、ローカルストレージ(HDDとか)に保存します(この<a href="#kancolle-info">モック</a>では、押しても何も起きません)。
+クリックすると現在のゲーム画面をPNG形式でキャプチャし、ローカルストレージ(HDDとか)に保存します(この<a href="#kancolle-info">モック</a>では、押すとCSSデバッグ表示モードに切り替わってしまいます)。
 実際の保存場所およびファイル名については、<a href="#desc-config">設定の説明</a>を参照してください。
 </p>
 
@@ -889,6 +937,9 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 
 <h2 id="histroy">履歴</h2>
 <dl>
+  <dt>2016-12-02</dt>
+  <dd id="v216">ver 2.1.6<br><span class="bugfix"></span>OS Xでレイアウトが崩れていた不具合を修正。<small>なんで同じGeckoなのにCSS解釈が違うの……</small></dd>
+
   <dt>2016-12-01</dt>
   <dd id="v215">ver 2.1.5<br><span class="update"></span>長すぎる艦名を省略表示するように変更(コマたん…)。<br><span class="update"></span>艦名に対するポップアップ内に艦名を含めるように変更。<br><span class="update"></span>艦隊情報が長すぎる場合も省略表示して1行に収まるように変更。<br><span class="bugfix"></span>連合艦隊編成中に第3・第4艦隊で出撃すると現在位置表示が乱れる不具合を修正。<br><span class="bugfix"></span>連合艦隊編成中、第2艦隊に未補給艦があっても艦隊情報にその旨が表示されない不具合を修正。<br><span class="bugfix"></span>連合艦隊対連合艦隊時、雷撃戦の被ダメージが正しく反映されていなかった不具合を修正。</dd>
 

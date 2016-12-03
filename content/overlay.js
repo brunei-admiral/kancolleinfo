@@ -285,7 +285,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; text-align: left; }', sheet.length);
       sheet.insertRule('#kancolle-info * { font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-headers { color: #ccc; background-color: #444; line-height: 1.5; font-weight: bold; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-left: 4px; margin-right: -2px; padding: 1px 12px 2px 12px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab-header { display: inline; border-top: gray solid 1px; border-left: gray solid 1px; border-right: gray solid 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-left: 4px; margin-right: -2px; padding: 1px 12px 3px 12px; }', sheet.length);
       sheet.insertRule('#kancolle-info #base-info { float: right; margin-right: 8px; color: white; font-weight: normal; }', sheet.length);
       sheet.insertRule('#kancolle-info #base-info button { height: 21px; position: relative; top: -1px; font-size: 10px; }', sheet.length);
       sheet.insertRule('#kancolle-info #updated { font-weight: bold; color: lightgreen; }', sheet.length);
@@ -300,6 +300,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab { padding: 2px 8px 2px 8px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab h2 { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .fleet-header { width: 600px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }', sheet.length);
+      sheet.insertRule('#kancolle-info #tab-main .fleet { width: 600px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .list-header { color: skyblue; text-decoration: none; font-weight: bold; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab a.list-header:hover { color: yellow !important; dext-decoration: none !important; font-weight: bold !important; cursor: pointer; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab table { color: inherit; font-size: 10pt; padding: 0; margin: 0; }', sheet.length);
@@ -314,12 +315,13 @@ var kcif = {
       sheet.insertRule('#kancolle-info .tab .item-no { text-align: right; padding: 0 6px 0 4px; width: 2.4em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-type { width: 2.7em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-name { display: block; font-weight: bold; width: 8.5em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-level, #kancolle-info .tab .ship-cond { text-align: right; width: 2.7em; padding-right: 15px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-level { text-align: right; width: 2.7em; padding-right: 15px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-cond { text-align: right; width: 2.5em; padding-right: 10px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-header-hp { width: 70px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-hp { text-align: right; width: 70px; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-hp-meter { padding-top: 4px; text-align: right; width: 70px; line-height: 0; font-size: 8pt; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-hp-meter meter { width: 70px; height: 6px; margin-top: 5px; }', sheet.length);
-      sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 7.4em; }', sheet.length);
+      sheet.insertRule('#kancolle-info .tab .ship-at { text-align: right; width: 7.7em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-fuel, #kancolle-info .tab .ship-bull { text-align: right; width: 3.8em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-fuel-bull-header { width: 4.2em; }', sheet.length);
       sheet.insertRule('#kancolle-info .tab .ship-fuel-bull { width: 4.2em; line-height: 0; }', sheet.length);
@@ -348,6 +350,7 @@ var kcif = {
       sheet.insertRule('#kancolle-info #tab-config td.config-input button { padding: 0; margin: 0; height: 24px; font-size: 10.5px; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-config div.config-buttons { text-align: center; }', sheet.length);
       sheet.insertRule('#kancolle-info #tab-config div.config-buttons button { width: 5em; padding: 0; margin: 0; height: 24px; font-size: 10.5px; }', sheet.length);
+      sheet.insertRule('#kancolle-info .clearfix:after { content: ""; clear: both; display: block; height: 0; padding: 0; margin: 0; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-green { color: lightgreen; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-yellow { color: yellow; }', sheet.length);
       sheet.insertRule('#kancolle-info .color-orange { color: orange; }', sheet.length);
@@ -397,7 +400,7 @@ var kcif = {
     if (kcif.info_div) {
       var base = makeElement("div", "kancolle-info");
 
-      var tabs = makeElement("div", "tab-headers");
+      var tabs = makeElement("div", "tab-headers", "clearfix");
 
       var tab = makeElement("div", "tab-header-main", "tab-header");
       var elem = makeElement("a", null, null, "メイン");
@@ -911,6 +914,7 @@ var kcif = {
     var html = "";
 
     // 資源
+    var upper_group = makeElement("div", "upper_group", "clearfix");
     var div = makeElement("div", "resource");
     var h2 = makeElement("h2");
     var elem = makeElement("span", null, "list-header", "資源等");
@@ -932,7 +936,7 @@ var kcif = {
     table.appendChild(kcif.formatMaterial("高速建造材", kcif.material[4]));
     table.appendChild(kcif.formatMaterial("改修資材", kcif.material[7]));
     div.appendChild(table);
-    maintab.appendChild(div);
+    upper_group.appendChild(div);
 
     // 艦隊
     for (var i = 0; i < 4; i++) {
@@ -1314,8 +1318,9 @@ var kcif = {
 
       div.appendChild(h2);
       div.appendChild(table);
-      maintab.appendChild(div);
+      upper_group.appendChild(div);
     }
+    maintab.appendChild(upper_group);
 
     // 入渠
     div = makeElement("div", "ndock");

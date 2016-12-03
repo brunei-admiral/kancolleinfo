@@ -1,6 +1,6 @@
 # -*- Ruby -*-
 
-DEPENDS = %w[chrome.manifest bootstrap.js content defaults install.rdf]
+DEPENDS = %w[chrome.manifest bootstrap.js content install.rdf]
 
 desc "make package"
 task :pack => :test do

@@ -887,7 +887,7 @@ var kcif = {
 
   setNextUpdate: function(dt, redonly) {
     var now = new Date().getTime();
-    if (dt < now) {
+    if (dt+10 < now) { // 10ms for margin
       return;
     }
     if (!redonly) {
@@ -3722,7 +3722,8 @@ var kcif = {
 
     if (kcif.update) {
       log("set update timer at " + new Date(kcif.update));
-      kcif.timer = setTimeout(kcif.main, kcif.update - new Date().getTime() + 10); /* 10ms to make sure */
+      var now = new Date().getTime();
+      kcif.timer = setTimeout(kcif.main, kcif.update - now + 10); /* 10ms to make sure */
       kcif.update = null;
     }
     else {

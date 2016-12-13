@@ -1118,15 +1118,15 @@ var kcif = {
                   }
                   else if (kcif.hasSeiku(item.type[2]) && ship.equip[k] > 0) {
                     var hosei = item.level;
-                    if (item.type[2] == 6) { // 艦戦
+                    if (item.type[2] == 6 || item.type[2] == 56) { // 艦戦、噴式戦闘機(TODO)
                       hosei *= 0.2;
                     }
-                    else if (item.type[2] == 7) { // 艦爆
+                    else if (item.type[2] == 7 || item.type[2] == 57) { // 艦爆、噴式戦闘爆撃機(TODO)
                       hosei *= 0.25;
                     }
                     var alv = 0;
                     if (kcif.getAircoverAlv()) {
-                      if (item.type[2] == 6 || item.type[2] == 45) { // 艦戦
+                      if (item.type[2] == 6 || item.type[2] == 45 || item.type[2] == 56) { // 艦戦、水戦、噴式戦闘機(TODO)
                         alv = [0, 0, 2, 5, 9, 14, 14, 22][item.alv];
                       }
                       else if (item.type[2] == 11) { // 水爆
@@ -2799,11 +2799,11 @@ var kcif = {
   },
 
   hasSeiku: function(type) {
-    return (type >= 6 && type <= 8) || type == 11 || type == 45;
+    return (type >= 6 && type <= 8) || type == 11 || type == 45 || (type >= 56 && type <= 58);
   },
 
   isPlane: function(type) {
-    return (type >= 6 && type <= 11 || type == 25 || type == 26 || type == 41 || type == 45 || type == 94);
+    return (type >= 6 && type <= 11) || type == 25 || type == 26 || type == 41 || type == 45 || (type >= 56 && type <= 59) || type == 94;
   },
 
   isInDock: function(ship) {
@@ -2830,6 +2830,7 @@ var kcif = {
         case 9: // 艦偵
         case 10:// 水偵
         case 11:// 水爆
+        case 59:// 噴式偵察機 TODO
         case 94:// 艦偵(II) TODO
           co = 2.0;
           break;
@@ -2841,12 +2842,15 @@ var kcif = {
     else if (type == 2) { // 2-5秋式
       switch (item.type[2]) {
         case 7: // 艦爆
+        case 57:// 噴式戦闘爆撃機 TODO
           co = 1.0376255;
           break;
         case 8: // 艦攻
+        case 58:// 噴式攻撃機 TODO
           co = 1.3677954;
           break;
         case 9: // 艦偵
+        case 59:// 噴式偵察機 TODO
         case 94:// 艦偵(II) TODO
           co = 1.6592780;
           break;
@@ -2871,12 +2875,15 @@ var kcif = {
     else if (type == 3) { // 2-5秋簡易式
       switch (item.type[2]) {
         case 7: // 艦爆
+        case 57:// 噴式戦闘爆撃機 TODO
           co = 0.6;
           break;
         case 8: // 艦攻
+        case 58:// 噴式攻撃機 TODO
           co = 0.8;
           break;
         case 9: // 艦偵
+        case 59:// 噴式偵察機 TODO
         case 94:// 艦偵(II) TODO
           co = 1.0;
           break;
@@ -2899,9 +2906,11 @@ var kcif = {
     else { // 33判定式
       switch (item.type[2]) {
         case 8: // 艦攻
+        case 58:// 噴式攻撃機 TODO
           co = 0.8;
           break;
         case 9: // 艦偵
+        case 59:// 噴式偵察機 TODO
         case 94:// 艦偵(II) TODO
           co = 1.0;
           break;
@@ -3419,6 +3428,19 @@ var kcif = {
       var rank = "";
       for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
         if (deck.api_id == deck_id) {
+          if (json.api_data.api_injection_kouku) {
+            log("  injection kouku");
+            kcif.damageKouku(deck, enemies, json.api_data.api_injection_kouku.api_stage3);
+            if (url.indexOf("combined") != -1 && json.api_data.api_injection_kouku.api_stage3_combined) {
+              var kdeck = deck;
+              if (url.indexOf("ec_") == -1) {
+                // must be 2nd fleet
+                log("  kouku (2nd)");
+                kdeck = kcif.deck_list[1];
+              }
+              kcif.damageKouku(kdeck, enemies, json.api_data.api_injection_kouku.api_stage3_combined, 6);
+            }
+          }
           if (json.api_data.api_air_base_attack) { // air base attack
             for (var j = 0, kouku; kouku = json.api_data.api_air_base_attack[j]; j++) {
               log("  air base attack " + (j+1));

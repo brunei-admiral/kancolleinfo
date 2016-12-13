@@ -646,7 +646,13 @@ JUST.testCase({
       refute(kcif.hasSeiku(i));
     }
     assert(kcif.hasSeiku(45));
-    for (var i = 46; i <= 199; i++) {
+    for (var i = 46; i <= 55; i++) {
+      refute(kcif.hasSeiku(i));
+    }
+    for (var i = 56; i <= 58; i++) {
+      assert(kcif.hasSeiku(i));
+    }
+    for (var i = 59; i <= 199; i++) {
       refute(kcif.hasSeiku(i));
     }
   },
@@ -671,7 +677,13 @@ JUST.testCase({
       refute(kcif.isPlane(i));
     }
     assert(kcif.isPlane(45));
-    for (var i = 46; i <= 93; i++) {
+    for (var i = 46; i <= 55; i++) {
+      refute(kcif.isPlane(i));
+    }
+    for (var i = 56; i <= 59; i++) {
+      assert(kcif.isPlane(i));
+    }
+    for (var i = 60; i <= 93; i++) {
       refute(kcif.isPlane(i));
     }
     assert(kcif.isPlane(94));

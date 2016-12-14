@@ -3723,7 +3723,12 @@ var kcif = {
     if (kcif.update) {
       log("set update timer at " + new Date(kcif.update));
       var now = new Date().getTime();
-      kcif.timer = setTimeout(kcif.main, kcif.update - now + 10); /* 10ms to make sure */
+      if (now < kcif.update + 10) {
+        kcif.timer = setTimeout(kcif.main, kcif.update + 10 - now); // 10ms to make sure
+      }
+      else {
+        kcif.timer = setTimeout(kcif.main, 10); // immediately, but margin 10ms
+      }
       kcif.update = null;
     }
     else {

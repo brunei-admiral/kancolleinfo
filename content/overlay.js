@@ -1112,7 +1112,7 @@ var kcif = {
                     drum++;
                     drum_p = true;
                   }
-                  else if (item.item_id == 68 || item.item_id == 166) { // 大発動艇
+                  else if (item.type[2] == 24) { // 上陸用舟艇
                     dai++;
                     dai_p = true;
                   }

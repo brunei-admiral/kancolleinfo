@@ -905,6 +905,14 @@ var kcif = {
     if (!kcif.update || kcif.update > dt) {
       kcif.update = dt;
     }
+
+    var tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0);
+    tomorrow = tomorrow.getTime();
+    if (kcif.update > tomorrow) {
+      kcif.update = tomorrow;
+    }
   },
 
   renderMain: function() {
@@ -3720,20 +3728,23 @@ var kcif = {
       return;
     }
 
-    if (kcif.update) {
-      log("set update timer at " + new Date(kcif.update));
-      var now = new Date().getTime();
-      if (now < kcif.update + 10) {
-        kcif.timer = setTimeout(kcif.main, kcif.update + 10 - now); // 10ms to make sure
-      }
-      else {
-        kcif.timer = setTimeout(kcif.main, 10); // immediately, but margin 10ms
-      }
-      kcif.update = null;
+    if (!kcif.update) {
+      var tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0);
+      tomorrow = tomorrow.getTime();
+      kcif.update = tomorrow;
+    }
+
+    log("set update timer at " + new Date(kcif.update));
+    var now = new Date().getTime();
+    if (now < kcif.update + 10) {
+      kcif.timer = setTimeout(kcif.main, kcif.update + 10 - now); // 10ms to make sure
     }
     else {
-      //kcif.timer = setTimeout(kcif.main, 10 * 1000);
+      kcif.timer = setTimeout(kcif.main, 10); // immediately, but margin 10ms
     }
+    kcif.update = null;
   },
 
   main: function(request, content, query) {

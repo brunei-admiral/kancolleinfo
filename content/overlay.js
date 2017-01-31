@@ -1095,8 +1095,8 @@ var kcif = {
               kira.push(ship.name);
             }
             if (!ship.taihi) {
-              var drum_p = false;
-              var dai_p = false;
+              var drum_num = 0;
+              var dai_num = 0;
               var s_base = ship.sakuteki;
               var s_sakuteki = 0;
               var s_sakuteki1 = 0;
@@ -1110,11 +1110,11 @@ var kcif = {
                 if (item) {
                   if (item.item_id == 75) { // ドラム缶(輸送用)
                     drum++;
-                    drum_p = true;
+                    drum_num++;
                   }
                   else if (item.type[2] == 24) { // 上陸用舟艇
                     dai++;
-                    dai_p = true;
+                    dai_num++;
                   }
                   else if (kcif.hasSeiku(item.type[2]) && ship.equip[k] > 0) {
                     var hosei = item.level;
@@ -1144,11 +1144,11 @@ var kcif = {
                   s_sakuteki3 += kcif.calcSakuteki(item, 4);
                 }
               }
-              if (drum_p) {
-                drum_ship.push(ship.name);
+              if (drum_num > 0) {
+                drum_ship.push(ship.name + "(" + drum_num + ")");
               }
-              if (dai_p) {
-                dai_ship.push(ship.name);
+              if (dai_num > 0) {
+                dai_ship.push(ship.name + "(" + dai_num + ")");
               }
               s_sakuteki += Math.sqrt(s_base);
               s_sakuteki2 += Math.sqrt(s_base) * 1.6841056;

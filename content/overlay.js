@@ -909,7 +909,7 @@ var kcif = {
     var tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0);
-    tomorrow = tomorrow.getTime();
+    tomorrow = tomorrow.getTime() - 10; // 10ms for margin;
     if (kcif.update > tomorrow) {
       kcif.update = tomorrow;
     }
@@ -3729,11 +3729,11 @@ var kcif = {
     }
 
     if (!kcif.update) {
+      log("kcif.update is null; set tomorrow");
       var tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(0, 0, 0);
-      tomorrow = tomorrow.getTime();
-      kcif.update = tomorrow;
+      kcif.update = tomorrow.getTime() - 10; // 10ms for margin
     }
 
     log("set update timer at " + new Date(kcif.update));

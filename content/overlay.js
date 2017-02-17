@@ -3453,7 +3453,7 @@ var kcif = {
             for (var j = 0, kouku; kouku = json.api_data.api_air_base_attack[j]; j++) {
               log("  air base attack " + (j+1));
               kcif.damageKouku(deck, enemies, kouku.api_stage3);
-              if (url.indexOf("combined") != -1 && json.api_data.api_kouku.api_stage3_combined) {
+              if (url.indexOf("combined") != -1 && kouku.api_stage3_combined) {
                 kcif.damageKouku(deck, enemies, kouku.api_stage3_combined, 6);
               }
             }

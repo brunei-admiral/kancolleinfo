@@ -100,6 +100,7 @@ TracingListener.prototype = {
     this.originalListener.onStopRequest(request, context, statusCode);
     // Get entire response
     var responseSource = this.receivedData.join("");
+    delete this.receivedData;
 
     kcif.main(request, responseSource, query);
   },

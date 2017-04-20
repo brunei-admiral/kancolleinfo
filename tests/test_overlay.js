@@ -1,6 +1,22 @@
-phantom.injectJs("just.js");
-phantom.injectJs("mock.js");
-phantom.injectJs("../content/overlay.js");
+if (typeof(phantom) !== "undefined") {
+  phantom.injectJs("just.js");
+  phantom.injectJs("mock.js");
+  phantom.injectJs("../content/overlay.js");
+}
+else {
+  if (typeof(process.env["NODE_PATH"]) === "undefined") {
+    process.env["NODE_PATH"] = "";
+  }
+  process.env["NODE_PATH"].concat("C:/Progra~1/node-v6.10.2-win-x64/node_modules");
+  var document = require("html-element").document;
+  const FS = require("fs");
+  const Path = require("path");
+  var geval = eval;
+  ["./just.js", "./mock.js", "../content/overlay.js"].forEach(function(file){
+    file = Path.resolve(__dirname, file);
+    geval(FS.readFileSync(file, "utf-8"));
+  });
+}
 
 // local stubs
 kcif.myPref = function(){

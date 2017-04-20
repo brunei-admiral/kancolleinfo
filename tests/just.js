@@ -43,7 +43,12 @@ var JUST = {
       }
     }
     console.log(String(JUST.tests) + " tests, " + JUST.assertions + " assertions, " + JUST.passes + " passes, " + JUST.failures + " failures, " + JUST.errors + " errors.");
-    phantom.exit(JUST.failures + JUST.errors);
+    if (typeof(phantom) !== "undefined") {
+      phantom.exit(JUST.failures + JUST.errors);
+    }
+    else {
+      process.exit(JUST.failures + JUST.errors);
+    }
   },
 
   FailedAssertion: function(message){

@@ -62,6 +62,9 @@ const Components = {
   },
 }
 
+if (typeof(window) === "undefined") {
+  var window = {};
+}
 window.Audio = function(){
   var obj = {
     load: function(){

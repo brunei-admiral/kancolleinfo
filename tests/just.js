@@ -21,17 +21,21 @@ var JUST = {
             JUST.failures++;
             console.log("[" + (JUST.failures + JUST.errors) + "] Failure: " + prop);
             console.log(ex.message);
-            stack = stack.replace(/^.*?\n/, "");
-            var re = /^\s+at (?:assert|refute).*?\n/;
-            while (re.test(stack)) {
-              stack = stack.replace(re, "");
+            if (typeof(stack) != "undefined") {
+              stack = stack.replace(/^.*?\n/, "");
+              var re = /^\s+at (?:assert|refute).*?\n/;
+              while (re.test(stack)) {
+                stack = stack.replace(re, "");
+              }
             }
           }
           else {
             JUST.errors++;
             console.log("[" + (JUST.failures + JUST.errors) + "] Error: " + prop);
           }
-          console.log(stack);
+          if (typeof(stack) != "undefined") {
+            console.log(stack);
+          }
           console.log("");
         }
         finally {

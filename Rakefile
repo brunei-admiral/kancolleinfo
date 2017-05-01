@@ -14,7 +14,19 @@ end
 desc "run test suite"
 task :test do
   Dir["tests/test*.js"].each do |test|
-    sh("phantomjs --output-encoding=shift_jis #{test}")
+    sh "phantomjs --output-encoding=shift_jis #{test}"
+  end
+end
+
+namespace :test do
+  desc "run test suite with Node.js"
+  task :node do
+    if ENV["NODE_DIR"]
+      ENV["PATH"] = [ENV["NODE_DIR"], ENV["PATH"]].join(File::PATH_SEPARATOR)
+    end
+    Dir["tests/test*.js"].each do |test|
+      sh "node #{test}"
+    end
   end
 end
 

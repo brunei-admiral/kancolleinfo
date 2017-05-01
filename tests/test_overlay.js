@@ -9,6 +9,7 @@ else {
   }
   process.env["NODE_PATH"].concat("C:/Progra~1/node-v6.10.2-win-x64/node_modules");
   var document = require("html-element").document;
+  document.URL = "http://example.com";
   const FS = require("fs");
   const Path = require("path");
   var geval = eval;

@@ -393,7 +393,7 @@ var kcif = {
         kcif.game_frame = game_frame;
       }
 
-      doc.body.setAttribute("onload", "if (typeof DMM != 'undefined' && DMM.netgame) DMM.netgame.reloadDialog = function(){}; history.pushState(null, null, null); window.addEventListener('popstate', function() { history.pushState(null, null, null); });");
+      doc.body.setAttribute("onLoad", "if (typeof DMM != 'undefined' && DMM.netgame) DMM.netgame.reloadDialog = function(){}; history.pushState(null, null, null); window.addEventListener('popstate', function() { history.pushState(null, null, null); });");
     }
   },
 
@@ -2258,6 +2258,13 @@ var kcif = {
 
   captureAndSave: function(evt) {
     if (evt) evt.preventDefault();
+
+    if (!kcif.game_frame && kcif.area_game) {
+      var game_frame = kcif.area_game.querySelector("#game_frame");
+      if (game_frame) {
+        kcif.game_frame = game_frame;
+      }
+    }
 
     var rect = kcif.flash.getBoundingClientRect();
     var rect2 = kcif.game_frame.getBoundingClientRect();

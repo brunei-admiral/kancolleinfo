@@ -886,6 +886,9 @@ JUST.testCase({
     assertEqual("C", kcif.judgeBattleResult([{hp: 1}], [{hp: 1}, {hp: 1}, {hp: 1}, {hp: 0}, {hp: 0}, {hp: 0}], [1], [0, 0, 0, 1, 1, 1]));
     assertEqual("D", kcif.judgeBattleResult([{hp: 1}], [{hp: 1}], [0], [0]));
     assertEqual("B", kcif.judgeBattleResult([{hp: 17}, {hp: 19}, {hp: 23}, {hp: 28}, {hp: 22}, {hp: 22}], [{hp: 79}, {hp: 59}, {hp: 27}, {hp: 0}, {hp: 0}, {hp: 0}], [0, 0, 0, 0, 0, 0], [11, 17, 49, 50, 43, 45]));
+    assertEqual("S", kcif.judgeBattleResult([{hp: 17}, {hp: 19}, {hp: 23}, {hp: 28}, {hp: 22}, {hp: 22}], [{hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}], [1, 0, 0, 0, 0, 0], [11, 17, 49, 50, 43, 45, 11, 17, 49, 50, 43, 45]));
+    assertEqual("A", kcif.judgeBattleResult([{hp: 17}, {hp: 19}, {hp: 23}, {hp: 28}, {hp: 22}, {hp: 22}], [{hp: 79}, {hp: 59}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 79}, {hp: 59}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}], [0, 0, 0, 0, 0, 0], [11, 17, 49, 50, 43, 45, 11, 17, 49, 50, 43, 45]));
+    assertEqual("B", kcif.judgeBattleResult([{hp: 17}, {hp: 19}, {hp: 23}, {hp: 28}, {hp: 22}, {hp: 22}], [{hp: 79}, {hp: 59}, {hp: 27}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 79}, {hp: 59}, {hp: 0}, {hp: 0}, {hp: 0}, {hp: 0}], [0, 0, 0, 0, 0, 0], [11, 17, 49, 50, 43, 45, 11, 17, 49, 50, 43, 45]));
   },
 
   testJudgeLdBattleResult: function(){

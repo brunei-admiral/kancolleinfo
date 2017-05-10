@@ -3271,7 +3271,9 @@ var kcif = {
           return "S";
         }
       }
-      else if (esunks >= Math.round(ecount * 0.6)) { // 半数以上沈めた
+      else if ((ecount < 6 && esunks >= Math.ceil(ecount * 0.5)) ||
+               (ecount >= 6 && ecount < 12 && esunks >= Math.ceil(ecount * 0.5) + 1) ||
+               (ecount == 12 && esunks >= 8)) { // 半数以上沈めた
         return "A";
       }
       else if (enemies[0].hp <= 0 || // 旗艦沈めた または

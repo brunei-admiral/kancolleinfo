@@ -2489,7 +2489,7 @@ var kcif = {
     }
     else {
       s = ship.name || "(" + ship.ship_id + ")";
-      items.push(s);
+      items.push(ship.type_name + " " + s);
       for (var i = 0; ship.slot && (i < ship.slot.length); i++) {
         if (ship.slot[i] >= 0 && kcif.item_list[ship.slot[i]]) {
           var item = kcif.item_list[ship.slot[i]];
@@ -2803,6 +2803,7 @@ var kcif = {
     if (kcif.ship_master[data.api_ship_id]) {
       ship.name = kcif.ship_master[data.api_ship_id].name;
       ship.type = kcif.ship_master[data.api_ship_id].type;
+      ship.type_name = kcif.ship_master[data.api_ship_id].type_name;
       ship.afterlv = kcif.ship_master[data.api_ship_id].afterlv;
       ship.aftershipid = kcif.ship_master[data.api_ship_id].aftershipid;
       ship.sort_no = kcif.ship_master[data.api_ship_id].sort_no;
@@ -4021,44 +4022,55 @@ var kcif = {
       }
     }
     else if (url.indexOf("/api_start2") != -1) {
+      var mst_ship_type = json.api_data.api_mst_stype;
+      var ship_type = {};
+      for (var i = 0, item; item = mst_ship_type[i]; i++) {
+        ship_type[item.api_id] = {
+          type_id: item.api_id,
+          name: item.api_name,
+        };
+        log("stype: " + item.api_id + " = " + ship_type[item.api_id].name);
+      }
+
       var mst_ship = json.api_data.api_mst_ship;
       var master = {};
       for (var i = 0, ship; ship = mst_ship[i]; i++) {
         master[ship.api_id] = {
-        ship_id: ship.api_id,
-        name: ship.api_name,
-        yomi: ship.api_yomi,
-        type: ship.api_stype,
-        afterlv: ship.api_afterlv,
-        aftershipid: ship.api_aftershipid,
-        sort_no: ship.api_sortno,
-        fuel_max: ship.api_fuel_max,
-        bull_max: ship.api_bull_max,
-        equip_max: ship.api_maxeq
-          };
+          ship_id: ship.api_id,
+          name: ship.api_name,
+          yomi: ship.api_yomi,
+          type: ship.api_stype,
+          type_name: ship_type[ship.api_stype].name,
+          afterlv: ship.api_afterlv,
+          aftershipid: ship.api_aftershipid,
+          sort_no: ship.api_sortno,
+          fuel_max: ship.api_fuel_max,
+          bull_max: ship.api_bull_max,
+          equip_max: ship.api_maxeq,
+        };
       }
       kcif.ship_master = master;
 
       var mst_item_type = json.api_data.api_mst_slotitem_equiptype;
-      item_type = {};
+      var item_type = {};
       for (var i = 0, item; item = mst_item_type[i]; i++) {
         item_type[item.api_id] = {
-        type_id: item.api_id,
-        name: item.api_name
-          };
+          type_id: item.api_id,
+          name: item.api_name,
+        };
       }
 
       var mst_item = json.api_data.api_mst_slotitem;
       master = {};
       for (var i = 0, item; item = mst_item[i]; i++) {
         master[item.api_id] = {
-        name: item.api_name,
-        type: item.api_type,
-        sort_no: item.api_sortno,
-        taiku: item.api_tyku,
-        sakuteki: item.api_saku,
-        type_name: item_type[item.api_type[2]].name
-          };
+          name: item.api_name,
+          type: item.api_type,
+          sort_no: item.api_sortno,
+          taiku: item.api_tyku,
+          sakuteki: item.api_saku,
+          type_name: item_type[item.api_type[2]].name,
+        };
       }
       kcif.item_master = master;
 
@@ -4066,8 +4078,8 @@ var kcif = {
       master = {};
       for (var i = 0, item; item = mst_mission[i]; i++) {
         master[item.api_id] = {
-        name: item.api_name,
-        time: item.api_time,
+          name: item.api_name,
+          time: item.api_time,
         };
       }
       kcif.mission_master = master;

@@ -405,25 +405,21 @@ var kcif = {
 
       var tab = makeElement("div", "tab-header-main", "tab-header");
       var elem = makeElement("a", null, null, "メイン");
-      elem.setAttribute("href", "#");
       tab.appendChild(elem);
       tabs.appendChild(tab);
 
       tab = makeElement("div", "tab-header-ships", "tab-header");
       elem = makeElement("a", null, null, "艦娘");
-      elem.setAttribute("href", "#");
       tab.appendChild(elem);
       tabs.appendChild(tab);
 
       tab = makeElement("div", "tab-header-items", "tab-header");
       elem = makeElement("a", null, null, "装備");
-      elem.setAttribute("href", "#");
       tab.appendChild(elem);
       tabs.appendChild(tab);
 
       tab = makeElement("div", "tab-header-config", "tab-header");
       elem = makeElement("a", null, null, "設定");
-      elem.setAttribute("href", "#");
       tab.appendChild(elem);
       tabs.appendChild(tab);
 
@@ -1464,37 +1460,31 @@ var kcif = {
 
     var td = makeElement("th", null, "ship-no th-right");
     var elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("no") ? ' sort-current' : ''), "#");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 
     td = makeElement("th", null, "ship-type");
     elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("type") ? ' sort-current' : ''), "艦種");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 
     td = makeElement("th", null, "ship-name");
     elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("name") ? ' sort-current' : ''), "艦名");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 
     td = makeElement("th", null, "ship-level th-right");
     elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("level") ? ' sort-current' : ''), "LV");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 
     td = makeElement("th", null, "ship-header-hp" + (kcif.getHpByMeter() ? '' : ' th-right'));
     elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("hp") ? ' sort-current' : ''), "耐久");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 
     td = makeElement("th", null, "ship-cond th-right");
     elem = makeElement("a", null, "list-header" + (kcif.sort_ships.startsWith("cond") ? ' sort-current' : ''), "疲労");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 
@@ -1604,37 +1594,31 @@ var kcif = {
 
     var td = makeElement("th", null, "item-no th-right");
     var elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("no") ? ' sort-current' : ''), "#");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 
     td = makeElement("th", null, "item-type");
     elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("type") ? ' sort-current' : ''), "種別");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 
     td = makeElement("th", null, "item-name");
     elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("name") ? ' sort-current' : ''), "名称");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 
     td = makeElement("th", null, "item-level th-right");
     elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("level") ? ' sort-current' : ''), "改修");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 
     td = makeElement("th", null, "item-alv th-right");
     elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("alv") ? ' sort-current' : ''), "熟練");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 
     td = makeElement("th", null, "ship-name");
     elem = makeElement("a", null, "list-header" + (kcif.sort_items.startsWith("holder") ? ' sort-current' : ''), "所在");
-    elem.setAttribute("href", "#");
     td.appendChild(elem);
     tr.appendChild(td);
 

@@ -2507,6 +2507,7 @@ var kcif = {
           title = '改造後 ' + kcif.ship_master[ship.aftershipid].name + '(' + kcif.type2str(kcif.ship_master[ship.aftershipid].type) + ')';
         }
         else {
+          col = "color-yellow";
           title = 'LV' + ship.afterlv + ' ' + kcif.ship_master[ship.aftershipid].name + '(' + kcif.type2str(kcif.ship_master[ship.aftershipid].type) + ')';
         }
       }

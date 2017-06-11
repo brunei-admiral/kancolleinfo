@@ -365,12 +365,13 @@ JUST.testCase({
     var ship = {
       p_level: 1,
       level: 1,
-      afterlv: 3,
-      aftershipid: 100,
     };
-    assertMatch(/^<td class="ship-level(?: color-default)?" title="LV3 .*?">1<\/td>$/, kcif.shipLevel(ship).outerHTML);
+    assertMatch(/^<td class="ship-level(?: color-default)?">1<\/td>$/, kcif.shipLevel(ship).outerHTML);
+    ship.afterlv = 3;
+    ship.aftershipid = 100;
+    assertMatch(/^<td class="ship-level color-yellow" title="LV3 .*?">1<\/td>$/, kcif.shipLevel(ship).outerHTML);
     ship.level = 2;
-    assertMatch(/^<td class="ship-level(?: color-default)? blink" title="LV3 .*?">2<\/td>$/, kcif.shipLevel(ship).outerHTML);
+    assertMatch(/^<td class="ship-level color-yellow blink" title="LV3 .*?">2<\/td>$/, kcif.shipLevel(ship).outerHTML);
     ship.p_level = 3;
     ship.level = 3;
     assertMatch(/^<td class="ship-level color-green" title="改造後 テスト100\(駆逐\)">3<\/td>$/, kcif.shipLevel(ship).outerHTML);

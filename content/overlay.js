@@ -3402,12 +3402,16 @@ var kcif = {
             ship_id: json.api_data.api_ship_ke[i + 1],
             hp: json.api_data.api_nowhps[i + 7],
             hp_max: json.api_data.api_maxhps[i + 7],
+            level: json.api_data.api_ship_lv[i + 1],
           };
           var mst = kcif.ship_master[enemies[i].ship_id];
           if (mst) {
             enemies[i].name = mst.name;
             if (!mst.sort_no && mst.yomi != "-") {
               enemies[i].name += mst.yomi;
+            }
+            else if (kcif.isOnPractice(kcif.mission[deck_id - 1])) {
+              enemies[i].name += " LV" + enemies[i].level;
             }
           }
         }
@@ -3417,12 +3421,16 @@ var kcif = {
               ship_id: json.api_data.api_ship_ke_combined[i + 1],
               hp: json.api_data.api_nowhps_combined[i + 7],
               hp_max: json.api_data.api_maxhps_combined[i + 7],
+              level: json.api_data.api_ship_lv_combined[i + 1],
             };
             var mst = kcif.ship_master[enemies[i+6].ship_id];
             if (mst) {
               enemies[i+6].name = mst.name;
               if (!mst.sort_no && mst.yomi != "-") {
                 enemies[i+6].name += mst.yomi;
+              }
+              else if (kcif.isOnPractice(kcif.mission[deck_id - 1])) {
+                enemies[i].name += " LV" + enemies[i].level;
               }
             }
           }

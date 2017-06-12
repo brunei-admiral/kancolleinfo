@@ -3406,7 +3406,7 @@ var kcif = {
           var mst = kcif.ship_master[enemies[i].ship_id];
           if (mst) {
             enemies[i].name = mst.name;
-            if (mst.sort_no == 0 && mst.yomi != "-") {
+            if (!mst.sort_no && mst.yomi != "-") {
               enemies[i].name += mst.yomi;
             }
           }
@@ -3421,7 +3421,7 @@ var kcif = {
             var mst = kcif.ship_master[enemies[i+6].ship_id];
             if (mst) {
               enemies[i+6].name = mst.name;
-              if (mst.sort_no == 0 && mst.yomi != "-") {
+              if (!mst.sort_no && mst.yomi != "-") {
                 enemies[i+6].name += mst.yomi;
               }
             }

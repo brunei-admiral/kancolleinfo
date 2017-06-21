@@ -3894,18 +3894,28 @@ var kcif = {
     }
     else if (url.indexOf("nyukyo/start") != -1) {
       var ship = kcif.ship_list[Number(query["api_ship_id"])];
-      if (ship && Number(query["api_highspeed"])) {
-        ship.p_hp = ship.hp;
-        ship.hp = ship.hp_max;
-        if (ship.cond < 40) {
-          ship.p_cond = ship.cond;
-          ship.cond = 40;
+      if (ship) {
+        if (Number(query["api_highspeed"])) {
+          ship.p_hp = ship.hp;
+          ship.hp = ship.hp_max;
+          if (ship.cond < 40) {
+            ship.p_cond = ship.cond;
+            ship.cond = 40;
+          }
+          kcif.material[5]--;
         }
-        kcif.material[5]--;
-      }
-      if (ship.ndock_item) {
-        kcif.material[0] -= ship.ndock_item[0];
-        kcif.material[2] -= ship.ndock_item[1];
+        else {
+          var dock_id = Number(query["api_ndock_id"]);
+          kcif.dock[dock_id - 1] = {
+            api_id: dock_id,
+            api_ship_id: ship.api_id,
+            api_complete_time: 0,
+          };
+        }
+        if (ship.ndock_item) {
+          kcif.material[0] -= ship.ndock_item[0];
+          kcif.material[2] -= ship.ndock_item[1];
+        }
       }
       log("nyukyo");
     }

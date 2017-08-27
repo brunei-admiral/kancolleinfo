@@ -3192,17 +3192,15 @@ var kcif = {
     for (var i = 1, t_list; t_list = taisen.api_df_list[i]; i++) {
       for (var j = 0, target; target = t_list[j]; j++) {
         var damage = Math.floor(taisen.api_damage[i][j]);
-        if (target >= 1 && target <= 6) {
-          var id = deck.api_ship[target - 1];
-          log("    fleet " + deck.api_id + " ship " + target + "(" + String(id) + ") damaged " + damage);
-          var ship = kcif.ship_list[id];
-          kcif.reflectDamage(kcif.battle_result[0], target - 1 + offset, ship, damage);
+        if (enemies[6]) {
+          target -= 1;
         }
-        else if (target >= 7 && target <= 12) {
-          if (enemies[target - 7]) {
-            log("    enemy " + (target - 6) + " damaged " + damage);
-            kcif.reflectDamage(kcif.battle_result[1], target - 7, enemies[target - 7], damage);
-          }
+        else {
+          target -= 7;
+        }
+        if (enemies[target]) {
+          log("    enemy " + (target + 1) + " damaged " + damage);
+          kcif.reflectDamage(kcif.battle_result[1], target, enemies[target], damage);
         }
       }
     }

@@ -166,6 +166,46 @@ span.bugfix:after {
   content: "修正";
 }
 
+#modal-dialog {
+  position: fixed;
+  width: 70%;
+  margin: 1.5em auto 0;
+  padding: 10px 20px;
+  border: 2px solid red;
+  background: white;
+  z-index: 2;
+}
+
+#modal-dialog h1 {
+  font-weight: bold;
+  font-size: 24pt;
+  margin: 4px 0 4px 0;
+  padding: 4px 0 4px 0;
+  color: black;
+  text-shadow: none;
+}
+
+#modal-dialog p {
+  margin: 4px 0 0 4px;
+  padding: 4px 0 0 4px;
+}
+
+#modal-dialog .button-container {
+  text-align: center;
+  padding: 1em 0 1em 0;
+}
+
+#modal-background {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 1;
+}
+
 /* 以下、モック用 */
 #kancolle-info { width: 800px; height: 310px; margin-left: auto; margin-right: auto; color: white; background-color: black; font-size: 10pt; font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; text-align: left; }
 #kancolle-info * { font-family: Verdana, Meiryo, "游ゴシック", YuGothic, "Hiragino Kaku Gothic ProN", sans-serif; }
@@ -246,6 +286,17 @@ span.bugfix:after {
 @-moz-keyframes blink { 0% {background-color: rgba(240,208,0,0.5);} 60% {background-color: inherit;} 100% {background-color: inherit;} }
 --></style>
 <script type="application/javascript"><!--
+// 開発終了のお知らせ
+function showNotice() {
+  // 表示
+  let elem = document.querySelector('#modal-background');
+  elem.style.display = 'block';
+
+  elem = document.querySelector('#modal-dialog');
+  elem.style.left = `${(window.innerWidth - elem.offsetWidth) / 2}px`;
+  elem.style.top = `${(window.innerHeight - h) / elem.offsetHeight}px`;
+}
+
 // 表示内容生成
 function fuel2meter(now, max) {
   var status = "";
@@ -1066,6 +1117,24 @@ kancolleinfoのソースコードは<a href="https://github.com/brunei-admiral/k
 <p class="footer">
 by <a href="https://twitter.com/brunei_admiral">ブルネイ泊地のとある提督</a>
 </p>
+
+<div id="modal-background">
+  <div id="modal-dialog">
+    <h1>kancolleinfo開発終了のお知らせ</h1>
+    <p>
+    2017年11月14日に公開予定のFirefox 57 (Quantum)では、従来のアドオン用のAPIが削除されます。
+    kancolleinfoでは、代替として提供される新APIへの対応を行っていましたが、Flash使用時には一部の必須APIが機能せず、Firefox側からは、今後Flashのサポートを打ち切っていく計画からこれに対応する予定は一切ない、という回答を得ました。
+    よって、kancolleinfoがFirefox 57以降に対応することは技術的に不可能ということが確定しましたので、残念ながら、これで開発を終了します。
+    </p>
+    <p>
+    2018年6月26日まで存続予定のFirefox Extended Support Release 52においては依然としてkancolleinfoは動作可能と思われますが、あと半年程度延命させてもさほど意味はないと思われますので、Firefox 57リリース以降の艦これ側の仕様変更への追従も行う予定はありません。
+    </p>
+    <p>
+    ユーザーの皆様におかれましては、長らくのご愛顧、ありがとうございました。
+    </p>
+    <div class="button-container"><button onClick="document.querySelector('#modal-background').style.display = 'none';">閉じる</button></div>
+  </div>
+</div>
 <script type="application/javascript"><!--
 var kcif = {
   info_div: null,
@@ -1215,6 +1284,8 @@ for (var i = 0; i < elems.length; i++) {
     elem.innerHTML = fuel2meter(fnow, fmax) + fuel2meter(bnow, bmax);
   }
 }
+
+showNotice();
 //--></script>
 </body>
 </html>

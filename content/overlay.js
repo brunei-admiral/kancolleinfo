@@ -3008,6 +3008,9 @@ var kcif = {
       case 5:
         s += "単横陣";
         break;
+      case 6:
+        s += "警戒陣";
+        break;
       case 11:
         s += "第一(対潜警戒)";
         break;
@@ -3087,8 +3090,8 @@ var kcif = {
         var damage_list = kouku.api_fdam;
         var id_list = deck.api_ship;
         for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
-          if (damage_list[i + 1] >= 0 && (kouku.api_frai_flag[i + 1] > 0 || kouku.api_fbak_flag[i + 1] > 0)) {
-            var damage = Math.floor(damage_list[i + 1]);
+          if (damage_list[i] >= 0 && (kouku.api_frai_flag[i] > 0 || kouku.api_fbak_flag[i] > 0)) {
+            var damage = Math.floor(damage_list[i]);
             log("    fleet " + deck.api_id + " ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
             var ship = kcif.ship_list[id];
             kcif.reflectDamage(kcif.battle_result[0], i + offset, ship, damage);
@@ -3100,8 +3103,8 @@ var kcif = {
         var damage_list = kouku.api_edam;
         for (var i = 0; i < 6; i++) {
           if (enemies[i + offset]) {
-            if (damage_list[i + 1] >= 0 && (kouku.api_erai_flag[i + 1] > 0 || kouku.api_ebak_flag[i + 1] > 0)) {
-              var damage = Math.floor(damage_list[i + 1]);
+            if (damage_list[i] >= 0 && (kouku.api_erai_flag[i] > 0 || kouku.api_ebak_flag[i] > 0)) {
+              var damage = Math.floor(damage_list[i]);
               log("    enemy " + (i + offset + 1) + " damaged " + damage);
               kcif.reflectDamage(kcif.battle_result[1], i + offset, enemies[i + offset], damage);
             }
@@ -3115,8 +3118,8 @@ var kcif = {
     var damage_list = raigeki.api_fdam;
     var id_list = deck.api_ship;
     for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
-      if (damage_list[i + 1] >= 0 && raigeki.api_erai.indexOf(i + 1) != -1) {
-        var damage = Math.floor(damage_list[i + 1]);
+      if (damage_list[i] >= 0 && raigeki.api_erai.indexOf(i) != -1) {
+        var damage = Math.floor(damage_list[i]);
         log("    fleet " + deck.api_id + " ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
         var ship = kcif.ship_list[id];
         kcif.reflectDamage(kcif.battle_result[0], i, ship, damage);
@@ -3125,8 +3128,8 @@ var kcif = {
     if (deck2) {
       id_list = deck2.api_ship;
       for (var i = 0, id; (id = id_list[i]) && id != -1; i++) {
-        if (damage_list[i + 7] >= 0 && raigeki.api_erai.indexOf(i + 7) != -1) {
-          var damage = Math.floor(damage_list[i + 7]);
+        if (damage_list[i + 6] >= 0 && raigeki.api_erai.indexOf(i + 6) != -1) {
+          var damage = Math.floor(damage_list[i + 6]);
           log("    fleet " + deck2.api_id + " ship " + (i + 1) + "(" + String(id) + ") damaged " + damage);
           var ship = kcif.ship_list[id];
           kcif.reflectDamage(kcif.battle_result[0], i, ship, damage);
@@ -3137,8 +3140,8 @@ var kcif = {
     damage_list = raigeki.api_edam;
     for (var i = 0; i < 12; i++) {
       if (enemies[i]) {
-        if (damage_list[i + 1] >= 0 && raigeki.api_frai.indexOf(i + 1) != -1) {
-          var damage = Math.floor(damage_list[i + 1]);
+        if (damage_list[i] >= 0 && raigeki.api_frai.indexOf(i) != -1) {
+          var damage = Math.floor(damage_list[i]);
           log("    enemy " + (i + 1) + " damaged " + damage);
           kcif.reflectDamage(kcif.battle_result[1], i, enemies[i], damage);
         }
@@ -3147,66 +3150,50 @@ var kcif = {
   },
 
   damageHougeki: function(deck, enemies, hougeki, e_offset, deck2) {
+    if (!hougeki.api_df_list) {
+        return;
+    }
+
     if (!e_offset) {
       e_offset = 0;
     }
-    for (var i = 1, t_list; t_list = hougeki.api_df_list[i]; i++) {
-      for (var j = 0, target; target = t_list[j]; j++) {
+    for (var i = 0, t_list; t_list = hougeki.api_df_list[i]; i++) {
+      for (var j = 0; j < t_list.length; j++) {
+        var target = t_list[j];
         var damage = Math.floor(hougeki.api_damage[i][j]);
         var eflag = -1;
         if (hougeki.api_at_eflag) {
           eflag = hougeki.api_at_eflag[i];
         }
 
-        if (eflag == 1 || (eflag == -1 && target >= 1 && target <= 6)) {
+        if (eflag == 1 || (eflag == -1 && target >= 0 && target < 6)) {
           var id;
           if (target <= 6) {
-            id = deck.api_ship[target - 1];
-            log("    fleet " + deck.api_id + " ship " + target + "(" + String(id) + ") damaged " + damage);
+            id = deck.api_ship[target];
+            log("    fleet " + deck.api_id + " ship " + (target+1) + "(" + String(id) + ") damaged " + damage);
           }
           else {
-            id = deck2.api_ship[target - 7];
-            log("    fleet " + deck2.api_id + " ship " + (target-6) + "(" + String(id) + ") damaged " + damage);
+            id = deck2.api_ship[target - 6];
+            log("    fleet " + deck2.api_id + " ship " + (target-6+1) + "(" + String(id) + ") damaged " + damage);
           }
           var ship = kcif.ship_list[id];
-          kcif.reflectDamage(kcif.battle_result[0], target - 1, ship, damage);
+          kcif.reflectDamage(kcif.battle_result[0], target, ship, damage);
         }
         else {
           if (eflag == -1) {
             target -= 6;
           }
-          if (enemies[target - 1]) {
-            log("    enemy " + (target + e_offset) + " damaged " + damage);
-            kcif.reflectDamage(kcif.battle_result[1], target - 1, enemies[target - 1 + e_offset], damage);
+          if (enemies[target]) {
+            log("    enemy " + (target + e_offset + 1) + " damaged " + damage);
+            kcif.reflectDamage(kcif.battle_result[1], target, enemies[target + e_offset], damage);
           }
-        }
-      }
-    }
-  },
-
-  damageTaisen: function(deck, enemies, taisen, offset) {
-    if (!offset) {
-      offset = 0;
-    }
-
-    for (var i = 1, t_list; t_list = taisen.api_df_list[i]; i++) {
-      for (var j = 0, target; target = t_list[j]; j++) {
-        var damage = Math.floor(taisen.api_damage[i][j]);
-        if (enemies[6]) {
-          target -= 1;
-        }
-        else {
-          target -= 7;
-        }
-        if (enemies[target]) {
-          log("    enemy " + (target + 1) + " damaged " + damage);
-          kcif.reflectDamage(kcif.battle_result[1], target, enemies[target], damage);
         }
       }
     }
   },
 
   judgeBattleResult: function(friends, enemies, myresult, eresult) {
+    log("result");
     var fcount = 0;
     var fsunks = 0;
     var fall = 0;
@@ -3233,7 +3220,7 @@ var kcif = {
       if (enemies[i].hp <= 0 && eresult[i] > 0) {
         esunks++;
       }
-      else if (enemies[i].hp <= 0 && eresult[i] <= 0) {
+      else if (typeof enemies[i].hp == "undefined" || (enemies[i].hp <= 0 && eresult[i] <= 0)) {
         break;
       }
       ecount++;
@@ -3286,6 +3273,7 @@ var kcif = {
   },
 
   judgeLdBattleResult: function(friends, myresult) {
+    log("result");
     var fall = 0;
     var fdmg = 0;
     for (var i = 0; i < 12; i++) {
@@ -3394,13 +3382,13 @@ var kcif = {
 
       // enemies
       var enemies = [];
-      if (json.api_data.api_nowhps && json.api_data.api_maxhps) {
+      if (json.api_data.api_e_nowhps && json.api_data.api_e_maxhps) {
         for (var i = 0; i < 6; i++) {
           enemies[i] = {
-            ship_id: json.api_data.api_ship_ke[i + 1],
-            hp: json.api_data.api_nowhps[i + 7],
-            hp_max: json.api_data.api_maxhps[i + 7],
-            level: json.api_data.api_ship_lv[i + 1],
+            ship_id: json.api_data.api_ship_ke[i],
+            hp: json.api_data.api_e_nowhps[i],
+            hp_max: json.api_data.api_e_maxhps[i],
+            level: json.api_data.api_ship_lv[i],
           };
           var mst = kcif.ship_master[enemies[i].ship_id];
           if (mst) {
@@ -3509,10 +3497,10 @@ var kcif = {
             log("  opening taisen");
             if (url.indexOf("combined") != -1 && url.indexOf("water") == -1 && url.indexOf("ec_") == -1) {
               // must be 2nd fleet
-              kcif.damageTaisen(kcif.deck_list[1], enemies, json.api_data.api_opening_taisen, 6);
+              kcif.damageHougeki(kcif.deck_list[1], enemies, json.api_data.api_opening_taisen, 6);
             }
             else {
-              kcif.damageTaisen(deck, enemies, json.api_data.api_opening_taisen);
+              kcif.damageHougeki(deck, enemies, json.api_data.api_opening_taisen);
             }
           }
           if (json.api_data.api_opening_atack) {

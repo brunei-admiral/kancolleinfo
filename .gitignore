@@ -3,5 +3,6 @@ memo.txt
 npm-debug.log
 old
 test.html
+*.bak
 *.xpi
 *.zip

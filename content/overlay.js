@@ -236,6 +236,14 @@ var kcif = {
 
   unload: function() {
     log("unload");
+    if (kcif.timer) {
+      clearTimeout(kcif.timer);
+      kcif.timer = null;
+    }
+    if (kcif.beep) {
+      kcif.beep.pause();
+      kcif.beep = null;
+    }
     if (kcif.info_div) {
       log("  remove info_div");
       kcif.info_div.parentNode.removeChild(kcif.info_div);

@@ -676,8 +676,14 @@ var kcif = {
       elem = makeElement("option", null, null, "秋簡易式");
       elem.value = "3";
       select.appendChild(elem);
-      elem = makeElement("option", null, null, "判定式(33)");
+      elem = makeElement("option", null, null, "判定式(33) 係数1");
       elem.value = "4";
+      select.appendChild(elem);
+      elem = makeElement("option", null, null, "判定式(33) 係数3");
+      elem.value = "6";
+      select.appendChild(elem);
+      elem = makeElement("option", null, null, "判定式(33) 係数4");
+      elem.value = "7";
       select.appendChild(elem);
       select.selectedIndex = kcif.getSearchFormula();
       td.appendChild(select);
@@ -1025,7 +1031,9 @@ var kcif = {
         var sakuteki1 = 0;
         var sakuteki1i = 0;
         var sakuteki2 = 0;
-        var sakuteki3 = 0;
+        var sakuteki31 = 0;
+        var sakuteki33 = 0;
+        var sakuteki34 = 0;
         var ndock = [];
         var damage = [];
         for (var j = 0; j < 6; j++) {
@@ -1131,7 +1139,9 @@ var kcif = {
               var s_sakuteki = 0;
               var s_sakuteki1 = 0;
               var s_sakuteki2 = 0;
-              var s_sakuteki3 = 0;
+              var s_sakuteki31 = 0;
+              var s_sakuteki33 = 0;
+              var s_sakuteki34 = 0;
               for (var k = 0; ship.slot && k < 5; k++) {
                 if (ship.slot[k] < 0) {
                   break;
@@ -1171,7 +1181,9 @@ var kcif = {
                   s_sakuteki += kcif.calcSakuteki(item, 3);
                   s_sakuteki1 += kcif.calcSakuteki(item, 1);
                   s_sakuteki2 += kcif.calcSakuteki(item, 2);
-                  s_sakuteki3 += kcif.calcSakuteki(item, 4);
+                  s_sakuteki31 += kcif.calcSakuteki(item, 4);
+                  s_sakuteki33 += kcif.calcSakuteki(item, 4) * 3;
+                  s_sakuteki34 += kcif.calcSakuteki(item, 4) * 4;
                 }
               }
               if (drum_num > 0) {
@@ -1182,21 +1194,29 @@ var kcif = {
               }
               s_sakuteki += Math.sqrt(s_base);
               s_sakuteki2 += Math.sqrt(s_base) * 1.6841056;
-              s_sakuteki3 += Math.sqrt(s_base);
+              s_sakuteki31 += Math.sqrt(s_base);
+              s_sakuteki33 += Math.sqrt(s_base);
+              s_sakuteki34 += Math.sqrt(s_base);
               sakuteki += Math.floor(s_sakuteki);
               sakuteki0 += ship.sakuteki;
               sakuteki1 += s_base;
               sakuteki1i += s_sakuteki1;
               sakuteki2 += s_sakuteki2;
-              sakuteki3 += s_sakuteki3;
+              sakuteki31 += s_sakuteki31;
+              sakuteki33 += s_sakuteki33;
+              sakuteki34 += s_sakuteki34;
             }
           }
         }
         sakuteki -= Math.floor(0.4 * kcif.admiral_level);
         sakuteki1 = Math.floor(Math.sqrt(sakuteki1)) + sakuteki1i;
         sakuteki2 -= Math.ceil((kcif.admiral_level) / 5) * 5.0 * 0.6142467;
-        sakuteki3 -= Math.ceil(0.4 * kcif.admiral_level);
-        sakuteki3 += 2 * (6 - ships.length);
+        sakuteki31 -= Math.ceil(0.4 * kcif.admiral_level);
+        sakuteki31 += 2 * (6 - ships.length);
+        sakuteki33 -= Math.ceil(0.4 * kcif.admiral_level);
+        sakuteki33 += 2 * (6 - ships.length);
+        sakuteki34 -= Math.ceil(0.4 * kcif.admiral_level);
+        sakuteki34 += 2 * (6 - ships.length);
 
         if (s && (!kcif.isCombined(mission) || kcif.mission[0])) {
           elem = makeElement("span", null, col, "[");
@@ -1294,8 +1314,14 @@ var kcif = {
           else if (formula == 3) {
             ss = sakuteki;
           }
-          else {
-            ss = sakuteki3.toFixed(2);
+          else if (formula == 4) {
+            ss = sakuteki31.toFixed(2);
+          }
+          else if (formula == 6) {
+            ss = sakuteki33.toFixed(2);
+          }
+          else if (formula == 7) {
+            ss = sakuteki34.toFixed(2);
           }
           elem = makeElement("span", null, "color-gray", "索敵:" + ss);
           ss = "";
@@ -1312,7 +1338,13 @@ var kcif = {
             ss += '秋簡易式:' + sakuteki + "\u000a";
           }
           if (formula != 4) {
-            ss += '判定式(33):' + sakuteki3.toFixed(2) + "\u000a";
+            ss += '判定式(33) 係数1:' + sakuteki31.toFixed(2) + "\u000a";
+          }
+          if (formula != 6) {
+            ss += '判定式(33) 係数3:' + sakuteki33.toFixed(2) + "\u000a";
+          }
+          if (formula != 7) {
+            ss += '判定式(33) 係数4:' + sakuteki34.toFixed(2) + "\u000a";
           }
           elem.setAttribute("title", ss);
           s.push(makeText(" "), elem);

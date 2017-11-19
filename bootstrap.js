@@ -23,7 +23,6 @@ function load(script, root){
 
 var WindowListener = {
   onOpenWindow: function(xulWindow){
-    log("new opened xulWindow: title = " + xulWindow.title);
     let window = xulWindow.QueryInterface(Components.interfaces.nsIInterfaceRequestor).getInterface(Components.interfaces.nsIDOMWindow);
     function loadListener(){
       window.removeEventListener('load', loadListener);
@@ -93,7 +92,7 @@ function loadOverlay(xulWindow){
 }
 
 function unloadOverlay(xulWindow){
-  xulWindow.QueryInterface(Components.interfaces.nsIInterfaceRequestor).getInterface(Components.interfaces.nsIDOMWindow).document.RemoveEventListener("DOMContentLoaded", kcif.onLoad, false);
+  xulWindow.QueryInterface(Components.interfaces.nsIInterfaceRequestor).getInterface(Components.interfaces.nsIDOMWindow).document.removeEventListener("DOMContentLoaded", kcif.onLoad, false);
 
   let browser = xulWindow.gBrowser;
   for (let i = 0; i < browser.browsers.length; i++) {

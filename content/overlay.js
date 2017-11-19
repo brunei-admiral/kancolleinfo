@@ -434,6 +434,9 @@ var kcif = {
       tab = makeElement("div", "base-info");
       elem = makeElement("button", "capture", null, "画面キャプチャ");
       tab.appendChild(elem);
+      elem = makeElement("button", "reload", null, "R");
+      elem.setAttribute("title", "リロード");
+      tab.appendChild(elem);
       tabs.appendChild(tab);
 
       base.appendChild(tabs);
@@ -722,6 +725,12 @@ var kcif = {
         }, false);
       }
 
+      // リロードボタン
+      var elem = base.querySelector("#reload");
+      if (elem) {
+        elem.addEventListener("click", kcif.reload, false);
+      }
+
       // タブ
       var elems = kcif.info_div.querySelectorAll(".tab-header a");
       for (var i = 0; i < elems.length; i++) {
@@ -868,11 +877,19 @@ var kcif = {
       base.appendChild(elem);
       elem = makeElement("button", "capture", null, "画面キャプチャ");
       base.appendChild(elem);
+      elem = makeElement("button", "reload", null, "R");
+      base.appendChild(elem);
 
       // ベース:キャプチャボタン
       var elem = base.querySelector("#capture");
       if (elem) {
         elem.addEventListener("click", kcif.captureAndSave, false);
+      }
+
+      // ベース:リロードボタン
+      var elem = base.querySelector("#reload");
+      if (elem) {
+        elem.addEventListener("click", kcif.reload, false);
       }
 
       // メイン
@@ -2281,6 +2298,14 @@ var kcif = {
       var filename = dir + kcif.getPathSeparator() + base + s + ".png";
       kcif.saveFile(blob, filename);
     }, "image/png");
+  },
+
+  reload: function(evt) {
+    if (evt) evt.preventDefault();
+
+    if (kcif.window.confirm("本当にリロードしますか？")) {
+      kcif.document.location.reload();
+    }
   },
 
   time2str: function(dt) {

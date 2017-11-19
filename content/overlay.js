@@ -1036,7 +1036,10 @@ var kcif = {
         var sakuteki34 = 0;
         var ndock = [];
         var damage = [];
-        for (var j = 0; j < 6; j++) {
+        for (var j = 0; j < 7; j++) {
+          if (j >= 6 && i != 2) { /* 第3艦隊のみ7隻可能 */
+            break;
+          }
           tr = makeElement("tr");
           var id = deck ? deck.api_ship[j] : -1
           if (id === -1 || id == null) {
@@ -2790,15 +2793,18 @@ var kcif = {
       if (!deck.api_ship) {
         continue;
       }
-      for (var j = 0; j < 6; j++) {
+      for (var j = 0; j < 7; j++) {
         if (deck.api_ship[j] === -1) {
           break;
         }
         if (deck.api_ship[j] == ship_id) {
-          for (var k = j + 1; k < 6; k++) {
+          for (var k = j + 1; k < 7; k++) {
+            if (k >= 6 && i != 2) { /* 第3艦隊のみ7隻可能 */
+              break;
+            }
             deck.api_ship[k - 1] = deck.api_ship[k];
           }
-          deck.api_ship[5] = -1;
+          deck.api_ship[k - 1] = -1;
           kcif.updateRepairStart(i);
           found = true;
           break;
@@ -3231,9 +3237,9 @@ var kcif = {
           eflag = hougeki.api_at_eflag[i];
         }
 
-        if (eflag == 1 || (eflag == -1 && target >= 0 && target < 6)) {
+        if (eflag == 1 || (eflag == -1 && target >= 0 && target < 7)) {
           var id;
-          if (target <= 6) {
+          if (target <= 7) {
             id = deck.api_ship[target];
             log("    fleet " + deck.api_id + " ship " + (target+1) + "(" + String(id) + ") damaged " + damage);
           }
@@ -4183,7 +4189,7 @@ var kcif = {
       var ship_id = Number(query["api_ship_id"]);
       log("changed (deck:" + deck_id + ", idx:" + idx + ", ship:" + ship_id + ", prev:" + deck.api_ship[idx] + ")");
       if (ship_id == -2) {
-        for (var i = 1; i < 6; i++) {
+        for (var i = 1; i < 7; i++) {
           deck.api_ship[i] = -1;
         }
         kcif.updateRepairStart(deck_id - 1);
@@ -4242,7 +4248,7 @@ var kcif = {
     else if (url.indexOf("goback_port") != -1) {
       var ship1 = null, ship2 = null;
       for (var i = 0, deck; i < 2 && (deck = kcif.deck_list[i]); i++) {
-        for (var j = 1, ship; j < 6 && (ship = kcif.ship_list[deck.api_ship[j]]); j++) {
+        for (var j = 1, ship; j < 7 && (ship = kcif.ship_list[deck.api_ship[j]]); j++) {
           if (!ship1 && !ship.taihi && ship.hp <= ship.hp_max / 4) {
             ship1 = ship;
           }

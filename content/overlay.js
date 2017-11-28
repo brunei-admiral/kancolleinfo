@@ -176,7 +176,7 @@ var kcifHttpObserver = {
 
     var httpChannel = aSubject.QueryInterface(Components.interfaces.nsIHttpChannel);
     var path = httpChannel.URI.path;
-    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material|require_info)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset(_ex)?|unsetslot_all|slot_(exchange_index|deprive))|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select|combined)|api_req_sortie\/((ld_)?air)?battle(result)?|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((ec_|each_)?((ld_)?air|midnight_)?battle(_water)?(result)?|sp_midnight|ec_night_to_day|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
+    if (path.match(/\/kcsapi\/(api_start2|api_get_member\/(ship[23]|basic|record|deck|ship_deck|kdock|ndock|slot_item|material|require_info)|api_port\/port|api_req_kousyou\/(createship(_speedchange)|getship|destroyship|createitem|destroyitem2|remodel_slot)|api_req_nyukyo\/(start|speedchange)|api_req_kaisou\/(powerup|slotset(_ex)?|unsetslot_all|slot_(exchange_index|deprive))|api_req_hokyu\/charge|api_req_hensei\/(change|preset_select|combined)|api_req_sortie\/(((ld_)?air)?battle(result)?|goback_port)|api_req_battle_midnight\/(battle|sp_midnight)|api_req_combined_battle\/((ec_|each_)?((ld_)?air|midnight_)?battle(_water)?(result)?|sp_midnight|ec_night_to_day|goback_port)|api_req_practice\/(midnight_)?battle|api_req_map\/(start|next))$/)) {
       log("create TracingListener: " + path);
       var newListener = new TracingListener();
       aSubject.QueryInterface(Components.interfaces.nsITraceableChannel);
@@ -3228,6 +3228,9 @@ var kcif = {
     for (var i = 0, t_list; t_list = hougeki.api_df_list[i]; i++) {
       for (var j = 0; j < t_list.length; j++) {
         var target = t_list[j];
+        if (target < 0) {
+          continue;
+        }
         var damage = Math.floor(hougeki.api_damage[i][j]);
         var eflag = -1;
         if (hougeki.api_at_eflag) {
@@ -4215,20 +4218,31 @@ var kcif = {
       }
     }
     else if (url.indexOf("goback_port") != -1) {
-      var ship1 = null, ship2 = null;
-      for (var i = 0, deck; i < 2 && (deck = kcif.deck_list[i]); i++) {
-        for (var j = 1, ship; j < 7 && (ship = kcif.ship_list[deck.api_ship[j]]); j++) {
-          if (!ship1 && !ship.taihi && ship.hp <= ship.hp_max / 4) {
-            ship1 = ship;
-          }
-          else if (i == 1 && !ship2 && !ship.taihi && ship.type == 2 && ship.hp > ship.hp_max * 3 / 4) {
-            ship2 = ship;
+      if (url.indexOf("combined") != -1) { // 連合艦隊退避
+        var ship1 = null, ship2 = null;
+        for (var i = 0, deck; i < 2 && (deck = kcif.deck_list[i]); i++) {
+          for (var j = 1, ship; j < 7 && (ship = kcif.ship_list[deck.api_ship[j]]); j++) {
+            if (!ship1 && !ship.taihi && ship.hp <= ship.hp_max / 4) {
+              ship1 = ship;
+            }
+            else if (i == 1 && !ship2 && !ship.taihi && ship.type == 2 && ship.hp > ship.hp_max * 3 / 4) {
+              ship2 = ship;
+            }
           }
         }
+        if (ship1 && ship2) {
+          ship1.taihi = true;
+          ship2.taihi = true;
+        }
       }
-      if (ship1 && ship2) {
-        ship1.taihi = true;
-        ship2.taihi = true;
+      else { // 遊撃部隊単艦退避
+        var deck = kcif.deck_list[2]; // 第3艦隊決め打ち
+        for (var i = 0, ship; i <= 7 && (ship = kcif.ship_list[deck.api_ship[i]]); i++) {
+          if (!ship.taihi && ship.hp <= ship.hp_max / 4) {
+            ship.taihi = true;
+            break;
+          }
+        }
       }
     }
     else if (url.indexOf("battleresult") != -1) {

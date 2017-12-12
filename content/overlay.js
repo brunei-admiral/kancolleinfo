@@ -3855,22 +3855,32 @@ var kcif = {
       update_all = false;
     }
     else if (url.indexOf("/destroyship") != -1) {
-      var id = query.api_ship_id;
-      var ship = kcif.ship_list[id];
-      if (ship) {
-        var slots = ship.slot;
-        for (var i = 0, slot; (slot = slots[i]) && slot >= 0; i++) {
-          delete kcif.item_list[slot];
+      var ids = query.api_ship_id.split(",");
+        for (var i = 0; i < ids.length; i++) {
+          var id = ids[i];
+          var ship = kcif.ship_list[id];
+          if (ship) {
+            var slots = ship.slot;
+            if (Number(query.api_slot_dest_flag)) {
+              for (var j = 0, slot; (slot = slots[j]) && slot >= 0; j++) {
+                delete kcif.item_list[slot];
+              }
+              kcif.item_num -= slots.filter(function(e){return e >= 0;}).length;
+            }
+            else {
+              for (var j = 0, slot; (slot = slots[j]) && slot >= 0; j++) {
+                kcif.item_list[slot].ship_id = -1;
+              }
+            }
+            kcif.removeFromDeck(Number(id));
+            delete kcif.ship_list[id];
+          }
+          kcif.ship_num--;
         }
-        kcif.item_num -= slots.filter(function(e){return e >= 0;}).length;
-        kcif.removeFromDeck(Number(id));
-        delete kcif.ship_list[id];
-      }
-      kcif.ship_num--;
-      for (var i = 0; i < json.api_data.api_material.length; i++) {
-        kcif.material[i] = json.api_data.api_material[i];
-      }
-      log("destroyship: " + String(kcif.ship_num) + " ships, " + String(kcif.item_num) + " items");
+        for (var i = 0; i < json.api_data.api_material.length; i++) {
+          kcif.material[i] = json.api_data.api_material[i];
+        }
+        log("destroyship: " + String(kcif.ship_num) + " ships, " + String(kcif.item_num) + " items");
     }
     else if (url.indexOf("/createitem") != -1) {
       if (json.api_data.api_create_flag > 0) {

@@ -3192,7 +3192,7 @@ var kcif = {
       if (raigeki.api_erai.indexOf(i) != -1) {
         var damage = Math.floor(damage_list[i]);
         var id;
-        if (deck2 && i >= 6) {
+        if (deck.api_id == 1 && deck2 && i >= 6) {
           id = deck2.api_ship[i - 6];
           log("    fleet " + deck2.api_id + " ship " + (i-6 + 1) + "(" + String(id) + ") damaged " + damage);
         }
@@ -3239,7 +3239,7 @@ var kcif = {
 
         if (eflag == 1) {
           var id;
-          if (!deck2 || target < 6) {
+          if (deck.api_id == 3 || !deck2 || target < 6) {
             id = deck.api_ship[target];
             log("    fleet " + deck.api_id + " ship " + (target+1) + "(" + String(id) + ") damaged " + damage);
           }
@@ -3392,6 +3392,76 @@ var kcif = {
     return ships;
   },
 
+  airAttack: function(url, json, deck, enemies) {
+    if (json.api_data.api_injection_kouku) {
+      log("  injection kouku");
+      kcif.damageKouku(deck, enemies, json.api_data.api_injection_kouku.api_stage3);
+      if (url.indexOf("combined") != -1 && json.api_data.api_injection_kouku.api_stage3_combined) {
+        var kdeck = deck;
+        if (url.indexOf("ec_") == -1) {
+          // must be 2nd fleet
+          log("  kouku (2nd)");
+          kdeck = kcif.deck_list[1];
+        }
+        kcif.damageKouku(kdeck, enemies, json.api_data.api_injection_kouku.api_stage3_combined, 6);
+      }
+    }
+    if (json.api_data.api_air_base_attack) { // air base attack
+      for (var j = 0, kouku; kouku = json.api_data.api_air_base_attack[j]; j++) {
+        log("  air base attack " + (j+1));
+        kcif.damageKouku(deck, enemies, kouku.api_stage3);
+        if (url.indexOf("combined") != -1 && kouku.api_stage3_combined) {
+          kcif.damageKouku(deck, enemies, kouku.api_stage3_combined, 6);
+        }
+      }
+    }
+    if (json.api_data.api_kouku) {
+      log("  kouku");
+      kcif.damageKouku(deck, enemies, json.api_data.api_kouku.api_stage3);
+      if (url.indexOf("combined") != -1 && json.api_data.api_kouku.api_stage3_combined) {
+        var kdeck = deck;
+        if (url.indexOf("ec_") == -1) {
+          // must be 2nd fleet
+          log("  kouku (2nd)");
+          kdeck = kcif.deck_list[1];
+        }
+        kcif.damageKouku(kdeck, enemies, json.api_data.api_kouku.api_stage3_combined, 6);
+      }
+    }
+    if (json.api_data.api_kouku2) { // air battle
+      log("  kouku2");
+      kcif.damageKouku(deck, enemies, json.api_data.api_kouku2.api_stage3);
+      if (url.indexOf("combined") != -1 && json.api_data.api_kouku2.api_stage3_combined) {
+        var kdeck = deck;
+        if (url.indexOf("ec_") == -1) {
+          // must be 2nd fleet
+          log("  kouku2 (2nd)");
+          kdeck = kcif.deck_list[1];
+        }
+        kcif.damageKouku(kdeck, json.api_data.api_kouku2.api_stage3_combined, 6);
+      }
+    }
+  },
+
+  supportAttack: function(url, support, deck, enemies) {
+    if (support.api_support_airatack) {
+      log("  support (airatack)");
+      kcif.damageKouku(deck, enemies, support.api_support_airatack.api_stage3);
+      if (url.indexOf("combined") != -1 && support.api_support_airatack.api_stage3_combined) {
+        kcif.damageKouku(deck, enemies, kouku.api_stage3_combined, 6);
+      }
+    }
+    else if (support.api_support_hourai) {
+      log("  support (hourai)");
+      var damage = support.api_support_hourai.api_damage;
+      for (var i = 0; i < 12; i++) {
+        if (damage[i + 1] > 0 && enemies[i]) {
+          kcif.reflectDamage(kcif.battle_result[1], i, enemies[i], Math.floor(damage[i + 1]));
+        }
+      }
+    }
+  },
+
   battle: function(url, json) {
     try {
       var elem;
@@ -3491,74 +3561,17 @@ var kcif = {
       }
 
       var rank = "";
+      var n2d = url.indexOf("night_to_day") != -1;
       for (var i = 0, deck; deck = kcif.deck_list[i]; i++) {
         if (deck.api_id == deck_id) {
-          if (json.api_data.api_injection_kouku) {
-            log("  injection kouku");
-            kcif.damageKouku(deck, enemies, json.api_data.api_injection_kouku.api_stage3);
-            if (url.indexOf("combined") != -1 && json.api_data.api_injection_kouku.api_stage3_combined) {
-              var kdeck = deck;
-              if (url.indexOf("ec_") == -1) {
-                // must be 2nd fleet
-                log("  kouku (2nd)");
-                kdeck = kcif.deck_list[1];
-              }
-              kcif.damageKouku(kdeck, enemies, json.api_data.api_injection_kouku.api_stage3_combined, 6);
+          if (!n2d) {
+            kcif.airAttack(url, json, deck, enemies);
+            if (json.api_data.api_support_info) {
+              kcif.supportAttack(url, json.api_data.api_support_info, deck, enemies);
             }
           }
-          if (json.api_data.api_air_base_attack) { // air base attack
-            for (var j = 0, kouku; kouku = json.api_data.api_air_base_attack[j]; j++) {
-              log("  air base attack " + (j+1));
-              kcif.damageKouku(deck, enemies, kouku.api_stage3);
-              if (url.indexOf("combined") != -1 && kouku.api_stage3_combined) {
-                kcif.damageKouku(deck, enemies, kouku.api_stage3_combined, 6);
-              }
-            }
-          }
-          if (json.api_data.api_kouku) {
-            log("  kouku");
-            kcif.damageKouku(deck, enemies, json.api_data.api_kouku.api_stage3);
-            if (url.indexOf("combined") != -1 && json.api_data.api_kouku.api_stage3_combined) {
-              var kdeck = deck;
-              if (url.indexOf("ec_") == -1) {
-                // must be 2nd fleet
-                log("  kouku (2nd)");
-                kdeck = kcif.deck_list[1];
-              }
-              kcif.damageKouku(kdeck, enemies, json.api_data.api_kouku.api_stage3_combined, 6);
-            }
-          }
-          if (json.api_data.api_kouku2) { // air battle
-            log("  kouku2");
-            kcif.damageKouku(deck, enemies, json.api_data.api_kouku2.api_stage3);
-            if (url.indexOf("combined") != -1 && json.api_data.api_kouku2.api_stage3_combined) {
-              var kdeck = deck;
-              if (url.indexOf("ec_") == -1) {
-                // must be 2nd fleet
-                log("  kouku2 (2nd)");
-                kdeck = kcif.deck_list[1];
-              }
-              kcif.damageKouku(kdeck, json.api_data.api_kouku2.api_stage3_combined, 6);
-            }
-          }
-          if (json.api_data.api_support_info) {
-            var support = json.api_data.api_support_info;
-            if (support.api_support_airatack) {
-              log("  support (airatack)");
-              kcif.damageKouku(deck, enemies, support.api_support_airatack.api_stage3);
-              if (url.indexOf("combined") != -1 && support.api_support_airatack.api_stage3_combined) {
-                kcif.damageKouku(deck, enemies, kouku.api_stage3_combined, 6);
-              }
-            }
-            else if (support.api_support_hourai) {
-              log("  support (hourai)");
-              var damage = support.api_support_hourai.api_damage;
-              for (var i = 0; i < 12; i++) {
-                if (damage[i + 1] > 0 && enemies[i]) {
-                  kcif.reflectDamage(kcif.battle_result[1], i, enemies[i], Math.floor(damage[i + 1]));
-                }
-              }
-            }
+          if (json.api_data.api_n_support_info) {
+            kcif.supportAttack(url, json.api_data.api_n_support_info, deck, enemies);
           }
           if (json.api_data.api_opening_taisen) {
             log("  opening taisen");
@@ -3589,12 +3602,18 @@ var kcif = {
             var deck2 = deck.api_id == 3 ? null : kcif_deck_list[1];
             kcif.damageHougeki(deck, enemies, json.api_data.api_n_hougeki2, 0, deck2);
           }
+          if (n2d) {
+            kcif.airAttack(url, json, deck, enemies);
+            if (json.api_data.api_support_info) {
+              kcif.supportAttack(url, json.api_data.api_support_info, deck, enemies);
+            }
+          }
           if (json.api_data.api_hougeki1) {
             log("  hougeki1");
             var deck2 = url.indexOf("combined") == -1 ? null : kcif.deck_list[1];
             kcif.damageHougeki(deck, enemies, json.api_data.api_hougeki1, 0, deck2);
           }
-          if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && url.indexOf("each") == -1 && url.indexOf("water") == -1) {
+          if (json.api_data.api_raigeki && url.indexOf("combined") != -1 && url.indexOf("each") == -1 && url.indexOf("water") == -1 && !n2d) {
             log("  raigeki");
             kcif.damageRaigeki(deck, enemies, json.api_data.api_raigeki, kcif.deck_list[1]);
           }
@@ -3612,7 +3631,7 @@ var kcif = {
             var deck2 = url.indexOf("combined") == -1 ? null : kcif.deck_list[1];
             kcif.damageHougeki(deck, enemies, json.api_data.api_hougeki3, 0, deck2);
           }
-          if (json.api_data.api_raigeki && (url.indexOf("combined") == -1 || url.indexOf("water") != -1)) {
+          if (json.api_data.api_raigeki && (url.indexOf("combined") == -1 || url.indexOf("water") != -1 || n2d)) {
             log("  raigeki");
             var deck2 = url.indexOf("combined") == -1 ? null : kcif.deck_list[1];
             kcif.damageRaigeki(deck, enemies, json.api_data.api_raigeki, deck2);
